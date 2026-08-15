@@ -419,6 +419,21 @@ export default function PrintQualifyingExam() {
     }
   };
 
+  const handlePrint = () => {
+    try {
+      setError(null);
+
+      // Give the browser a moment to finish rendering the current preview
+      // before opening the native print dialog.
+      requestAnimationFrame(() => {
+        window.print();
+      });
+    } catch (err) {
+      console.error("Print error:", err);
+      setError(err.message || "Failed to print the exam.");
+    }
+  };
+
   if (error) {
     return (
       <div className="lightbox-bg fixed inset-0 z-60 overflow-hidden bg-gray-100">
@@ -460,8 +475,100 @@ export default function PrintQualifyingExam() {
 
   return (
     <div className="outfit -mx-2 mt-10 flex min-h-screen flex-col">
+      <style>{`
+        @media print {
+          @page {
+            size: A4;
+            margin: 10mm 8mm;
+          }
+
+          html,
+          body {
+            margin: 0 !important;
+            padding: 0 !important;
+            background: #fff !important;
+          }
+
+          /* Hide CAPS controls that should not appear on paper */
+          .print-hide,
+          .pdf-generation-container {
+            display: none !important;
+          }
+
+          /* Remove the dashboard layout constraints */
+          .print-preview-wrapper {
+            display: block !important;
+            width: 100% !important;
+            max-width: none !important;
+            margin: 0 !important;
+            padding: 0 !important;
+            overflow: visible !important;
+            zoom: 1 !important;
+          }
+
+          .print-main-content {
+            width: 100% !important;
+            max-width: none !important;
+            margin: 0 !important;
+            padding: 0 !important;
+            overflow: visible !important;
+            align-items: flex-start !important;
+            justify-content: flex-start !important;
+          }
+
+          .print-preview-container {
+            width: 210mm !important;
+            max-width: 210mm !important;
+            margin: 0 auto !important;
+            padding: 0 !important;
+          }
+
+          .pdf-preview {
+            width: 210mm !important;
+            max-width: 210mm !important;
+            margin: 0 auto !important;
+            padding: 0 !important;
+            box-shadow: none !important;
+            background: #fff !important;
+          }
+
+          .a4-page {
+            width: 210mm !important;
+            margin: 0 !important;
+            padding: 10mm 8mm !important;
+            box-sizing: border-box !important;
+            box-shadow: none !important;
+            border: none !important;
+            background: #fff !important;
+          }
+
+          .question-container {
+            page-break-inside: avoid !important;
+            break-inside: avoid !important;
+          }
+
+          .question-container * {
+            page-break-inside: avoid !important;
+            break-inside: avoid !important;
+          }
+
+          img {
+            page-break-inside: avoid !important;
+            break-inside: avoid !important;
+          }
+
+          /* Print button prints the worksheet only, not the answer key */
+          .answer-key-page-break {
+            display: none !important;
+          }
+
+          .page-break-indicator {
+            display: none !important;
+          }
+        }
+      `}</style>
       {/* Settings Bar */}
-      <div className="border-color fixed top-0 z-10 mt-10 flex w-full items-center space-x-6 border-b bg-white px-8 py-[6px] text-sm lg:mt-0">
+      <div className="print-hide border-color fixed top-0 z-10 mt-10 flex w-full items-center space-x-6 border-b bg-white px-8 py-[6px] text-sm lg:mt-0">
         {/* Back button */}
         <button
           onClick={() => navigate(-1)}
@@ -609,7 +716,7 @@ export default function PrintQualifyingExam() {
 
       {/* Main Content Row */}
       <div
-        className="mt-10 mb-20 flex flex-1 pb-35 lg:mb-0"
+        className="mt-10 mb-20 flex flex-1 pb-35 lg:mb-0 print-preview-wrapper"
         style={{
           maxWidth: "100%",
           width: "100%",
@@ -618,7 +725,7 @@ export default function PrintQualifyingExam() {
       >
         {/* Main Content */}
         <div
-          className="flex w-full flex-1 flex-col items-center justify-center overflow-x-auto px-4 py-8 min-[1200px]:mr-96 md:mr-80 lg:mr-96"
+          className="print-main-content flex w-full flex-1 flex-col items-center justify-center overflow-x-auto px-4 py-8 min-[1200px]:mr-96 md:mr-80 lg:mr-96"
           style={{
             zoom: zoom,
             transition: "zoom 0.2s",
@@ -628,7 +735,7 @@ export default function PrintQualifyingExam() {
         >
           <div
             ref={modalContentRef}
-            className="w-full max-w-4xl md:max-w-[calc(100vw-22rem)] lg:mx-auto lg:w-[210mm]"
+            className="print-preview-container w-full max-w-4xl md:max-w-[calc(100vw-22rem)] lg:mx-auto lg:w-[210mm]"
             style={{
               fontFamily:
                 "'Palatino Linotype', 'Book Antiqua', Palatino, serif",
@@ -1142,7 +1249,7 @@ export default function PrintQualifyingExam() {
       {/* Hidden PDF Content Container - No zoom applied */}
       <div
         ref={pdfContentRef}
-        className="fixed top-0 -left-[9999px] w-full max-w-4xl lg:mx-auto lg:w-[210mm]"
+        className="pdf-generation-container fixed top-0 -left-[9999px] w-full max-w-4xl lg:mx-auto lg:w-[210mm]"
         style={{
           fontFamily: "'Palatino Linotype', 'Book Antiqua', Palatino, serif",
           width: "100%",
@@ -1637,7 +1744,7 @@ export default function PrintQualifyingExam() {
       </div>
 
       {/* Sidebar */}
-      <div className="border-color fixed right-0 bottom-0 left-0 z-9 flex h-auto w-full flex-col rounded-t-3xl border-t bg-white p-4 min-[1200px]:top-[48px] min-[1200px]:right-0 min-[1200px]:bottom-auto min-[1200px]:left-auto min-[1200px]:h-[calc(100vh-48px)] min-[1200px]:w-96 min-[1200px]:rounded-none min-[1200px]:border-l min-[1200px]:p-8">
+      <div className="print-hide border-color fixed right-0 bottom-0 left-0 z-9 flex h-auto w-full flex-col rounded-t-3xl border-t bg-white p-4 min-[1200px]:top-[48px] min-[1200px]:right-0 min-[1200px]:bottom-auto min-[1200px]:left-auto min-[1200px]:h-[calc(100vh-48px)] min-[1200px]:w-96 min-[1200px]:rounded-none min-[1200px]:border-l min-[1200px]:p-8">
         <div className="mb-1 text-xl font-bold min-[1200px]:text-[18px]">
           {examTitle}
         </div>
@@ -1710,6 +1817,16 @@ export default function PrintQualifyingExam() {
           </button>
         </div>
 
+        {/* Print */}
+        <button
+          type="button"
+          onClick={handlePrint}
+          className="mt-3 flex w-full cursor-pointer items-center justify-center gap-2 rounded-lg border border-orange-500 bg-white py-2 text-[14px] font-semibold text-orange-500 transition-colors hover:bg-orange-50"
+        >
+          <i className="bx bx-printer text-[18px]"></i>
+          Print
+        </button>
+
         <div className="mt-3 hidden items-start text-[12px] text-gray-600 min-[1200px]:flex">
           <span>
             You may choose to download the qualifying exam worksheet, or
@@ -1719,7 +1836,7 @@ export default function PrintQualifyingExam() {
         </div>
       </div>
       {/* Zoom Controls beside sidebar */}
-      <div className="fixed right-4 bottom-20 z-50 hidden gap-2 min-[1200px]:right-[calc(24rem+20px)] min-[1200px]:bottom-4 min-[1200px]:flex min-[1200px]:flex-row">
+      <div className="print-hide fixed right-4 bottom-20 z-50 hidden gap-2 min-[1200px]:right-[calc(24rem+20px)] min-[1200px]:bottom-4 min-[1200px]:flex min-[1200px]:flex-row">
         <button
           className="flex cursor-pointer items-center justify-center rounded bg-gray-800 p-2 text-white shadow hover:bg-gray-700"
           onClick={() => setZoom(1)}
