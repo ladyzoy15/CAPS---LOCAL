@@ -1,15 +1,15 @@
 ﻿
-
 import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
-import collegeLogo from "/src/assets/college-logo.png";
-import heroImg from "/src/assets/landing/firstpic.png";
-import MobileheroImg from "/src/assets/landing/secondpic.png";
-import CogIcon from "/src/assets/landing/cog.svg";
-import ExportIcon from "/src/assets/landing/export.svg";
-import APlusIcon from "/src/assets/landing/a+.svg";
-import RightDisplay from "/src/assets/landing/rtp.png";
-import GetStarted from "/src/assets/landing/getstarted.png";
+import collegeLogo from "../assets/college-logo.png";
+import heroImg from "../assets/landing/firstpic.png";
+import MobileheroImg from "../assets/landing/secondpic.png";
+import CogIcon from "../assets/landing/cog.svg";
+import ExportIcon from "../assets/landing/export.svg";
+import APlusIcon from "../assets/landing/a+.svg";
+import RightDisplay from "../assets/landing/rtp.png";
+import GetStarted from "../assets/landing/getstarted.png";
+import RizalBg from "../assets/landing/rizal-bg.webp";
 import LoginModal from "../components/LoginModal";
 import RegisterModal from "../components/RegisterModal";
 import ForgotPasswordModal from "../components/ForgotPasswordModal";
@@ -152,60 +152,6 @@ function LandingPage() {
     <>
       <div className="flex min-h-screen flex-col items-center justify-center bg-white pt-8">
         {/* Top Navigation */}
-        {/* Logo - top-left */}
-        <div className="absolute top-4 left-4 z-50 flex items-center gap-2 md:top-5 md:left-8 2xl:left-16">
-          <img
-            src={collegeLogo}
-            alt="CAPS logo"
-            decoding="async"
-            fetchPriority="low"
-            className="h-6 w-6 md:h-8 md:w-8"
-          />
-          <span className="outfit-500 text-[20px] tracking-wide md:text-[24px]">
-            CAPS
-          </span>
-        </div>
-
-        {/* Hamburger Menu Button - visible on small screens */}
-        <button
-          onClick={() => setIsSidebarOpen(true)}
-          className="absolute top-4 right-4 z-50 flex flex-col gap-1.5 p-2 md:hidden"
-          aria-label="Open menu"
-        >
-          <span className="h-0.5 w-6 bg-gray-700 transition-all"></span>
-          <span className="h-0.5 w-6 bg-gray-700 transition-all"></span>
-          <span className="h-0.5 w-6 bg-gray-700 transition-all"></span>
-        </button>
-
-        {/* Nav buttons - top-right (hidden on small screens) */}
-        <ul className="outfit-500 absolute top-4 right-4 z-50 hidden items-center gap-4 text-[14px] text-gray-700 md:top-5 md:right-8 md:flex md:gap-6 md:text-[16px] 2xl:right-16">
-          <li>
-            <a
-              onClick={() => alert("Application is coming soon")}
-              className="cursor-pointer hover:text-gray-900"
-            >
-              Download
-            </a>
-          </li>
-
-          <li>
-            <a href="/team-caps" className="hover:text-gray-900">
-              Developers
-            </a>
-          </li>
-
-          <li>
-            <a
-              href="https://docs.google.com/spreadsheets/d/1YzHRRk4Y_LSc9-fazPL4tDginLq_V1-6/edit?fbclid=IwY2xjawLBQ-5leHRuA2FlbQIxMABicmlkETFzMFZMckszUTBuMzFWYTIyAR7sVSVjXMwMZEQr9U0iCvDgzORURS9UFfOmPEEVEJxgxnAegPuUAeN99-GXBQ_aem_3VnqJNYrAHDz_RMtVx_Ssg&pli=1&gid=1756766640#gid=1756766640"
-              target="_blank"
-              rel="noopener noreferrer"
-              className="hover:text-gray-900"
-            >
-              Feedback
-            </a>
-          </li>
-        </ul>
-
         {/* Sidebar Overlay */}
         {isSidebarOpen && (
           <div
@@ -246,7 +192,7 @@ function LandingPage() {
                   alert("Application is coming soon");
                   setIsSidebarOpen(false);
                 }}
-                className="cusror-pointer text-[14px] font-medium text-gray-700 hover:text-gray-900"
+                className="cursor-pointer text-[14px] font-medium text-gray-700 hover:text-gray-900"
               >
                 Download
               </a>
@@ -272,97 +218,166 @@ function LandingPage() {
           </div>
         </div>
 
-        <div className="relative isolate w-full max-w-[1450px] rounded-[50px]">
-          <div className="pointer-events-none absolute inset-0 overflow-hidden rounded-[50px]">
-            <div className="absolute -bottom-[30%] -left-[5%] h-[350px] w-[400px] rounded-full bg-[rgba(255,153,0,0.5)] blur-[150px]" />
-            <div className="absolute -bottom-[-5%] -left-[-80%] h-[250px] w-[300px] rounded-full bg-[rgba(255,153,0,0.5)] blur-[150px]" />
+        {/* ========================= HERO SECTION ========================= */}
+        <section className="relative isolate mx-auto mt-4 w-full max-w-[1450px] overflow-hidden rounded-[34px] border border-gray-300 bg-[#fffaf2] shadow-sm md:mt-6 md:rounded-[42px] lg:rounded-[50px]">
+          {/* Background layers */}
+          <div className="pointer-events-none absolute inset-0 z-0">
+            <div className="absolute inset-0 bg-gradient-to-br from-[#fffaf2] via-[#fff9f0] to-[#fffdf9]" />
+            <div className="absolute -bottom-44 -left-24 h-[620px] w-[720px] rounded-full bg-orange-200/35 blur-[120px]" />
+            <div className="absolute -bottom-20 left-[34%] h-[380px] w-[520px] rounded-full bg-amber-100/45 blur-[110px]" />
+            <div className="absolute top-[25%] right-[-12%] h-[520px] w-[520px] rounded-full bg-orange-100/30 blur-[130px]" />
           </div>
 
-          <div className="outfit finisher-header relative z-10 text-gray-900">
-            {/* Hero */}
-            <header className="header outfit-700 z-10 mx-auto mt-8 grid h-[610px] w-full grid-cols-1 items-center gap-10 py-10 md:-mt-10 md:h-[450px] md:max-w-220 md:grid-cols-2 md:px-10 md:py-0 lg:mt-10 lg:h-[450px] lg:max-w-220 lg:gap-30 lg:px-0 xl:h-[500px] xl:max-w-280 xl:gap-50">
-              {/* Text content on the left */}
-              <div className="mx-auto max-w-xl text-center md:mx-0 md:mt-15 md:text-left lg:-mt-10">
-                <h1 className="text-[34px] leading-9 md:mt-10 md:text-[30px] md:leading-8 lg:mt-0 lg:text-[40px] lg:leading-12 xl:text-5xl">
-                  CREATE,
-                  <br />
-                  ANSWER OR
-                  <br />
-                  STUDY FOR EXAMS
-                </h1>
-                <p className="outfit-400 mx-auto mt-4 max-w-md text-[14px] text-gray-600 md:mx-0 md:text-[13px] lg:text-[14px]">
-                  A collaborative platform to help students effectively <br />{" "}
-                  learn, prepare, and excel.
-                </p>
-                <div className="relative mt-4 flex flex-wrap items-center justify-center gap-3 md:mt-6 md:justify-start lg:mt-8">
-                  {/* LOG IN Button */}
-                  <button
-                    onClick={() => setIsLoginOpen(true)}
-                    className="relative z-10 inline-flex cursor-pointer items-center justify-center gap-2 rounded-full bg-orange-500 px-6 py-2.5 text-[12px] font-medium text-white shadow-sm transition-all duration-150 hover:bg-orange-600 hover:shadow-md focus:outline-none active:scale-95 active:shadow-sm"
-                  >
-                    <svg
-                      xmlns="http://www.w3.org/2000/svg"
-                      width="20"
-                      height="20"
-                      viewBox="0 0 24 24"
-                      fill="none"
-                      stroke="currentColor"
-                      strokeWidth="2"
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                      className="lucide lucide-log-in-icon lucide-log-in"
-                    >
-                      <path d="m10 17 5-5-5-5" />
-                      <path d="M15 12H3" />
-                      <path d="M15 3h4a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2h-4" />
-                    </svg>
-                    LOG IN
-                  </button>
+          {/* Rizal gold outline */}
+          <img
+            src={RizalBg}
+            alt=""
+            aria-hidden="true"
+            className="pointer-events-none absolute bottom-[-95px] left-[-75px] z-[1] h-[500px] w-auto select-none object-contain opacity-30 md:bottom-[-115px] md:left-[-90px] md:h-[610px] lg:bottom-[-135px] lg:left-[-110px] lg:h-[700px] xl:left-[-125px] xl:h-[760px]"
+          />
 
-                  {/* CREATE ACCOUNT Button */}
-                  <button
-                    onClick={() => setIsRegisterOpen(true)}
-                    className="flex cursor-pointer items-center gap-2 rounded-full border px-6 py-2.5 text-[12px] font-medium text-gray-800 transition-all duration-150 hover:shadow-md focus:outline-none active:scale-95 active:shadow-sm"
-                  >
-                    <svg
-                      xmlns="http://www.w3.org/2000/svg"
-                      width="20"
-                      height="20"
-                      viewBox="0 0 24 24"
-                      fill="none"
-                      stroke="#000000"
-                      strokeWidth="2"
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                      className="lucide lucide-user-round-icon"
-                    >
-                      <circle cx="12" cy="8" r="5" />
-                      <path d="M20 21a8 8 0 0 0-16 0" />
-                    </svg>
-                    SIGN UP
-                  </button>
-                </div>
-              </div>
+          {/* Navigation */}
+          <div className="relative z-30 flex items-center justify-between px-6 pt-5 md:px-10 md:pt-7 lg:px-12 xl:px-14">
+            <div className="flex items-center gap-2">
+              <img
+                src={collegeLogo}
+                alt="CAPS logo"
+                decoding="async"
+                fetchPriority="low"
+                className="h-7 w-7 md:h-8 md:w-8"
+              />
+              <span className="outfit-500 flex items-center gap-1.5 text-[20px] tracking-wide text-gray-900 md:text-[24px]">
+                CAPS
+                <span className="rounded-md border border-orange-500 px-1.5 py-0.5 text-[9px] font-semibold tracking-widest text-orange-500 md:text-[11px]">
+                  REVIEW
+                </span>
+              </span>
+            </div>
 
-              {/* Image on the right */}
-              <div className="relative mx-auto -mb-77 flex w-full justify-center md:block md:self-start">
-                <div className="flex w-full justify-center md:-mt-10 md:block md:size-90 lg:-mt-10 lg:size-120 lg:-translate-x-15 xl:mt-5 xl:size-140 xl:-translate-x-20">
-                  <picture>
-                    <source media="(min-width: 768px)" srcSet={heroImg} />
-                    <img
-                      src={MobileheroImg}
-                      alt="Illustration"
-                      loading="eager"
-                      decoding="async"
-                      fetchPriority="high"
-                      className="w-[400px] object-contain sm:w-[400px] md:size-225 md:w-auto"
-                    />
-                  </picture>
-                </div>
-              </div>
-            </header>
+            <nav className="outfit-500 hidden items-center gap-6 text-[14px] text-gray-700 md:flex lg:gap-8 lg:text-[16px]">
+              <a
+                onClick={() => alert("Application is coming soon")}
+                className="cursor-pointer transition-colors hover:text-gray-900"
+              >
+                Download
+              </a>
+              <a
+                href="/team-caps"
+                className="transition-colors hover:text-gray-900"
+              >
+                Developers
+              </a>
+              <a
+                href="https://docs.google.com/spreadsheets/d/1YzHRRk4Y_LSc9-fazPL4tDginLq_V1-6/edit?fbclid=IwY2xjawLBQ-5leHRuA2FlbQIxMABicmlkETFzMFZMckszUTBuMzFWYTIyAR7sVSVjXMwMZEQr9U0iCvDgzORURS9UFfOmPEEVEJxgxnAegPuUAeN99-GXBQ_aem_3VnqJNYrAHDz_RMtVx_Ssg&pli=1&gid=1756766640#gid=1756766640"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="transition-colors hover:text-gray-900"
+              >
+                Feedback
+              </a>
+            </nav>
+
+            <button
+              onClick={() => setIsSidebarOpen(true)}
+              className="flex flex-col gap-1.5 rounded-lg p-2 md:hidden"
+              aria-label="Open menu"
+            >
+              <span className="h-0.5 w-6 bg-gray-700" />
+              <span className="h-0.5 w-6 bg-gray-700" />
+              <span className="h-0.5 w-6 bg-gray-700" />
+            </button>
           </div>
-        </div>
+
+          {/* Hero content */}
+          <header className="relative z-10 mx-auto grid min-h-[650px] w-full max-w-[1380px] grid-cols-1 items-center px-6 pb-12 pt-12 md:min-h-[560px] md:grid-cols-[47%_53%] md:px-10 md:pb-14 md:pt-7 lg:min-h-[620px] lg:px-12 xl:min-h-[700px] xl:px-14">
+            {/* Left side */}
+            <div className="relative z-20 flex flex-col justify-center pt-6 text-center md:pt-0 md:text-left">
+              <div className="mb-5 flex items-center justify-center gap-2 md:justify-start">
+                <span className="h-2 w-2 rounded-full bg-emerald-500" />
+                <span className="outfit-500 text-[11px] tracking-wide text-gray-500 md:text-[12px]">
+                  Trusted by students across JRMSU
+                </span>
+              </div>
+
+              <h1 className="outfit-700 max-w-[650px] text-[39px] leading-[0.98] tracking-[-1.7px] text-[#172033] sm:text-[45px] md:text-[39px] lg:text-[50px] xl:text-[60px]">
+                CREATE, ANSWER,
+                <br />
+                AND <span className="text-orange-500">REVIEW</span>
+                <br />
+                UNTIL IT STICKS
+              </h1>
+
+              <p className="outfit-400 mx-auto mt-5 max-w-[500px] text-[13px] leading-6 text-gray-600 md:mx-0 md:text-[14px] lg:text-[15px]">
+                A collaborative platform to help students effectively
+                <br className="hidden sm:block" />
+                review, retain, and excel in every exam.
+              </p>
+
+              <div className="mt-7 flex flex-wrap items-center justify-center gap-4 md:justify-start lg:mt-8">
+                <button
+                  onClick={() => setIsLoginOpen(true)}
+                  className="outfit-500 inline-flex cursor-pointer items-center justify-center gap-2 rounded-full bg-orange-500 px-6 py-3 text-[12px] text-white shadow-md transition-all duration-200 hover:bg-orange-600 hover:shadow-lg focus:outline-none active:scale-95 lg:px-7 lg:py-3.5 lg:text-[13px]"
+                >
+                  <svg
+                    xmlns="http://www.w3.org/2000/svg"
+                    width="19"
+                    height="19"
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    stroke="currentColor"
+                    strokeWidth="2"
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                  >
+                    <path d="m10 17 5-5-5-5" />
+                    <path d="M15 12H3" />
+                    <path d="M15 3h4a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2h-4" />
+                  </svg>
+                  LOG IN
+                </button>
+
+                <button
+                  onClick={() => setIsRegisterOpen(true)}
+                  className="outfit-500 inline-flex cursor-pointer items-center justify-center gap-2 rounded-full border border-gray-400 bg-white/40 px-6 py-3 text-[12px] text-gray-800 transition-all duration-200 hover:bg-white hover:shadow-md focus:outline-none active:scale-95 lg:px-7 lg:py-3.5 lg:text-[13px]"
+                >
+                  <svg
+                    xmlns="http://www.w3.org/2000/svg"
+                    width="19"
+                    height="19"
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    stroke="currentColor"
+                    strokeWidth="2"
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                  >
+                    <circle cx="12" cy="8" r="5" />
+                    <path d="M20 21a8 8 0 0 0-16 0" />
+                  </svg>
+                  SIGN UP
+                </button>
+              </div>
+            </div>
+
+            {/* Right side - phone / platform preview */}
+            <div className="relative flex min-h-[410px] items-center justify-center md:min-h-[520px] md:justify-end">
+              <div className="relative z-10 flex items-center justify-center md:-mr-16 lg:-mr-20 xl:-mr-24">
+                <picture>
+                  <source media="(min-width: 768px)" srcSet={heroImg} />
+                  <img
+                    src={MobileheroImg}
+                    alt="CAPS Review platform preview"
+                    loading="eager"
+                    decoding="async"
+                    fetchPriority="high"
+                    className="w-[410px] max-w-none object-contain sm:w-[450px] md:w-[550px] lg:w-[650px] xl:w-[720px]"
+                  />
+                </picture>
+              </div>
+            </div>
+          </header>
+        </section>
+        {/* ======================= END HERO SECTION ======================= */}
 
         {/* Comprehensive Assessment and Preparation System Section */}
         <div className="z-101 w-full rounded-b-[35px] bg-white px-6 py-12 md:px-12 lg:max-w-[1650px] lg:px-16 xl:max-w-[1550px] xl:px-30">
@@ -424,10 +439,10 @@ function LandingPage() {
                     viewBox="0 0 24 24"
                     fill="none"
                     stroke="currentColor"
-                    stroke-width="2"
-                    stroke-linecap="round"
-                    stroke-linejoin="round"
-                    class="lucide lucide-newspaper-icon lucide-newspaper"
+                    strokeWidth="2"
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    className="lucide lucide-newspaper-icon lucide-newspaper"
                   >
                     <path d="M15 18h-5" />
                     <path d="M18 14h-8" />
@@ -454,10 +469,10 @@ function LandingPage() {
                     viewBox="0 0 24 24"
                     fill="none"
                     stroke="currentColor"
-                    stroke-width="2"
-                    stroke-linecap="round"
-                    stroke-linejoin="round"
-                    class="lucide lucide-file-pen-line-icon lucide-file-pen-line"
+                    strokeWidth="2"
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    className="lucide lucide-file-pen-line-icon lucide-file-pen-line"
                   >
                     <path d="M14.364 13.634a2 2 0 0 0-.506.854l-.837 2.87a.5.5 0 0 0 .62.62l2.87-.837a2 2 0 0 0 .854-.506l4.013-4.009a1 1 0 0 0-3.004-3.004z" />
                     <path d="M14.487 7.858A1 1 0 0 1 14 7V2" />

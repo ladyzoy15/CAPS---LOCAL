@@ -40,7 +40,7 @@ return new class extends Migration
             $table->timestamps();
             
             // Ensure unique attempt per student per quiz assignment
-            $table->unique(['class_quiz_assignment_id', 'studentID', 'attempt_number'], 'unique_student_quiz_attempt');
+            $table->unique(['class_quiz_assignment_id', 'studentID', 'attempt_number'], 'unique_student_quiz_result_attempt');
         });
     }
 

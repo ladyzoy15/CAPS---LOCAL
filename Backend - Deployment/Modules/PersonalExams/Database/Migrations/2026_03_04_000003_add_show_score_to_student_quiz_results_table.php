@@ -13,7 +13,7 @@ return new class extends Migration
     {
         Schema::table('student_quiz_results', function (Blueprint $table) {
             if (!Schema::hasColumn('student_quiz_results', 'showScore')) {
-                $table->boolean('showScore')->default(true)->after('isPassed');
+                $table->boolean('showScore')->default(true);
             }
         });
     }
