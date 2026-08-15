@@ -20,11 +20,12 @@ export default function LoginPage() {
   const [passwordVisible, setPasswordVisible] = useState(false);
   const apiUrl = import.meta.env.VITE_API_BASE_URL;
 
-  // Get toast functions from hook
   const { toast, showToast } = useToast();
 
   const [isLogIn, setIsLogIn] = useState(false);
-  const [rememberMe, setRememberMe] = useState(() => isRememberMeEnabled());
+  const [rememberMe, setRememberMe] = useState(() =>
+    isRememberMeEnabled(),
+  );
 
   useEffect(() => {
     if (isRememberMeEnabled()) {
@@ -63,10 +64,11 @@ export default function LoginPage() {
 
       if (!response.ok) {
         if (response.status === 401) {
-          // 401 Unauthorized -> wrong userCode or password
-          showToast(data.message || "Incorrect user code or password", "error");
+          showToast(
+            data.message || "Incorrect user code or password",
+            "error",
+          );
         } else {
-          // Other errors
           showToast(
             data.message || "Something went wrong. Please try again later.",
             "error",
@@ -76,40 +78,49 @@ export default function LoginPage() {
       }
 
       setRememberedUserCode(rememberMe ? idCode.trim() : "");
+
       setAuth({
         token: data.token,
         user: data.user,
         rememberMe,
       });
 
-      // Redirect to /dashboard/:userId after login
       navigate(
         `/dashboard/${data.user.userID || data.user.id || data.user._id}`,
       );
 
       const roleId = Number(data.user.roleID);
+
       switch (roleId) {
         case 1:
           navigate("/student-dashboard");
           break;
+
         case 2:
           navigate("/faculty-dashboard");
           break;
+
         case 3:
           navigate("/program-chair-dashboard");
           break;
+
         case 4:
           navigate("/dean-dashboard");
           break;
+
         case 5:
           navigate("/asso-dean-dashboard");
           break;
+
         default:
           setError("Invalid user role.");
           break;
       }
     } catch (error) {
-      showToast("Something went wrong. Please try again later.", "error");
+      showToast(
+        "Something went wrong. Please try again later.",
+        "error",
+      );
     } finally {
       setIsLogIn(false);
     }
@@ -117,120 +128,502 @@ export default function LoginPage() {
 
   return (
     <>
-      {/* Desktop View */}
-      <div className="relative hidden min-h-screen w-full bg-[url('/login-bg.png')] bg-cover bg-center bg-no-repeat lg:block">
-        {/* Left Section */}
-        <div className="flex min-h-screen flex-row">
-          <div className="mr-18 flex w-full flex-col items-center justify-center p-6 text-white lg:w-1/2">
-            {/* Logos */}
-            <div className="absolute top-3 left-3 flex items-center space-x-2">
-              <img src={univLogo} alt="Logo 1" className="size-8" />
-              <img src={collegeLogo} alt="Logo 2" className="size-8" />
-              <h1 className="outfit-500 text-xs lg:text-lg">
+      {/* =========================================================
+          DESKTOP LOGIN
+      ========================================================= */}
+      <div
+        className="
+          relative
+          hidden
+          min-h-screen
+          w-full
+          overflow-hidden
+          bg-[url('/login-bg.png')]
+          bg-cover
+          bg-center
+          bg-no-repeat
+          lg:block
+        "
+      >
+        {/* =====================================================
+            GLASS BACKGROUND OVERLAY
+        ===================================================== */}
+        <div className="pointer-events-none absolute inset-0 bg-white/10 backdrop-blur-[2px]" />
+
+        {/* Orange Glow */}
+        <div
+          className="
+            pointer-events-none
+            absolute
+            -top-32
+            -left-32
+            h-[450px]
+            w-[450px]
+            rounded-full
+            bg-orange-400/20
+            blur-[120px]
+          "
+        />
+
+        {/* Blue Glow */}
+        <div
+          className="
+            pointer-events-none
+            absolute
+            -right-32
+            -bottom-32
+            h-[450px]
+            w-[450px]
+            rounded-full
+            bg-sky-400/20
+            blur-[120px]
+          "
+        />
+
+        {/* Center Glow */}
+        <div
+          className="
+            pointer-events-none
+            absolute
+            top-1/2
+            left-1/2
+            h-[350px]
+            w-[350px]
+            -translate-x-1/2
+            -translate-y-1/2
+            rounded-full
+            bg-white/10
+            blur-[100px]
+          "
+        />
+
+        <div className="relative z-10 flex min-h-screen flex-row">
+          {/* ===================================================
+              LEFT SECTION
+          =================================================== */}
+          <div
+            className="
+              mr-18
+              flex
+              min-h-screen
+              w-full
+              flex-col
+              items-center
+              justify-center
+              p-6
+              text-white
+              lg:w-1/2
+            "
+          >
+            {/* University Logos */}
+            <div
+              className="
+                absolute
+                top-3
+                left-3
+                flex
+                items-center
+                space-x-2
+                rounded-2xl
+                border
+                border-white/20
+                bg-white/10
+                px-3
+                py-2
+                shadow-lg
+                backdrop-blur-xl
+              "
+            >
+              <img
+                src={univLogo}
+                alt="University Logo"
+                className="size-8"
+              />
+
+              <img
+                src={collegeLogo}
+                alt="College Logo"
+                className="size-8"
+              />
+
+              <h1 className="outfit-500 text-xs text-white drop-shadow-md lg:text-lg">
                 JOSE RIZAL MEMORIAL STATE UNIVERSITY
               </h1>
             </div>
 
             {/* Title */}
-            <div className="outfit-700 mt-20 hidden flex-col items-center justify-center lg:flex">
-              <h1 className="text-3xl leading-snug lg:text-4xl">
-                <span className="text-5xl text-orange-500">C</span>OMPREHENSIVE
+            <div
+              className="
+                outfit-700
+                mt-20
+                hidden
+                flex-col
+                items-center
+                justify-center
+                lg:flex
+              "
+            >
+              <h1 className="text-3xl leading-snug drop-shadow-lg lg:text-4xl">
+                <span className="text-5xl text-orange-400">C</span>
+                OMPREHENSIVE
                 <br />
-                <span className="text-5xl text-orange-500">A</span>SSESSMENT AND
+
+                <span className="text-5xl text-orange-400">A</span>
+                SSESSMENT AND
                 <br />
-                <span className="text-5xl text-orange-500">P</span>REPARATION
+
+                <span className="text-5xl text-orange-400">P</span>
+                REPARATION
                 <br />
-                <span className="text-5xl text-orange-500">S</span>YSTEM
+
+                <span className="text-5xl text-orange-400">S</span>
+                YSTEM
               </h1>
-              <p className="outfit-400 mt-20 mr-10 hidden max-w-xs text-center text-sm text-gray-500 lg:block">
-                A platform designed to help students practice and prepare for
-                qualifying exams while assessing their knowledge through
-                randomized questions.
+
+              <p
+                className="
+                  outfit-400
+                  mt-20
+                  mr-10
+                  hidden
+                  max-w-xs
+                  text-center
+                  text-sm
+                  text-white/75
+                  drop-shadow
+                  lg:block
+                "
+              >
+                A platform designed to help students practice and prepare
+                for qualifying exams while assessing their knowledge
+                through randomized questions.
               </p>
             </div>
 
+            {/* Mobile Title */}
             <div className="outfit mt-12 flex flex-col items-center justify-center lg:hidden">
-              <h1 className="text-center text-[20px] leading-snug font-bold tracking-wide whitespace-nowrap text-white sm:text-[30px]">
+              <h1
+                className="
+                  text-center
+                  text-[20px]
+                  leading-snug
+                  font-bold
+                  tracking-wide
+                  whitespace-nowrap
+                  text-white
+                  drop-shadow-lg
+                  sm:text-[30px]
+                "
+              >
                 <span>
-                  <span className="text-3xl text-orange-500">C</span>
+                  <span className="text-3xl text-orange-400">C</span>
                   OMPREHENSIVE
                 </span>
+
                 <span>
-                  <span className="text-3xl text-orange-500"> A</span>SSESSMENT
+                  <span className="text-3xl text-orange-400"> A</span>
+                  SSESSMENT
                 </span>
+
                 <br />
+
                 <span>AND</span>
+
                 <span>
-                  <span className="text-3xl text-orange-500"> P</span>REPARATION
+                  <span className="text-3xl text-orange-400"> P</span>
+                  REPARATION
                 </span>
+
                 <span>
-                  <span className="text-3xl text-orange-500"> S</span>YSTEM
+                  <span className="text-3xl text-orange-400"> S</span>
+                  YSTEM
                 </span>
               </h1>
             </div>
           </div>
 
-          {/* Right Section */}
-          <div className="outfit-400 mt-30 flex w-full items-center justify-center p-6 sm:mt-30 md:mt-30 lg:mt-0 lg:w-1/2">
-            <div className="w-full max-w-xs space-y-6 sm:max-w-md">
-              <div className="text-center sm:ml-10 lg:ml-0">
-                <h2 className="outfit-700 mr-15 mb-1 text-[20px] text-gray-900">
+          {/* ===================================================
+              RIGHT SECTION - GLASS LOGIN CARD
+          =================================================== */}
+          <div
+            className="
+              outfit-400
+              mt-30
+              flex
+              w-full
+              items-center
+              justify-center
+              p-6
+              sm:mt-30
+              md:mt-30
+              lg:mt-0
+              lg:w-1/2
+            "
+          >
+            <div
+              className="
+                relative
+                w-full
+                max-w-md
+                overflow-hidden
+                rounded-[30px]
+                border
+                border-white/60
+                bg-white/35
+                p-7
+                shadow-[0_25px_70px_rgba(0,0,0,0.18)]
+                backdrop-blur-2xl
+                sm:p-9
+              "
+            >
+              {/* Glass Highlight */}
+              <div
+                className="
+                  pointer-events-none
+                  absolute
+                  inset-x-8
+                  top-0
+                  h-px
+                  bg-gradient-to-r
+                  from-transparent
+                  via-white
+                  to-transparent
+                "
+              />
+
+              {/* Top Glass Shine */}
+              <div
+                className="
+                  pointer-events-none
+                  absolute
+                  -top-20
+                  left-1/2
+                  h-40
+                  w-40
+                  -translate-x-1/2
+                  rounded-full
+                  bg-white/20
+                  blur-3xl
+                "
+              />
+
+              <div className="relative z-10 text-center">
+                {/* Login Icon */}
+                <div
+                  className="
+                    mx-auto
+                    mb-4
+                    flex
+                    size-14
+                    items-center
+                    justify-center
+                    rounded-2xl
+                    border
+                    border-white/70
+                    bg-white/40
+                    shadow-lg
+                    backdrop-blur-xl
+                  "
+                >
+                  <i className="bx bx-lock-open-alt text-2xl text-orange-500" />
+                </div>
+
+                <h2
+                  className="
+                    outfit-700
+                    mb-1
+                    text-[22px]
+                    font-bold
+                    text-gray-900
+                  "
+                >
                   LOG IN ACCOUNT
                 </h2>
-                <p className="mt-2 justify-center text-center text-sm text-gray-500 lg:mr-15">
-                  <span>Welcome! Please enter your code and password </span>
-                  <span> to access your account.</span>
+
+                <p className="mt-2 text-sm leading-relaxed text-gray-600">
+                  Welcome! Please enter your code and password
+                  to access your account.
                 </p>
 
-                <form className="mt-6 w-full max-w-sm">
-                  {/* ID Number Input */}
-                  <div className="relative mb-2">
+                <form
+                  className="mt-7 w-full"
+                  onSubmit={handleLogin}
+                >
+                  {/* =================================================
+                      USER CODE
+                  ================================================= */}
+                  <div className="relative mb-5">
                     <div className="relative">
                       <input
                         type="text"
                         id="userCode"
-                        className="peer mt-2 w-full rounded-xl border border-gray-300 px-4 py-[9px] text-base text-gray-900 placeholder-transparent transition-all duration-200 hover:border-gray-500 focus:border-[#FE6902] focus:outline-none"
+                        className="
+                          peer
+                          mt-2
+                          w-full
+                          rounded-2xl
+                          border
+                          border-white/70
+                          bg-white/45
+                          px-4
+                          py-[12px]
+                          text-base
+                          text-gray-900
+                          shadow-sm
+                          outline-none
+                          backdrop-blur-md
+                          transition-all
+                          duration-200
+                          placeholder-transparent
+                          hover:bg-white/55
+                          hover:shadow-md
+                          focus:border-orange-400/70
+                          focus:bg-white/60
+                          focus:ring-4
+                          focus:ring-orange-400/10
+                        "
                         placeholder="User Code"
                         value={idCode}
                         onChange={(e) => setIdCode(e.target.value)}
                       />
+
                       <label
                         htmlFor="userCode"
-                        className="pointer-events-none absolute top-1/2 left-4 z-10 -translate-y-1/2 bg-white px-1 text-base text-gray-500 transition-all duration-200 peer-placeholder-shown:top-1/2 peer-placeholder-shown:mt-1 peer-placeholder-shown:text-base peer-focus:top-2 peer-focus:mt-0 peer-focus:text-xs peer-focus:text-[#FE6902] peer-[&:not(:placeholder-shown)]:top-2 peer-[&:not(:placeholder-shown)]:text-xs"
+                        className="
+                          pointer-events-none
+                          absolute
+                          top-1/2
+                          left-4
+                          z-10
+                          -translate-y-1/2
+                          bg-transparent
+                          px-1
+                          text-base
+                          text-gray-500
+                          transition-all
+                          duration-200
+
+                          peer-placeholder-shown:top-1/2
+                          peer-placeholder-shown:mt-1
+                          peer-placeholder-shown:text-base
+
+                          peer-focus:top-2
+                          peer-focus:mt-0
+                          peer-focus:bg-white/70
+                          peer-focus:text-xs
+                          peer-focus:text-orange-500
+
+                          peer-[&:not(:placeholder-shown)]:top-2
+                          peer-[&:not(:placeholder-shown)]:text-xs
+                        "
                       >
                         Instructor Code/Student ID Number
                       </label>
                     </div>
                   </div>
 
-                  {/* Password Input */}
+                  {/* =================================================
+                      PASSWORD
+                  ================================================= */}
                   <div className="relative mb-4">
                     <div className="relative flex items-center overflow-hidden">
                       <input
-                        type={passwordVisible ? "text" : "password"}
-                        className="peer mt-2 w-full rounded-xl border border-gray-300 px-4 py-[9px] text-base text-gray-900 placeholder-transparent transition-all duration-200 hover:border-gray-500 focus:border-[#FE6902] focus:outline-none"
+                        type={
+                          passwordVisible ? "text" : "password"
+                        }
+                        id="password"
+                        className="
+                          peer
+                          mt-2
+                          w-full
+                          rounded-2xl
+                          border
+                          border-white/70
+                          bg-white/45
+                          px-4
+                          py-[12px]
+                          pr-12
+                          text-base
+                          text-gray-900
+                          shadow-sm
+                          outline-none
+                          backdrop-blur-md
+                          transition-all
+                          duration-200
+                          placeholder-transparent
+                          hover:bg-white/55
+                          hover:shadow-md
+                          focus:border-orange-400/70
+                          focus:bg-white/60
+                          focus:ring-4
+                          focus:ring-orange-400/10
+                        "
                         placeholder=" "
                         value={password}
-                        onChange={(e) => setPassword(e.target.value)}
+                        onChange={(e) =>
+                          setPassword(e.target.value)
+                        }
                         autoComplete="current-password"
                       />
+
                       <label
                         htmlFor="password"
-                        className="pointer-events-none absolute top-1/2 left-4 z-10 -translate-y-1/2 bg-white px-1 text-base text-gray-500 transition-all duration-200 peer-placeholder-shown:top-1/2 peer-placeholder-shown:mt-1 peer-placeholder-shown:text-base peer-focus:top-2 peer-focus:mt-0 peer-focus:text-xs peer-focus:text-[#FE6902] peer-[&:not(:placeholder-shown)]:top-2 peer-[&:not(:placeholder-shown)]:text-xs"
+                        className="
+                          pointer-events-none
+                          absolute
+                          top-1/2
+                          left-4
+                          z-10
+                          -translate-y-1/2
+                          bg-transparent
+                          px-1
+                          text-base
+                          text-gray-500
+                          transition-all
+                          duration-200
+
+                          peer-placeholder-shown:top-1/2
+                          peer-placeholder-shown:mt-1
+                          peer-placeholder-shown:text-base
+
+                          peer-focus:top-2
+                          peer-focus:mt-0
+                          peer-focus:bg-white/70
+                          peer-focus:text-xs
+                          peer-focus:text-orange-500
+
+                          peer-[&:not(:placeholder-shown)]:top-2
+                          peer-[&:not(:placeholder-shown)]:text-xs
+                        "
                       >
                         Password
                       </label>
+
                       <button
                         type="button"
-                        className="absolute top-[18px] right-3 text-gray-400 transition-colors hover:text-gray-600"
-                        onClick={() => setPasswordVisible((v) => !v)}
+                        className="
+                          absolute
+                          top-[19px]
+                          right-3
+                          text-gray-400
+                          transition-colors
+                          hover:text-orange-500
+                        "
+                        onClick={() =>
+                          setPasswordVisible((v) => !v)
+                        }
                         tabIndex={-1}
                       >
                         <i
-                          className={`bx ${passwordVisible ? "bx-eye-alt text-orange-500" : "bx-eye-slash"} text-[25px]`}
-                        ></i>
+                          className={`bx ${
+                            passwordVisible
+                              ? "bx-eye-alt text-orange-500"
+                              : "bx-eye-slash"
+                          } text-[24px]`}
+                        />
                       </button>
                     </div>
+
                     {error && (
                       <p className="mt-3 text-center text-xs text-red-500">
                         {error}
@@ -238,57 +631,138 @@ export default function LoginPage() {
                     )}
                   </div>
 
-                  <label className="outfit-400 mb-2 flex cursor-pointer items-center gap-2 text-sm text-gray-600">
+                  {/* =================================================
+                      REMEMBER ME
+                  ================================================= */}
+                  <label
+                    className="
+                      outfit-400
+                      mb-4
+                      flex
+                      cursor-pointer
+                      items-center
+                      gap-2
+                      text-sm
+                      text-gray-600
+                    "
+                  >
                     <input
                       type="checkbox"
                       checked={rememberMe}
-                      onChange={(e) => setRememberMe(e.target.checked)}
-                      className="h-4 w-4 cursor-pointer rounded border-gray-300 accent-orange-500"
+                      onChange={(e) =>
+                        setRememberMe(e.target.checked)
+                      }
+                      className="
+                        h-4
+                        w-4
+                        cursor-pointer
+                        rounded
+                        border-gray-300
+                        accent-orange-500
+                      "
                     />
+
                     Remember me
                   </label>
 
-                  {/* Login Button */}
-                  <div className="mx-auto flex w-full items-center justify-center text-sm">
-                    <button
-                      type="submit"
-                      onClick={handleLogin}
-                      disabled={isLogIn}
-                      className="mb-1 w-full cursor-pointer rounded-xl bg-gradient-to-r from-[#ed3700] to-[#FE6902] py-[10px] text-base font-semibold text-white shadow-md transition-all duration-200 ease-in-out hover:brightness-150 active:scale-[0.98] active:shadow-sm disabled:opacity-60"
-                    >
-                      {isLogIn ? (
-                        <div className="flex items-center justify-center">
-                          <span className="loader-white"></span>
-                        </div>
-                      ) : (
-                        "Log in"
-                      )}
-                    </button>
-                  </div>
-
+                  {/* =================================================
+                      LOGIN BUTTON
+                  ================================================= */}
                   <button
-                    className="mt-2 text-sm text-[#FE6902] hover:underline"
-                    onClick={() => navigate("/forgot-password")}
+                    type="submit"
+                    disabled={isLogIn}
+                    className="
+                      mb-2
+                      flex
+                      w-full
+                      cursor-pointer
+                      items-center
+                      justify-center
+                      rounded-2xl
+                      border
+                      border-orange-300/40
+                      bg-gradient-to-r
+                      from-[#ed3700]/95
+                      to-[#FE6902]/95
+                      py-[12px]
+                      text-base
+                      font-semibold
+                      text-white
+                      shadow-[0_8px_25px_rgba(249,105,2,0.25)]
+                      backdrop-blur-md
+                      transition-all
+                      duration-300
+                      ease-in-out
+                      hover:-translate-y-0.5
+                      hover:brightness-110
+                      hover:shadow-[0_12px_30px_rgba(249,105,2,0.35)]
+                      active:scale-[0.98]
+                      disabled:cursor-not-allowed
+                      disabled:opacity-60
+                    "
+                  >
+                    {isLogIn ? (
+                      <div className="flex items-center justify-center">
+                        <span className="loader-white"></span>
+                      </div>
+                    ) : (
+                      "Log in"
+                    )}
+                  </button>
+
+                  {/* Forgot Password */}
+                  <button
+                    type="button"
+                    className="
+                      mt-2
+                      cursor-pointer
+                      text-sm
+                      text-orange-500
+                      transition
+                      hover:text-orange-600
+                      hover:underline
+                    "
+                    onClick={() =>
+                      navigate("/forgot-password")
+                    }
                   >
                     Forgot your password?
                   </button>
 
-                  {/* Register Link */}
-                  <p className="mt-4 mb-4 justify-center text-center text-[14px] text-gray-600">
+                  {/* Register */}
+                  <p
+                    className="
+                      mt-5
+                      mb-4
+                      text-center
+                      text-[14px]
+                      text-gray-600
+                    "
+                  >
                     Don't have an account?{" "}
                     <span
                       onClick={() => navigate("/register")}
-                      className="cursor-pointer text-orange-500 hover:underline"
+                      className="
+                        cursor-pointer
+                        font-medium
+                        text-orange-500
+                        hover:underline
+                      "
                     >
                       Register here
                     </span>
                   </p>
 
-                  <span className="mx-2 text-xs text-gray-400">
+                  {/* Developer */}
+                  <span className="text-xs text-gray-400">
                     Developed by{" "}
                     <span
                       onClick={() => navigate("/team-caps")}
-                      className="cursor-pointer text-orange-500 hover:underline"
+                      className="
+                        cursor-pointer
+                        text-orange-500
+                        hover:underline
+                      "
                     >
                       Team Caps
                     </span>
@@ -297,152 +771,540 @@ export default function LoginPage() {
               </div>
             </div>
           </div>
-          <div className="absolute bottom-3 left-1/2 flex -translate-x-1/2 transform items-center space-x-2 text-gray-400 lg:left-8">
+
+          {/* App Version */}
+          <div
+            className="
+              absolute
+              bottom-3
+              left-1/2
+              flex
+              -translate-x-1/2
+              transform
+              items-center
+              space-x-2
+              text-gray-300
+              lg:left-8
+            "
+          >
             <AppVersion />
           </div>
         </div>
       </div>
 
-      {/* Mobile View */}
-      <div className="flex flex-col lg:hidden">
-        <div className="flex w-full flex-col items-center justify-center bg-gradient-to-br from-[#101010] to-[#3c3c3c]">
-          {/* Purple Gradient Header */}
-          <div className="relative flex h-60 w-full flex-col items-center justify-center">
-            <div className="outfit absolute top-5 right-5">
-              <span className="mr-2 text-[12px] text-white">
-                Don't have an account?{" "}
+      {/* =========================================================
+          MOBILE LOGIN
+      ========================================================= */}
+      <div
+        className="
+          relative
+          flex
+          min-h-screen
+          flex-col
+          overflow-hidden
+          bg-gradient-to-br
+          from-[#101010]
+          via-[#252525]
+          to-[#3c3c3c]
+          lg:hidden
+        "
+      >
+        {/* Mobile Background Glows */}
+        <div
+          className="
+            pointer-events-none
+            absolute
+            -top-20
+            -right-20
+            h-72
+            w-72
+            rounded-full
+            bg-orange-500/20
+            blur-[90px]
+          "
+        />
+
+        <div
+          className="
+            pointer-events-none
+            absolute
+            bottom-40
+            -left-20
+            h-72
+            w-72
+            rounded-full
+            bg-sky-500/10
+            blur-[90px]
+          "
+        />
+
+        {/* =====================================================
+            MOBILE HEADER
+        ===================================================== */}
+        <div
+          className="
+            relative
+            flex
+            h-60
+            w-full
+            flex-col
+            items-center
+            justify-center
+            border-b
+            border-white/10
+            bg-white/5
+            backdrop-blur-xl
+          "
+        >
+          {/* Register */}
+          <div className="outfit absolute top-5 right-5">
+            <span className="mr-2 text-[12px] text-white/70">
+              Don't have an account?
+            </span>
+
+            <button
+              onClick={() => navigate("/register")}
+              className="
+                cursor-pointer
+                rounded-xl
+                border
+                border-white/20
+                bg-white/10
+                px-4
+                py-1.5
+                text-[14px]
+                font-medium
+                text-white
+                shadow-md
+                backdrop-blur-md
+                transition
+                hover:bg-white/20
+              "
+            >
+              Sign in
+            </button>
+          </div>
+
+          {/* Logos */}
+          <div
+            className="
+              absolute
+              top-5
+              left-5
+              z-10
+              flex
+              items-center
+              gap-3
+              rounded-xl
+              border
+              border-white/10
+              bg-white/10
+              px-2
+              py-1.5
+              backdrop-blur-md
+            "
+          >
+            <img
+              src={univLogo}
+              alt="University Logo"
+              className="size-8 object-contain"
+            />
+
+            <img
+              src={collegeLogo}
+              alt="College Logo"
+              className="size-8 object-contain"
+            />
+          </div>
+
+          {/* CAPS Title */}
+          <div className="mt-5 mb-1 flex flex-col items-center">
+            <h1
+              className="
+                text-center
+                text-[22px]
+                font-bold
+                tracking-wide
+                whitespace-nowrap
+                text-white
+                drop-shadow-lg
+                sm:text-[30px]
+              "
+            >
+              <span>
+                <span className="text-3xl text-orange-500">
+                  C
+                </span>
+                OMPREHENSIVE
               </span>
-              <button
-                onClick={() => navigate("/register")}
-                className="cursor-pointer rounded-lg bg-white/10 px-4 py-1 text-[14px] font-medium text-white shadow-md backdrop-blur-md transition hover:bg-white/20 hover:backdrop-blur-lg"
-              >
-                Sign in
-              </button>
-            </div>
-            {/* Logos at top left */}
-            <div className="absolute top-5 left-5 z-10 flex items-center gap-3">
-              <img
-                src={univLogo}
-                alt="University Logo"
-                className="size-8 object-contain"
-              />
-              <img
-                src={collegeLogo}
-                alt="College Logo"
-                className="size-8 object-contain"
-              />
-            </div>
-            <div className="mt-5 mb-1 flex flex-col items-center">
-              <h1 className="text-center text-[22px] font-bold tracking-wide whitespace-nowrap text-white sm:text-[30px]">
-                <span>
-                  <span className="text-3xl text-orange-500">C</span>
-                  OMPREHENSIVE
+
+              <span>
+                <span className="text-3xl text-orange-500">
+                  {" "}
+                  A
                 </span>
-                <span>
-                  <span className="text-3xl text-orange-500"> A</span>SSESSMENT
+                SSESSMENT
+              </span>
+
+              <br />
+
+              <span>AND</span>
+
+              <span>
+                <span className="text-3xl text-orange-500">
+                  {" "}
+                  P
                 </span>
-                <br />
-                <span>AND</span>
-                <span>
-                  <span className="text-3xl text-orange-500"> P</span>REPARATION
+                REPARATION
+              </span>
+
+              <span>
+                <span className="text-3xl text-orange-500">
+                  {" "}
+                  S
                 </span>
-                <span>
-                  <span className="text-3xl text-orange-500"> S</span>YSTEM
-                </span>
-              </h1>
-            </div>
+                YSTEM
+              </span>
+            </h1>
           </div>
         </div>
 
+        {/* Glass Transition */}
         <div
-          style={{
-            borderTopLeftRadius: "30px 15px",
-            borderTopRightRadius: "30px 15px",
-          }}
-          className="mx-auto -mt-10 flex h-[14px] w-[85%] flex-col items-center justify-center bg-white/10 shadow-lg backdrop-blur-md"
-        ></div>
+          className="
+            relative
+            z-10
+            mx-auto
+            -mt-7
+            h-[30px]
+            w-[85%]
+            rounded-t-[30px]
+            border
+            border-b-0
+            border-white/30
+            bg-white/10
+            shadow-lg
+            backdrop-blur-xl
+          "
+        />
 
-        {/* Login Card */}
-        <div className="flex w-full flex-col items-center justify-center rounded-t-4xl bg-white p-6">
+        {/* =====================================================
+            MOBILE GLASS LOGIN CARD
+        ===================================================== */}
+        <div
+          className="
+            relative
+            z-20
+            -mt-1
+            flex
+            w-full
+            flex-1
+            flex-col
+            items-center
+            justify-start
+            rounded-t-[32px]
+            border-t
+            border-white/70
+            bg-white/70
+            px-6
+            pt-7
+            pb-8
+            shadow-[0_-15px_40px_rgba(0,0,0,0.15)]
+            backdrop-blur-2xl
+          "
+        >
+          {/* Glass shine */}
+          <div
+            className="
+              pointer-events-none
+              absolute
+              top-0
+              left-1/2
+              h-px
+              w-3/4
+              -translate-x-1/2
+              bg-gradient-to-r
+              from-transparent
+              via-white
+              to-transparent
+            "
+          />
+
+          {/* Login Icon */}
+          <div
+            className="
+              mb-3
+              flex
+              size-12
+              items-center
+              justify-center
+              rounded-2xl
+              border
+              border-white
+              bg-white/50
+              shadow-md
+              backdrop-blur-xl
+            "
+          >
+            <i className="bx bx-lock-open-alt text-xl text-orange-500" />
+          </div>
+
           <h2 className="mb-1 text-[20px] font-bold text-gray-900">
             LOG IN ACCOUNT
           </h2>
-          <p className="mb-5 max-w-80 justify-center text-center text-xs text-gray-500 md:max-w-full lg:mr-15">
-            <span>Welcome! Please enter your code and password </span>
-            <span> to access your account.</span>
+
+          <p className="mb-5 max-w-80 text-center text-xs leading-relaxed text-gray-500 md:max-w-full">
+            Welcome! Please enter your code and password
+            to access your account.
           </p>
+
           <form
-            className="mt-2 flex w-full flex-col gap-4 sm:max-w-md md:max-w-xl"
+            className="
+              mt-2
+              flex
+              w-full
+              flex-col
+              gap-4
+              sm:max-w-md
+              md:max-w-xl
+            "
             onSubmit={handleLogin}
           >
+            {/* User Code */}
             <div className="relative w-full">
               <div className="relative">
                 <input
                   type="text"
-                  id="userCode"
-                  className="peer mt-2 w-full rounded-xl border border-gray-300 px-4 py-[12px] text-base text-gray-900 placeholder-transparent transition-all duration-200 hover:border-gray-500 focus:border-[#FE6902] focus:outline-none"
+                  id="mobileUserCode"
+                  className="
+                    peer
+                    mt-2
+                    w-full
+                    rounded-2xl
+                    border
+                    border-white/80
+                    bg-white/50
+                    px-4
+                    py-[12px]
+                    text-base
+                    text-gray-900
+                    shadow-sm
+                    outline-none
+                    backdrop-blur-md
+                    transition-all
+                    duration-200
+                    placeholder-transparent
+                    focus:border-orange-400/70
+                    focus:bg-white/70
+                    focus:ring-4
+                    focus:ring-orange-400/10
+                  "
                   placeholder="User Code"
                   value={idCode}
                   onChange={(e) => setIdCode(e.target.value)}
                 />
+
                 <label
-                  htmlFor="userCode"
-                  className="pointer-events-none absolute top-1/2 left-4 z-10 -translate-y-1/2 bg-white px-1 text-base text-gray-500 transition-all duration-200 peer-placeholder-shown:top-1/2 peer-placeholder-shown:mt-1 peer-placeholder-shown:text-base peer-focus:top-2 peer-focus:mt-0 peer-focus:text-xs peer-focus:text-[#FE6902] peer-[&:not(:placeholder-shown)]:top-2 peer-[&:not(:placeholder-shown)]:text-xs"
+                  htmlFor="mobileUserCode"
+                  className="
+                    pointer-events-none
+                    absolute
+                    top-1/2
+                    left-4
+                    z-10
+                    -translate-y-1/2
+                    bg-transparent
+                    px-1
+                    text-base
+                    text-gray-500
+                    transition-all
+                    duration-200
+
+                    peer-placeholder-shown:top-1/2
+                    peer-placeholder-shown:mt-1
+                    peer-placeholder-shown:text-base
+
+                    peer-focus:top-2
+                    peer-focus:mt-0
+                    peer-focus:bg-white/70
+                    peer-focus:text-xs
+                    peer-focus:text-orange-500
+
+                    peer-[&:not(:placeholder-shown)]:top-2
+                    peer-[&:not(:placeholder-shown)]:text-xs
+                  "
                 >
                   Instructor Code/Student ID Number
                 </label>
               </div>
             </div>
 
-            {/* Password Field */}
+            {/* Password */}
             <div className="relative w-full">
               <div className="relative">
                 <input
-                  type={passwordVisible ? "text" : "password"}
-                  className="peer mt-2 w-full rounded-xl border border-gray-300 px-4 py-[12px] text-base text-gray-900 placeholder-transparent transition-all duration-200 hover:border-gray-500 focus:border-[#FE6902] focus:outline-none"
+                  type={
+                    passwordVisible ? "text" : "password"
+                  }
+                  id="mobilePassword"
+                  className="
+                    peer
+                    mt-2
+                    w-full
+                    rounded-2xl
+                    border
+                    border-white/80
+                    bg-white/50
+                    px-4
+                    py-[12px]
+                    pr-12
+                    text-base
+                    text-gray-900
+                    shadow-sm
+                    outline-none
+                    backdrop-blur-md
+                    transition-all
+                    duration-200
+                    placeholder-transparent
+                    focus:border-orange-400/70
+                    focus:bg-white/70
+                    focus:ring-4
+                    focus:ring-orange-400/10
+                  "
                   placeholder=" "
                   value={password}
-                  onChange={(e) => setPassword(e.target.value)}
+                  onChange={(e) =>
+                    setPassword(e.target.value)
+                  }
                   autoComplete="current-password"
                 />
+
                 <label
-                  htmlFor="password"
-                  className="pointer-events-none absolute top-1/2 left-4 z-10 -translate-y-1/2 bg-white px-1 text-base text-gray-500 transition-all duration-200 peer-placeholder-shown:top-1/2 peer-placeholder-shown:mt-1 peer-placeholder-shown:text-base peer-focus:top-2 peer-focus:mt-0 peer-focus:text-xs peer-focus:text-[#FE6902] peer-[&:not(:placeholder-shown)]:top-2 peer-[&:not(:placeholder-shown)]:text-xs"
+                  htmlFor="mobilePassword"
+                  className="
+                    pointer-events-none
+                    absolute
+                    top-1/2
+                    left-4
+                    z-10
+                    -translate-y-1/2
+                    bg-transparent
+                    px-1
+                    text-base
+                    text-gray-500
+                    transition-all
+                    duration-200
+
+                    peer-placeholder-shown:top-1/2
+                    peer-placeholder-shown:mt-1
+                    peer-placeholder-shown:text-base
+
+                    peer-focus:top-2
+                    peer-focus:mt-0
+                    peer-focus:bg-white/70
+                    peer-focus:text-xs
+                    peer-focus:text-orange-500
+
+                    peer-[&:not(:placeholder-shown)]:top-2
+                    peer-[&:not(:placeholder-shown)]:text-xs
+                  "
                 >
                   Password
                 </label>
+
                 <button
                   type="button"
-                  className="absolute top-[21px] right-3 text-gray-400 transition-colors hover:text-gray-600"
-                  onClick={() => setPasswordVisible((v) => !v)}
+                  className="
+                    absolute
+                    top-[21px]
+                    right-3
+                    text-gray-400
+                    transition-colors
+                    hover:text-orange-500
+                  "
+                  onClick={() =>
+                    setPasswordVisible((v) => !v)
+                  }
                   tabIndex={-1}
                 >
                   <i
-                    className={`bx ${passwordVisible ? "bx-eye-alt text-orange-500" : "bx-eye-slash"} text-[25px]`}
-                  ></i>
+                    className={`bx ${
+                      passwordVisible
+                        ? "bx-eye-alt text-orange-500"
+                        : "bx-eye-slash"
+                    } text-[25px]`}
+                  />
                 </button>
               </div>
             </div>
 
             {error && (
-              <p className="text-center text-xs text-red-500">{error}</p>
+              <p className="text-center text-xs text-red-500">
+                {error}
+              </p>
             )}
 
-            <label className="outfit-400 flex cursor-pointer items-center gap-2 text-sm text-gray-600">
+            {/* Remember Me */}
+            <label
+              className="
+                outfit-400
+                flex
+                cursor-pointer
+                items-center
+                gap-2
+                text-sm
+                text-gray-600
+              "
+            >
               <input
                 type="checkbox"
                 checked={rememberMe}
-                onChange={(e) => setRememberMe(e.target.checked)}
-                className="h-4 w-4 cursor-pointer rounded border-gray-300 accent-orange-500"
+                onChange={(e) =>
+                  setRememberMe(e.target.checked)
+                }
+                className="
+                  h-4
+                  w-4
+                  cursor-pointer
+                  rounded
+                  border-gray-300
+                  accent-orange-500
+                "
               />
+
               Remember me
             </label>
 
+            {/* Login */}
             <button
               type="submit"
-              onClick={handleLogin}
               disabled={isLogIn}
-              className="mt-3 mb-1 w-full cursor-pointer rounded-xl bg-gradient-to-r from-[#ed3700] to-[#FE6902] py-3 text-base font-semibold text-white shadow-md transition-all duration-200 ease-in-out hover:brightness-150 active:scale-[0.98] active:shadow-sm disabled:opacity-60"
+              className="
+                mt-3
+                mb-1
+                flex
+                w-full
+                cursor-pointer
+                items-center
+                justify-center
+                rounded-2xl
+                border
+                border-orange-300/40
+                bg-gradient-to-r
+                from-[#ed3700]/95
+                to-[#FE6902]/95
+                py-3
+                text-base
+                font-semibold
+                text-white
+                shadow-[0_8px_25px_rgba(249,105,2,0.25)]
+                transition-all
+                duration-300
+                hover:-translate-y-0.5
+                hover:brightness-110
+                active:scale-[0.98]
+                disabled:opacity-60
+              "
             >
               {isLogIn ? (
                 <div className="flex items-center justify-center">
@@ -453,25 +1315,46 @@ export default function LoginPage() {
               )}
             </button>
           </form>
+
+          {/* Forgot Password */}
           <button
-            className="mt-2 mb-5 text-sm text-[#FE6902] hover:underline"
-            onClick={() => navigate("/forgot-password")}
+            type="button"
+            className="
+              mt-3
+              mb-5
+              cursor-pointer
+              text-sm
+              text-orange-500
+              hover:underline
+            "
+            onClick={() =>
+              navigate("/forgot-password")
+            }
           >
             Forgot your password?
           </button>
+
+          {/* App Version */}
           <div className="my-2 flex w-full items-center">
-            <div className="h-px flex-1 bg-gray-200"></div>
+            <div className="h-px flex-1 bg-gray-200/70"></div>
+
             <span className="mx-2 text-xs text-gray-400">
               <AppVersion />
             </span>
-            <div className="h-px flex-1 bg-gray-200"></div>
+
+            <div className="h-px flex-1 bg-gray-200/70"></div>
           </div>
 
+          {/* Developer */}
           <span className="mx-2 text-xs text-gray-400">
             Developed by{" "}
             <button
               onClick={() => navigate("/team-caps")}
-              className="cursor-pointer text-orange-500 hover:underline"
+              className="
+                cursor-pointer
+                text-orange-500
+                hover:underline
+              "
             >
               Team Caps
             </button>
@@ -479,7 +1362,12 @@ export default function LoginPage() {
         </div>
       </div>
 
-      <Toast message={toast.message} type={toast.type} show={toast.show} />
+      {/* Toast */}
+      <Toast
+        message={toast.message}
+        type={toast.type}
+        show={toast.show}
+      />
     </>
   );
 }

@@ -126,18 +126,29 @@ export default function LoginModal({
     <>
       {/* Backdrop */}
       <div
-        className="fixed inset-0 z-[200] flex items-center justify-center bg-black/40 px-4 backdrop-blur-sm"
+        className="fixed inset-0 z-[200] flex items-center justify-center overflow-hidden bg-black/70 px-4 backdrop-blur-sm"
         onClick={onClose}
       >
-        {/* Modal card */}
+        {/* Ambient glow blobs behind the glass card */}
+        <div className="pointer-events-none absolute inset-0">
+          <div className="absolute -top-24 -left-20 h-[380px] w-[380px] rounded-full bg-blue-600/30 blur-[120px]" />
+          <div className="absolute -right-24 top-10 h-[340px] w-[340px] rounded-full bg-purple-600/30 blur-[120px]" />
+          <div className="absolute -bottom-28 left-1/3 h-[360px] w-[360px] rounded-full bg-yellow-400/20 blur-[130px]" />
+        </div>
+
+        {/* Modal card - dark glass */}
         <div
-          className="relative w-full max-w-[420px] rounded-2xl bg-white p-8 shadow-2xl"
+          className="relative z-10 w-full max-w-[420px] overflow-hidden rounded-3xl border border-white/15 bg-white/5 p-8 shadow-[0_25px_70px_rgba(0,0,0,0.55)] backdrop-blur-2xl"
           onClick={(e) => e.stopPropagation()}
         >
+          {/* Top glass shine */}
+          <div className="pointer-events-none absolute inset-x-10 top-0 h-px bg-gradient-to-r from-transparent via-white/60 to-transparent" />
+          <div className="pointer-events-none absolute -top-20 left-1/2 h-40 w-40 -translate-x-1/2 rounded-full bg-blue-400/20 blur-3xl" />
+
           {/* Close button */}
           <button
             onClick={onClose}
-            className="absolute top-4 right-4 flex h-8 w-8 cursor-pointer items-center justify-center rounded-full text-gray-400 transition hover:bg-gray-100 hover:text-gray-700"
+            className="absolute top-4 right-4 z-10 flex h-8 w-8 cursor-pointer items-center justify-center rounded-full border border-white/10 bg-white/5 text-gray-300 backdrop-blur-md transition hover:bg-white/15 hover:text-white"
             aria-label="Close"
           >
             <svg
@@ -157,31 +168,34 @@ export default function LoginModal({
           </button>
 
           {/* Logo */}
-          <div className="mb-5 flex flex-col items-center">
-            <div className="flex h-14 w-14 items-center justify-center">
+          <div className="relative z-10 mb-5 flex flex-col items-center">
+            <div className="flex h-14 w-14 items-center justify-center rounded-2xl border border-white/15 bg-white/5 shadow-lg backdrop-blur-xl">
               <img
                 src={collegeLogo}
                 alt="CAPS logo"
-                className="size-12 object-contain"
+                className="size-9 object-contain"
               />
             </div>
           </div>
 
           {/* Heading */}
-          <div className="mb-6 text-center">
-            <h2 className="outfit-700 text-[22px] text-gray-900">
+          <div className="relative z-10 mb-6 text-center">
+            <h2 className="outfit-700 text-[22px] text-white">
               Welcome back
             </h2>
-            <p className="outfit-400 mt-1 text-sm text-gray-500">
+            <p className="outfit-400 mt-1 text-sm text-gray-400">
               Please enter your details to login.
             </p>
           </div>
 
-          <form onSubmit={handleLogin} className="flex flex-col gap-4">
+          <form
+            onSubmit={handleLogin}
+            className="relative z-10 flex flex-col gap-4"
+          >
             {/* ID Code field */}
             <div>
               <div className="mb-1.5 flex items-center justify-between">
-                <label className="outfit-500 text-sm text-gray-700">
+                <label className="outfit-500 text-sm text-gray-300">
                   ID Code
                 </label>
                 {/* <button
@@ -190,7 +204,7 @@ export default function LoginModal({
                     onClose();
                     onSwitchToForgotUserCode?.();
                   }}
-                  className="outfit-400 text-sm text-orange-500 hover:underline"
+                  className="outfit-400 text-sm text-yellow-400 hover:underline"
                 >
                   Forgot ID code?
                 </button> */}
@@ -201,14 +215,14 @@ export default function LoginModal({
                 placeholder="e.g. 23-A-12345"
                 value={idCode}
                 onChange={(e) => setIdCode(e.target.value)}
-                className="w-full rounded-lg border border-gray-200 bg-gray-50 px-4 py-2.5 text-sm text-gray-900 transition outline-none placeholder:text-gray-400 hover:border-gray-300 focus:border-orange-400 focus:bg-white focus:ring-2 focus:ring-orange-100"
+                className="w-full rounded-xl border border-white/10 bg-white/5 px-4 py-2.5 text-sm text-white transition outline-none placeholder:text-gray-500 hover:border-white/20 hover:bg-white/10 focus:border-blue-400/60 focus:bg-white/10 focus:ring-2 focus:ring-blue-400/20"
               />
             </div>
 
             {/* Password field */}
             <div>
               <div className="mb-1.5 flex items-center justify-between">
-                <label className="outfit-500 text-sm text-gray-700">
+                <label className="outfit-500 text-sm text-gray-300">
                   Password
                 </label>
                 <button
@@ -217,7 +231,7 @@ export default function LoginModal({
                     onClose();
                     onSwitchToForgotPassword?.();
                   }}
-                  className="outfit-400 text-sm text-orange-500 hover:underline"
+                  className="outfit-400 text-sm text-yellow-400 hover:underline"
                 >
                   Forgot password?
                 </button>
@@ -229,40 +243,40 @@ export default function LoginModal({
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
                   autoComplete="current-password"
-                  className="w-full rounded-lg border border-gray-200 bg-gray-50 px-4 py-2.5 pr-10 text-sm text-gray-900 transition outline-none placeholder:text-gray-400 hover:border-gray-300 focus:border-orange-400 focus:bg-white focus:ring-2 focus:ring-orange-100"
+                  className="w-full rounded-xl border border-white/10 bg-white/5 px-4 py-2.5 pr-10 text-sm text-white transition outline-none placeholder:text-gray-500 hover:border-white/20 hover:bg-white/10 focus:border-blue-400/60 focus:bg-white/10 focus:ring-2 focus:ring-blue-400/20"
                 />
                 <button
                   type="button"
                   onClick={() => setPasswordVisible((v) => !v)}
                   tabIndex={-1}
-                  className="absolute top-1/2 right-3 -translate-y-1/2 text-gray-400 transition hover:text-gray-600"
+                  className="absolute top-1/2 right-3 -translate-y-1/2 text-gray-500 transition hover:text-gray-300"
                 >
                   <i
-                    className={`bx ${passwordVisible ? "bx-eye-alt text-orange-500" : "bx-eye-slash"} text-[20px]`}
+                    className={`bx ${passwordVisible ? "bx-eye-alt text-yellow-400" : "bx-eye-slash"} text-[20px]`}
                   ></i>
                 </button>
               </div>
             </div>
 
-            <label className="outfit-400 flex cursor-pointer items-center gap-2 text-sm text-gray-600">
+            <label className="outfit-400 flex cursor-pointer items-center gap-2 text-sm text-gray-400">
               <input
                 type="checkbox"
                 checked={rememberMe}
                 onChange={(e) => setRememberMe(e.target.checked)}
-                className="h-4 w-4 cursor-pointer rounded border-gray-300"
+                className="h-4 w-4 cursor-pointer rounded border-white/20 bg-white/5 accent-blue-500"
               />
               Remember me
             </label>
 
             {error && (
-              <p className="text-center text-xs text-red-500">{error}</p>
+              <p className="text-center text-xs text-red-400">{error}</p>
             )}
 
-            {/* Login button */}
+            {/* Login button - blue/purple gradient with yellow-tinted glow */}
             <button
               type="submit"
               disabled={isLogIn}
-              className="outfit-400 mt-1 w-full cursor-pointer rounded-lg bg-orange-500 py-3 text-sm font-semibold text-white shadow-sm transition hover:bg-orange-600 active:scale-[0.98] disabled:opacity-60"
+              className="outfit-400 mt-1 w-full cursor-pointer rounded-xl border border-white/10 bg-gradient-to-r from-blue-600 to-purple-600 py-3 text-sm font-semibold text-white shadow-[0_8px_25px_rgba(99,102,241,0.35)] backdrop-blur-md transition-all duration-300 hover:-translate-y-0.5 hover:shadow-[0_12px_30px_rgba(99,102,241,0.45)] active:scale-[0.98] disabled:opacity-60"
             >
               {isLogIn ? (
                 <div className="flex items-center justify-center">
@@ -274,14 +288,14 @@ export default function LoginModal({
             </button>
 
             {/* Register link */}
-            <p className="outfit-400 text-center text-sm text-gray-500">
+            <p className="outfit-400 text-center text-sm text-gray-400">
               Don't have an account?{" "}
               <span
                 onClick={() => {
                   onClose();
                   onSwitchToRegister?.();
                 }}
-                className="cursor-pointer font-medium text-orange-500 hover:underline"
+                className="cursor-pointer font-medium text-yellow-400 hover:underline"
               >
                 Register
               </span>
