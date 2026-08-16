@@ -86,17 +86,53 @@ export default function LoginModal({
         }),
       });
 
-      const data = await response.json();
+      // ── ADDED: Guard against non-JSON responses (e.g. HTML error pages,
+      // empty bodies) so JSON.parse itself doesn't throw and get swallowed
+      // by the generic catch block below.
+      let data;
+      try {
+        data = await response.json();
+      } catch (parseErr) {
+        console.error("LOGIN: failed to parse response as JSON", parseErr);
+        showToast("Unexpected server response. Please try again later.", "error");
+        return;
+      }
+
+      // ── ADDED: Log the raw response so you can inspect the actual shape
+      // the backend returns (open DevTools → Console after attempting login).
+      console.log("LOGIN RESPONSE:", data);
 
       if (!response.ok) {
         if (response.status === 401) {
-          showToast(data.message || "Incorrect user code or password", "error");
+          showToast(data?.message || "Incorrect user code or password", "error");
         } else {
           showToast(
-            data.message || "Something went wrong. Please try again later.",
+            data?.message || "Something went wrong. Please try again later.",
             "error",
           );
         }
+        return;
+      }
+
+      // ── ADDED: Defensive checks — if the backend's success response
+      // doesn't actually include `user` / `roleID` in the shape we expect,
+      // show a clear message instead of silently crashing into the catch
+      // block and showing the generic "something went wrong" toast.
+      if (!data || !data.user) {
+        console.error("LOGIN: response.ok was true but data.user is missing", data);
+        showToast(
+          "Login succeeded but user data was missing from the response.",
+          "error",
+        );
+        return;
+      }
+
+      if (data.user.roleID === undefined || data.user.roleID === null) {
+        console.error("LOGIN: data.user.roleID is missing", data.user);
+        showToast(
+          "Login succeeded but your account role is missing. Contact support.",
+          "error",
+        );
         return;
       }
 
@@ -113,7 +149,11 @@ export default function LoginModal({
       } else {
         setError("Invalid user role.");
       }
-    } catch {
+    } catch (err) {
+      // ── CHANGED: log the actual error instead of swallowing it silently,
+      // so future issues are visible in the console instead of just showing
+      // a generic toast.
+      console.error("LOGIN: unexpected error", err);
       showToast("Something went wrong. Please try again later.", "error");
     } finally {
       setIsLogIn(false);
