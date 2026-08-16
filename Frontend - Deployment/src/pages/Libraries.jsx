@@ -1029,7 +1029,7 @@ function Libraries() {
       )}
       {/* Library left panel (only visible on Libraries page) */}
       <aside className="fixed top-0 left-[63px] hidden h-screen w-56 overflow-hidden border-r border-gray-200 bg-white px-4 py-4 lg:block lg:w-64">
-        <h2 className="outfit-500 mb-4 text-[16px] tracking-wide text-black">
+        <h2 className="outfit-500 mb-4 text-[16px] tracking-wide text-amber">
           Library
         </h2>
 
