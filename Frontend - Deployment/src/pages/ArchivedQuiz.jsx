@@ -444,7 +444,7 @@ const ArchivedQuiz = () => {
           >
             <span className="flex items-center gap-2">
               <img src={MyQuizzezIcon} alt="My Quizzez" className="h-4 w-4" />
-              <span>My quizzes</span>
+              <span>My Quizzes</span>
             </span>
           </button>
 
@@ -526,8 +526,8 @@ const ArchivedQuiz = () => {
               <button
                 type="button"
                 onClick={() => navigate("/libraries")}
-                className="flex h-9 w-9 flex-shrink-0 cursor-pointer items-center justify-center rounded-full text-gray-700 hover:bg-gray-100 md:hidden"
-                aria-label="Back to My quizzes"
+                className="flex h-9 w-9 flex-shrink-0 cursor-pointer items-center justify-center rounded-full text-amber-700 hover:bg-gray-100 md:hidden"
+                aria-label="Back to My Quizzes"
               >
                 <i className="bx bx-arrow-left-stroke text-[28px]" />
               </button>

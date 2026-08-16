@@ -117,6 +117,7 @@ const CustomSelect = ({
 };
 
 const UserList = () => {
+  
   // State for user data and loading
   const [users, setUsers] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -165,6 +166,13 @@ const UserList = () => {
   const [isLoadingModalOptions, setIsLoadingModalOptions] = useState(false);
   const [isSavingCredentials, setIsSavingCredentials] = useState(false);
   const [credentialError, setCredentialError] = useState("");
+
+  // Mouse-follow glow position
+  const [mousePos, setMousePos] = useState({ x: 0, y: 0 });
+
+  const handleMouseMove = (e) => {
+    setMousePos({ x: e.clientX, y: e.clientY });
+  };
 
   // Hide mobile sidebar when banner is displayed (only on mobile)
   useEffect(() => {
@@ -1434,14 +1442,33 @@ const UserList = () => {
   };
 
   return (
-    <div className="flex min-h-screen">
+  <div
+    className="relative flex min-h-screen"
+    onMouseMove={handleMouseMove}
+  >
+    {/* Background layer */}
+    <div className="pointer-events-none fixed inset-0 z-0 overflow-hidden bg-gradient-to-br from-orange-50 via-white to-orange-100">
+      <div className="absolute -top-24 -left-24 h-80 w-80 rounded-full bg-orange-200/50 blur-3xl" />
+      <div className="absolute -top-24 -right-24 h-80 w-80 rounded-full bg-orange-200/50 blur-3xl" />
+      <div className="absolute -bottom-24 -left-24 h-80 w-80 rounded-full bg-orange-200/50 blur-3xl" />
+      <div className="absolute -bottom-24 -right-24 h-80 w-80 rounded-full bg-orange-200/50 blur-3xl" />
+      <div className="absolute top-1/2 left-1/2 h-96 w-96 -translate-x-1/2 -translate-y-1/2 rounded-full bg-orange-100/40 blur-3xl" />
+
+      {/* Mouse-follow glow */}
+      <div
+        className="pointer-events-none absolute h-4 w-4 rounded-full bg-orange-500/100 blur-md transition-transform duration-75 ease-out"
+        style={{
+          transform: `translate(${mousePos.x - 8}px, ${mousePos.y - 8}px)`,
+        }}
+      />
+    </div>
       {/* Main content area */}
-      <div className="mt-10 flex min-h-screen flex-1 flex-col gap-6 overflow-y-auto px-4 pt-4 md:px-6 md:pt-6 lg:mt-0">
+    <div className="relative z-10 mt-10 flex min-h-screen flex-1 flex-col gap-6 overflow-y-auto px-4 pt-4 md:px-6 md:pt-6 lg:mt-0">
         <div className="min-w-0 space-y-4">
           <SearchBar
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
-            placeholder="Search users..."
+            placeholder="Type here to search..."
             mobileCollapsible
             showMobileSearch={showSearch}
             onCloseMobileSearch={() => {
@@ -1456,7 +1483,7 @@ const UserList = () => {
           {/* Header with title and action buttons */}
           <div className="flex flex-wrap items-center justify-between gap-2">
             <div className="min-w-0 flex-1">
-              <p className="outfit-500 mt-1 text-[18px] break-words text-black">
+              <p className="outfit-500 mt-1 text-[18px] break-words text-amber-900 sm:text-[20px] md:text-[22px]">
                 {selectedUsers.length > 0
                   ? "Select the users you want to modify"
                   : hasActiveFilters()
@@ -1464,7 +1491,7 @@ const UserList = () => {
                     : searchQuery.trim()
                       ? `Search results for "${searchQuery}"`
                       : activeView === "all"
-                        ? "All users"
+                        ? "All Users"
                         : activeView === "students"
                           ? "Students"
                           : activeView === "faculty"
@@ -3129,7 +3156,22 @@ const UserList = () => {
         headerIcon={warningModal.headerIcon}
       />
 
-      <Toast message={toast.message} type={toast.type} show={toast.show} />
+     <Toast message={toast.message} type={toast.type} show={toast.show} />
+
+      {/* Mouse-follow glow overlay - shows on top of all content */}
+      <div
+        className="pointer-events-none fixed inset-0 z-40 overflow-hidden"
+        style={{ mixBlendMode: "multiply" }}
+      >
+        
+        {/* Inner bright core - sits on top for more visibility */}
+        <div
+            className="pointer-events-none absolute h-4 w-4 rounded-full bg-orange-500/100 blur-md transition-transform duration-75 ease-out"
+            style={{
+              transform: `translate(${mousePos.x - 8}px, ${mousePos.y - 8}px)`,
+            }}
+          />
+        </div>
     </div>
   );
 };

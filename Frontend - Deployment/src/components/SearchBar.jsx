@@ -46,7 +46,7 @@ const SearchBar = ({
         ref={inputRef}
         type="text"
         placeholder={placeholder}
-        className="-mt-0 w-full max-w-full min-w-0 rounded-full border border-gray-200 bg-white py-2 pr-10 pl-10 text-sm text-gray-900 transition-all focus:border-orange-400 focus:ring-1 focus:ring-orange-400 focus:outline-none md:-mt-2"
+        className="-mt-0 w-full max-w-full min-w-0 rounded-full border border-orange-200 bg-white py-2 pr-10 pl-10 text-sm text-amber-900 transition-all focus:border-orange-400 focus:ring-1 focus:ring-orange-400 focus:outline-none md:-mt-2"
         value={value || ""}
         maxLength={45}
         onChange={(e) => onChange(e)}
