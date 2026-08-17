@@ -14,6 +14,7 @@ const AdminDashboard = () => {
     }
   }, []);
 
+  // ── Mouse position ─────────────────────────────────────
   const handleMouseMove = (e) => {
     const rect = e.currentTarget.getBoundingClientRect();
 
@@ -49,7 +50,8 @@ const AdminDashboard = () => {
         onMouseMove={handleMouseMove}
         className="outfit- 100 relative flex min-h-screen w-full flex-col items-center justify-center overflow-hidden text-center"
       >
-        {/* Subtle background blobs */}
+
+        {/* ── Subtle background blobs ───────────────────────── */}
         <div className="pointer-events-none absolute inset-0 overflow-hidden">
 
           {/* Top-left */}
@@ -67,23 +69,25 @@ const AdminDashboard = () => {
           {/* Middle */}
           <div className="absolute top-1/2 left-1/2 h-96 w-96 -translate-x-1/2 -translate-y-1/2 rounded-full bg-orange-100/40 blur-3xl" />
 
-          {/* Mouse-follow glow */}
+          {/* ── Mouse-follow glow ──────────────────────────── */}
           <div
             className="pointer-events-none absolute h-4 w-4 rounded-full bg-orange-500/100 blur-md transition-transform duration-75 ease-out"
             style={{
-              transform: `translate(${mousePos.x - 8}px, ${mousePos.y - 8}px)`,
+              transform: `translate(${mousePos.x - 8}px, ${
+                mousePos.y - 8
+              }px)`,
             }}
           />
         </div>
 
+        {/* ── Welcome Content ──────────────────────────────── */}
         <div className="relative z-10 -mt-50 flex flex-col items-center gap-5 lg:mt-0">
 
-          
-         {/* Badge */}
-         <span className="inline-flex items-center gap-2 rounded-full border border-orange-300/60 bg-orange-200/40 px-3 py-1 text-[11px] font-semibold tracking-widest text-amber-700 uppercase backdrop-blur-md">
-         <span className="text-[15px] leading-none">✦</span>
-          CAPS RVW • READY TO EXPLORE
-         </span>
+          {/* Badge */}
+          <span className="inline-flex items-center gap-2 rounded-full border border-orange-300/60 bg-orange-200/40 px-3 py-1 text-[11px] font-semibold tracking-widest text-amber-700 uppercase backdrop-blur-md">
+            <span className="text-[15px] leading-none">✦</span>
+            CAPS RVW • READY TO EXPLORE
+          </span>
 
           {/* Heading */}
           <div className="flex flex-col items-center gap-2">
@@ -114,14 +118,16 @@ const AdminDashboard = () => {
           </button>
 
           {/* Bottom guide text */}
-         <p className="max-w-md text-[12px] leading-relaxed text-gray-400">
-          Select a section from the sidebar to begin exploring{" "}
-         <span className="font-semibold text-orange-400">CAPS RVW</span>.
-
+          <p className="max-w-md text-[12px] leading-relaxed text-gray-400">
+            Select a section from the sidebar to begin exploring{" "}
+            <span className="font-semibold text-orange-400">
+              CAPS RVW
+            </span>.
           </p>
         </div>
       </div>
 
+      {/* ── Changelog Modal ────────────────────────────────── */}
       {showChangelog && (
         <ChangelogModal onClose={() => setShowChangelog(false)} />
       )}

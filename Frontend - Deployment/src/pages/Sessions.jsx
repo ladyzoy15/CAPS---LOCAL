@@ -17,6 +17,7 @@ const Sessions = () => {
   const [expandedSessionId, setExpandedSessionId] = useState(null);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState(null);
+  const [mousePos, setMousePos] = useState({ x: 0, y: 0 });
   const [sessions, setSessions] = useState({
     ongoing: [],
     completed: [],
@@ -295,12 +296,43 @@ const Sessions = () => {
     return headerColors[num % headerColors.length];
   };
 
+  const handleMouseMove = (e) => {
+    const rect = e.currentTarget.getBoundingClientRect();
+    setMousePos({
+      x: e.clientX - rect.left,
+      y: e.clientY - rect.top,
+    });
+  };
+
   return (
     <>
       <Toast message={toast.message} type={toast.type} show={toast.show} />
-      <div className="flex h-screen">
+
+      <div onMouseMove={handleMouseMove} className="relative flex h-screen overflow-hidden bg-gradient-to-br from-orange-50 via-white to-orange-100">
+        {/* Background blobs + mouse-follow glow - absolute, anchored to this wrapper (not fixed/viewport) */}
+        <div className="pointer-events-none absolute inset-0 z-0 overflow-hidden">
+          {/* Top-left */}
+          <div className="absolute -top-24 -left-24 h-80 w-80 rounded-full bg-orange-200/50 blur-3xl" />
+          {/* Top-right */}
+          <div className="absolute -top-24 -right-24 h-80 w-80 rounded-full bg-orange-200/50 blur-3xl" />
+          {/* Bottom-left */}
+          <div className="absolute -bottom-24 -left-24 h-80 w-80 rounded-full bg-orange-200/50 blur-3xl" />
+          {/* Bottom-right */}
+          <div className="absolute -bottom-24 -right-24 h-80 w-80 rounded-full bg-orange-200/50 blur-3xl" />
+          {/* Middle */}
+          <div className="absolute top-1/2 left-1/2 h-96 w-96 -translate-x-1/2 -translate-y-1/2 rounded-full bg-orange-100/40 blur-3xl" />
+
+          {/* Mouse-follow glow */}
+          <div
+            className="pointer-events-none absolute h-4 w-4 rounded-full bg-orange-500/100 blur-md transition-transform duration-75 ease-out"
+            style={{
+              transform: `translate(${mousePos.x - 8}px, ${mousePos.y - 8}px)`,
+            }}
+          />
+        </div>
+
         {/* Main content area */}
-        <div className="mt-10 flex h-full flex-1 flex-col gap-6 overflow-y-auto py-4 pb-24 lg:mt-0 lg:p-6">
+        <div className="relative z-10 mt-10 flex h-full flex-1 flex-col gap-6 overflow-y-auto py-4 pb-24 lg:mt-0 lg:p-6">
           <div className="space-y-4">
             {/* Mobile search input - below header when toggled */}
             {showMobileSearch && (

@@ -644,7 +644,7 @@ const Sidebar = ({
       <div
         ref={sidebarRef}
         onMouseMove={handleMouseMove}
-        className={`fixed top-0 left-0 z-55 h-[100vh] overflow-visible border-r border-amber-300/20 bg-[linear-gradient(180deg,rgba(255,236,213,0.95)_0%,rgba(255,228,196,0.92)_52%,rgba(255,220,180,0.95)_100%)] shadow-[12px_0_40px_rgba(217,119,6,0.6),inset_-1px_0_0_rgba(255,200,100,0.15)] backdrop-blur-[26px] backdrop-saturate-150 transition-all duration-300 ease-in-out ${
+        className={`fixed top-0 left-0 z-55 h-[100vh] overflow-visible border-r border-white-300/20 bg-[linear-gradient(180deg,rgba(255,236,213,0.95)_0%,rgba(206, 188, 167, 0.92)_52%,rgba(255,220,180,0.95)_100%)] shadow-[12px_0_40px_rgba(217,119,6,0.6),inset_-1px_0_0_rgba(255,200,100,0.15)] backdrop-blur-[26px] backdrop-saturate-150 transition-all duration-300 ease-in-out ${
           isUsersPage ? "w-[63px]" : "w-[220px]"
         }`}
       >
