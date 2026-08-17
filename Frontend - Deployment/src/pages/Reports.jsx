@@ -25,6 +25,16 @@ const Reports = () => {
   const [leaderboardError, setLeaderboardError] = useState(null);
   const [expandedId, setExpandedId] = useState(null);
 
+  // Mouse glow effect state
+  const [mousePos, setMousePos] = useState({ x: 0, y: 0 });
+  const handleMouseMove = (e) => {
+    const rect = e.currentTarget.getBoundingClientRect();
+    setMousePos({
+      x: e.clientX - rect.left,
+      y: e.clientY - rect.top,
+    });
+  };
+
   // Determine if user is student (role 1) or faculty/above (roles 2, 3, 4, 5)
   const isStudent = userRole === 1;
   const isFaculty = userRole && [2, 3, 4, 5].includes(Number(userRole));
@@ -153,92 +163,277 @@ const Reports = () => {
 
   return (
     <>
-      <div className="flex h-screen">
-        <div className="mt-10 flex h-full flex-1 flex-col gap-6 overflow-y-auto p-4 pb-0 md:p-6 lg:mt-0">
-          <div className="space-y-4">
-            <div>
-              <h1 className="outfit-500 text-[18px] text-black">Reports</h1>
-              <p className="outfit-400 text-[14px] text-gray-600">
-                View overall practice exam statistics across all subjects.
-              </p>
-            </div>
+      {/* BACKGROUND */}
+      <div className="pointer-events-none fixed inset-0 -z-10 overflow-hidden bg-gradient-to-br from-orange-50 via-white to-orange-100">
+        <div className="absolute -top-24 -left-24 h-80 w-80 rounded-full bg-orange-200/50 blur-3xl" />
+        <div className="absolute -top-24 -right-24 h-80 w-80 rounded-full bg-orange-200/50 blur-3xl" />
+        <div className="absolute -bottom-24 -left-24 h-80 w-80 rounded-full bg-orange-200/50 blur-3xl" />
+        <div className="absolute -right-24 -bottom-24 h-80 w-80 rounded-full bg-orange-200/50 blur-3xl" />
+        <div className="absolute top-1/2 left-1/2 h-96 w-96 -translate-x-1/2 -translate-y-1/2 rounded-full bg-orange-100/40 blur-3xl" />
+      </div>
 
-            <div className="my-4 h-px bg-gray-200" />
+      {/* MOUSE-TRACKING WRAPPER */}
+      <div onMouseMove={handleMouseMove} className="relative">
+        {/* MOUSE GLOW DOT */}
+        <div
+          className="pointer-events-none absolute h-4 w-4 rounded-full bg-orange-500 blur-md transition-transform duration-75 ease-out z-40"
+          style={{
+            transform: `translate(${mousePos.x - 8}px, ${mousePos.y - 8}px)`,
+          }}
+        />
 
-            <div className="flex items-center gap-2">
-              <button
-                onClick={() => {
-                  setActiveTab("recent");
-                  setExpandedId(null);
-                }}
-                className={`outfit-500 rounded-full px-4 py-2 text-[14px] font-medium transition-colors ${
-                  activeTab === "recent"
-                    ? "bg-gray-100 text-black"
-                    : "text-gray-600 hover:bg-gray-50"
-                }`}
-              >
-                <span className="flex items-center gap-2">
-                  <i className="bx bx-history text-[16px]"></i>
-                  Recent Takers
-                </span>
-              </button>
-              <button
-                onClick={() => {
-                  setActiveTab("leaderboard");
-                  setExpandedId(null);
-                }}
-                className={`outfit-500 rounded-full px-4 py-2 text-[14px] font-medium transition-colors ${
-                  activeTab === "leaderboard"
-                    ? "bg-gray-100 text-black"
-                    : "text-gray-600 hover:bg-gray-50"
-                }`}
-              >
-                <span className="flex items-center gap-2">
-                  <i className="bx bx-bar-chart-big text-[16px]"></i>
-                  Leaderboard
-                </span>
-              </button>
-            </div>
+        <div className="flex h-screen">
+          <div className="mt-10 flex h-full flex-1 flex-col gap-6 overflow-y-auto p-4 pb-0 md:p-6 lg:mt-0">
+            <div className="space-y-4">
+              <div>
+                <h1 className="outfit-500 text-[20px] text-amber-700">Reports</h1>
+                <p className="outfit-400 text-[14px] text-gray-600">
+                  View overall practice exam statistics across all subjects.
+                </p>
+              </div>
 
-            {/* Tab Content */}
-            {activeTab === "recent" ? (
-              loading ? (
+              <div className="my-4 h-px bg-gray-200" />
+
+              <div className="flex items-center gap-2">
+                <button
+                  onClick={() => {
+                    setActiveTab("recent");
+                    setExpandedId(null);
+                  }}
+                  className={`outfit-500 rounded-full px-4 py-2 text-[14px] font-medium transition-colors ${
+                    activeTab === "recent"
+                      ? "bg-gray-100 text-orange-600"
+                      : "text-amber-600 hover:bg-amber-50"
+                  }`}
+                >
+                  <span className="flex items-center gap-2">
+                    <i className="bx bx-history text-[16px]"></i>
+                    Recent Takers
+                  </span>
+                </button>
+                <button
+                  onClick={() => {
+                    setActiveTab("leaderboard");
+                    setExpandedId(null);
+                  }}
+                  className={`outfit-500 rounded-full px-4 py-2 text-[14px] font-medium transition-colors ${
+                    activeTab === "leaderboard"
+                      ? "bg-gray-100 text-orange-600"
+                      : "text-orange-600 hover:bg-amber-50"
+                  }`}
+                >
+                  <span className="flex items-center gap-2">
+                    <i className="bx bx-bar-chart-big text-[16px]"></i>
+                    Leaderboard
+                  </span>
+                </button>
+              </div>
+
+              {/* Tab Content */}
+              {activeTab === "recent" ? (
+                loading ? (
+                  <div className="outfit-400 py-8 text-center text-[14px] text-gray-500">
+                    {isStudent
+                      ? "Loading your recent activity..."
+                      : "Loading recent takers..."}
+                  </div>
+                ) : error ? (
+                  <div className="rounded-md border border-red-300 bg-red-50 p-4 text-center text-red-600">
+                    <p className="font-semibold">Error</p>
+                    <p>{error}</p>
+                  </div>
+                ) : recentTakers.length === 0 ? (
+                  <div className="outfit-400 outfit-400 flex min-h-64 flex-col items-center justify-center rounded-xl border border-gray-200 bg-white py-12 text-[14px]">
+                    <img
+                      src={EmptyImage}
+                      alt="No recent activity"
+                      className="mx-auto mb-3 h-32 w-32 opacity-80"
+                    />
+                    <p className="text-center text-sm text-orange-600">
+                      {isStudent
+                        ? "No recent exam activity found."
+                        : "No recent practice exam takers found."}
+                    </p>
+                  </div>
+                ) : (
+                  <>
+                    {/* Mobile expandable list - Recent Takers */}
+                    <div className="outfit-400 mb-6 space-y-0 overflow-hidden rounded-xl border border-gray-200 bg-white">
+                      {recentTakers.map((row, idx) => {
+                        const rowId = row.userID ?? `recent-${idx}`;
+                        const isExpanded = expandedId === rowId;
+                        const displayName =
+                          row.name ||
+                          `${row.firstName || ""} ${row.lastName || ""}`.trim() ||
+                          "-";
+                        const displayScore = `${row.lastAttemptScore || 0} / ${row.totalPoints || 0}`;
+
+                        const roleId = row.roleID ?? row.roleId ?? 1;
+
+                        return (
+                          <div
+                            key={rowId}
+                            className="border-b border-gray-200 last:border-b-0"
+                          >
+                            <button
+                              type="button"
+                              onClick={() =>
+                                setExpandedId(isExpanded ? null : rowId)
+                              }
+                              className="flex w-full cursor-pointer items-center gap-3 px-4 py-3 text-left transition-colors hover:bg-gray-50"
+                            >
+                              {/* Profile Image */}
+                              <div className="flex size-10 shrink-0 items-center justify-center overflow-hidden rounded-full bg-gray-100">
+                                <img
+                                  src={roleImages[roleId] || StudentPfp}
+                                  alt={displayName}
+                                  className="h-full w-full object-cover"
+                                />
+                              </div>
+
+                              {/* Name + Course */}
+                              <div className="min-w-0 flex-1">
+                                <div className="text-sm font-semibold text-gray-900">
+                                  {displayName}
+                                </div>
+                                <div className="outfit-400 text-xs text-gray-500">
+                                  {row.course || "-"}
+                                </div>
+                              </div>
+
+                              {/* Subject + Score + Chevron */}
+                              <div className="flex shrink-0 items-center gap-4">
+                                {/* Subject + Score (Stacked) */}
+                                <div className="mr-4 flex flex-col items-end leading-tight">
+                                  <span className="text-xs text-gray-500">
+                                    {row.lastAttemptSubject?.subjectName || "-"}
+                                  </span>
+                                  <span className="text-sm font-semibold text-gray-900">
+                                    {displayScore}
+                                  </span>
+                                </div>
+
+                                {/* Chevron */}
+                                <i
+                                  className={`bx bx-chevron-down text-xl text-gray-400 transition-transform ${
+                                    isExpanded ? "rotate-180" : ""
+                                  }`}
+                                />
+                              </div>
+                            </button>
+                            {isExpanded && (
+                              <div className="border-t border-gray-100 bg-gray-50/60 px-4 py-4">
+                                <div className="space-y-3 text-sm">
+                                  {isFaculty && (
+                                    <>
+                                      <div className="flex justify-between">
+                                        <span className="text-gray-500">
+                                          Year
+                                        </span>
+                                        <span className="text-gray-900">
+                                          {row.year || row.yearLevel || "-"}
+                                        </span>
+                                      </div>
+                                      <div className="flex justify-between">
+                                        <span className="text-gray-500">
+                                          Student ID
+                                        </span>
+                                        <span className="text-gray-900">
+                                          {row.studentID || "-"}
+                                        </span>
+                                      </div>
+                                    </>
+                                  )}
+                                  <div className="flex justify-between">
+                                    <span className="text-gray-500">
+                                      Last Subject
+                                    </span>
+                                    <span className="text-gray-900">
+                                      {row.lastAttemptSubject?.subjectName ||
+                                        row.lastAttemptSubject?.subjectCode ||
+                                        "-"}
+                                    </span>
+                                  </div>
+                                  <div className="flex justify-between">
+                                    <span className="text-gray-500">
+                                      Last Score
+                                    </span>
+                                    <span className="text-gray-900">
+                                      {row.lastAttemptScore || 0} /{" "}
+                                      {row.totalPoints || 0}
+                                    </span>
+                                  </div>
+                                  <div className="flex justify-between">
+                                    <span className="text-gray-500">
+                                      Highest %
+                                    </span>
+                                    <span className="text-gray-900">
+                                      {row.highestPercentage || 0}%
+                                    </span>
+                                  </div>
+                                  <div className="flex justify-between">
+                                    <span className="text-gray-500">Avg %</span>
+                                    <span className="text-gray-900">
+                                      {row.averagePercentage || 0}%
+                                    </span>
+                                  </div>
+                                  <div className="flex justify-between">
+                                    <span className="text-gray-500">
+                                      Attempts
+                                    </span>
+                                    <span className="text-gray-900">
+                                      {row.totalAttempts || 0}
+                                    </span>
+                                  </div>
+                                  <div className="flex justify-between">
+                                    <span className="text-gray-500">
+                                      Last Attempt
+                                    </span>
+                                    <span className="text-gray-900">
+                                      {formatDate(row.lastAttemptDate)}
+                                    </span>
+                                  </div>
+                                </div>
+                              </div>
+                            )}
+                          </div>
+                        );
+                      })}
+                    </div>
+                  </>
+                )
+              ) : leaderboardLoading ? (
                 <div className="outfit-400 py-8 text-center text-[14px] text-gray-500">
-                  {isStudent
-                    ? "Loading your recent activity..."
-                    : "Loading recent takers..."}
+                  Loading leaderboard...
                 </div>
-              ) : error ? (
+              ) : leaderboardError ? (
                 <div className="rounded-md border border-red-300 bg-red-50 p-4 text-center text-red-600">
                   <p className="font-semibold">Error</p>
-                  <p>{error}</p>
+                  <p>{leaderboardError}</p>
                 </div>
-              ) : recentTakers.length === 0 ? (
-                <div className="outfit-400 outfit-400 flex min-h-64 flex-col items-center justify-center rounded-xl border border-gray-200 bg-white py-12 text-[14px]">
+              ) : leaderboard.length === 0 ? (
+                <div className="outfit-400 flex min-h-64 flex-col items-center justify-center rounded-xl border border-gray-200 bg-white py-12">
                   <img
                     src={EmptyImage}
-                    alt="No recent activity"
+                    alt="No leaderboard"
                     className="mx-auto mb-3 h-32 w-32 opacity-80"
                   />
-                  <p className="text-center text-sm text-gray-600">
-                    {isStudent
-                      ? "No recent exam activity found."
-                      : "No recent practice exam takers found."}
+                  <p className="text-center text-[14px] text-orange-600">
+                    No leaderboard data available yet.
                   </p>
                 </div>
               ) : (
                 <>
-                  {/* Mobile expandable list - Recent Takers */}
-                  <div className="outfit-400 mb-6 space-y-0 overflow-hidden rounded-xl border border-gray-200 bg-white">
-                    {recentTakers.map((row, idx) => {
-                      const rowId = row.userID ?? `recent-${idx}`;
+                  {/* Mobile expandable list - Leaderboard */}
+                  <div className="outfit-400 space-y-0 overflow-hidden rounded-xl border border-gray-200 bg-white">
+                    {leaderboard.map((row, idx) => {
+                      const rowId = row.userID ?? `leaderboard-${idx}`;
                       const isExpanded = expandedId === rowId;
                       const displayName =
                         row.name ||
                         `${row.firstName || ""} ${row.lastName || ""}`.trim() ||
                         "-";
-                      const displayScore = `${row.lastAttemptScore || 0} / ${row.totalPoints || 0}`;
-
+                      const displayScore = `${row.averagePercentage || 0}%`;
                       const roleId = row.roleID ?? row.roleId ?? 1;
 
                       return (
@@ -253,7 +448,6 @@ const Reports = () => {
                             }
                             className="flex w-full cursor-pointer items-center gap-3 px-4 py-3 text-left transition-colors hover:bg-gray-50"
                           >
-                            {/* Profile Image */}
                             <div className="flex size-10 shrink-0 items-center justify-center overflow-hidden rounded-full bg-gray-100">
                               <img
                                 src={roleImages[roleId] || StudentPfp}
@@ -261,30 +455,23 @@ const Reports = () => {
                                 className="h-full w-full object-cover"
                               />
                             </div>
-
-                            {/* Name + Course */}
                             <div className="min-w-0 flex-1">
-                              <div className="text-sm font-semibold text-gray-900">
-                                {displayName}
+                              <div className="flex items-center gap-2">
+                                <span className="text-sm font-semibold text-gray-900">
+                                  {displayName}
+                                </span>
+                                {idx === 0 && (
+                                  <i className="bx bx-trophy text-yellow-500"></i>
+                                )}
                               </div>
                               <div className="outfit-400 text-xs text-gray-500">
                                 {row.course || "-"}
                               </div>
                             </div>
-
-                            {/* Subject + Score + Chevron */}
-                            <div className="flex shrink-0 items-center gap-4">
-                              {/* Subject + Score (Stacked) */}
-                              <div className="mr-4 flex flex-col items-end leading-tight">
-                                <span className="text-xs text-gray-500">
-                                  {row.lastAttemptSubject?.subjectName || "-"}
-                                </span>
-                                <span className="text-sm font-semibold text-gray-900">
-                                  {displayScore}
-                                </span>
-                              </div>
-
-                              {/* Chevron */}
+                            <div className="flex shrink-0 items-center gap-2">
+                              <span className="text-sm font-medium text-gray-900">
+                                {displayScore}
+                              </span>
                               <i
                                 className={`bx bx-chevron-down text-xl text-gray-400 transition-transform ${
                                   isExpanded ? "rotate-180" : ""
@@ -295,63 +482,32 @@ const Reports = () => {
                           {isExpanded && (
                             <div className="border-t border-gray-100 bg-gray-50/60 px-4 py-4">
                               <div className="space-y-3 text-sm">
-                                {isFaculty && (
-                                  <>
-                                    <div className="flex justify-between">
-                                      <span className="text-gray-500">
-                                        Year
-                                      </span>
-                                      <span className="text-gray-900">
-                                        {row.year || row.yearLevel || "-"}
-                                      </span>
-                                    </div>
-                                    <div className="flex justify-between">
-                                      <span className="text-gray-500">
-                                        Student ID
-                                      </span>
-                                      <span className="text-gray-900">
-                                        {row.studentID || "-"}
-                                      </span>
-                                    </div>
-                                  </>
-                                )}
                                 <div className="flex justify-between">
-                                  <span className="text-gray-500">
-                                    Last Subject
-                                  </span>
+                                  <span className="text-gray-500">Rank</span>
+                                  <span className="text-gray-900">{idx + 1}</span>
+                                </div>
+                                <div className="flex justify-between">
+                                  <span className="text-gray-500">Year</span>
                                   <span className="text-gray-900">
-                                    {row.lastAttemptSubject?.subjectName ||
-                                      row.lastAttemptSubject?.subjectCode ||
-                                      "-"}
+                                    {row.year || row.yearLevel || "-"}
                                   </span>
                                 </div>
                                 <div className="flex justify-between">
                                   <span className="text-gray-500">
-                                    Last Score
+                                    Student ID
                                   </span>
                                   <span className="text-gray-900">
-                                    {row.lastAttemptScore || 0} /{" "}
-                                    {row.totalPoints || 0}
+                                    {row.studentID || "-"}
                                   </span>
                                 </div>
                                 <div className="flex justify-between">
-                                  <span className="text-gray-500">
-                                    Highest %
-                                  </span>
+                                  <span className="text-gray-500">Highest %</span>
                                   <span className="text-gray-900">
                                     {row.highestPercentage || 0}%
                                   </span>
                                 </div>
                                 <div className="flex justify-between">
-                                  <span className="text-gray-500">Avg %</span>
-                                  <span className="text-gray-900">
-                                    {row.averagePercentage || 0}%
-                                  </span>
-                                </div>
-                                <div className="flex justify-between">
-                                  <span className="text-gray-500">
-                                    Attempts
-                                  </span>
+                                  <span className="text-gray-500">Attempts</span>
                                   <span className="text-gray-900">
                                     {row.totalAttempts || 0}
                                   </span>
@@ -372,134 +528,8 @@ const Reports = () => {
                     })}
                   </div>
                 </>
-              )
-            ) : leaderboardLoading ? (
-              <div className="outfit-400 py-8 text-center text-[14px] text-gray-500">
-                Loading leaderboard...
-              </div>
-            ) : leaderboardError ? (
-              <div className="rounded-md border border-red-300 bg-red-50 p-4 text-center text-red-600">
-                <p className="font-semibold">Error</p>
-                <p>{leaderboardError}</p>
-              </div>
-            ) : leaderboard.length === 0 ? (
-              <div className="outfit-400 flex min-h-64 flex-col items-center justify-center rounded-xl border border-gray-200 bg-white py-12">
-                <img
-                  src={EmptyImage}
-                  alt="No leaderboard"
-                  className="mx-auto mb-3 h-32 w-32 opacity-80"
-                />
-                <p className="text-center text-[14px] text-gray-600">
-                  No leaderboard data available yet.
-                </p>
-              </div>
-            ) : (
-              <>
-                {/* Mobile expandable list - Leaderboard */}
-                <div className="outfit-400 space-y-0 overflow-hidden rounded-xl border border-gray-200 bg-white">
-                  {leaderboard.map((row, idx) => {
-                    const rowId = row.userID ?? `leaderboard-${idx}`;
-                    const isExpanded = expandedId === rowId;
-                    const displayName =
-                      row.name ||
-                      `${row.firstName || ""} ${row.lastName || ""}`.trim() ||
-                      "-";
-                    const displayScore = `${row.averagePercentage || 0}%`;
-                    const roleId = row.roleID ?? row.roleId ?? 1;
-
-                    return (
-                      <div
-                        key={rowId}
-                        className="border-b border-gray-200 last:border-b-0"
-                      >
-                        <button
-                          type="button"
-                          onClick={() =>
-                            setExpandedId(isExpanded ? null : rowId)
-                          }
-                          className="flex w-full cursor-pointer items-center gap-3 px-4 py-3 text-left transition-colors hover:bg-gray-50"
-                        >
-                          <div className="flex size-10 shrink-0 items-center justify-center overflow-hidden rounded-full bg-gray-100">
-                            <img
-                              src={roleImages[roleId] || StudentPfp}
-                              alt={displayName}
-                              className="h-full w-full object-cover"
-                            />
-                          </div>
-                          <div className="min-w-0 flex-1">
-                            <div className="flex items-center gap-2">
-                              <span className="text-sm font-semibold text-gray-900">
-                                {displayName}
-                              </span>
-                              {idx === 0 && (
-                                <i className="bx bx-trophy text-yellow-500"></i>
-                              )}
-                            </div>
-                            <div className="outfit-400 text-xs text-gray-500">
-                              {row.course || "-"}
-                            </div>
-                          </div>
-                          <div className="flex shrink-0 items-center gap-2">
-                            <span className="text-sm font-medium text-gray-900">
-                              {displayScore}
-                            </span>
-                            <i
-                              className={`bx bx-chevron-down text-xl text-gray-400 transition-transform ${
-                                isExpanded ? "rotate-180" : ""
-                              }`}
-                            />
-                          </div>
-                        </button>
-                        {isExpanded && (
-                          <div className="border-t border-gray-100 bg-gray-50/60 px-4 py-4">
-                            <div className="space-y-3 text-sm">
-                              <div className="flex justify-between">
-                                <span className="text-gray-500">Rank</span>
-                                <span className="text-gray-900">{idx + 1}</span>
-                              </div>
-                              <div className="flex justify-between">
-                                <span className="text-gray-500">Year</span>
-                                <span className="text-gray-900">
-                                  {row.year || row.yearLevel || "-"}
-                                </span>
-                              </div>
-                              <div className="flex justify-between">
-                                <span className="text-gray-500">
-                                  Student ID
-                                </span>
-                                <span className="text-gray-900">
-                                  {row.studentID || "-"}
-                                </span>
-                              </div>
-                              <div className="flex justify-between">
-                                <span className="text-gray-500">Highest %</span>
-                                <span className="text-gray-900">
-                                  {row.highestPercentage || 0}%
-                                </span>
-                              </div>
-                              <div className="flex justify-between">
-                                <span className="text-gray-500">Attempts</span>
-                                <span className="text-gray-900">
-                                  {row.totalAttempts || 0}
-                                </span>
-                              </div>
-                              <div className="flex justify-between">
-                                <span className="text-gray-500">
-                                  Last Attempt
-                                </span>
-                                <span className="text-gray-900">
-                                  {formatDate(row.lastAttemptDate)}
-                                </span>
-                              </div>
-                            </div>
-                          </div>
-                        )}
-                      </div>
-                    );
-                  })}
-                </div>
-              </>
-            )}
+              )}
+            </div>
           </div>
         </div>
       </div>

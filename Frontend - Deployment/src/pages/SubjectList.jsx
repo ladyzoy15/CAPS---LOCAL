@@ -243,6 +243,16 @@ function SubjectList() {
   const kebabButtonRefs = useRef({});
   const [dropdownButtonRect, setDropdownButtonRect] = useState(null);
 
+  // Mouse glow effect state
+  const [mousePos, setMousePos] = useState({ x: 0, y: 0 });
+  const handleMouseMove = (e) => {
+    const rect = e.currentTarget.getBoundingClientRect();
+    setMousePos({
+      x: e.clientX - rect.left,
+      y: e.clientY - rect.top,
+    });
+  };
+
   // Close kebab menu when clicking outside or scrolling
   useEffect(() => {
     const handleClickOutside = (event) => {
@@ -777,1154 +787,1176 @@ function SubjectList() {
   );
 
   return (
-    <div className="flex min-h-screen">
-      {/* Left sidebar panel */}
-      <aside className="fixed top-0 left-[63px] hidden h-screen w-56 overflow-hidden border-r border-gray-200 bg-white px-4 py-4 lg:block lg:w-64">
-        <h2 className="outfit-500 mb-4 text-[16px] tracking-wide text-black">
-          Subjects
-        </h2>
+    <>
+      {/* BACKGROUND */}
+      <div className="pointer-events-none fixed inset-0 -z-10 overflow-hidden bg-gradient-to-br from-orange-50 via-white to-orange-100">
+        <div className="absolute -top-24 -left-24 h-80 w-80 rounded-full bg-orange-200/50 blur-3xl" />
+        <div className="absolute -top-24 -right-24 h-80 w-80 rounded-full bg-orange-200/50 blur-3xl" />
+        <div className="absolute -bottom-24 -left-24 h-80 w-80 rounded-full bg-orange-200/50 blur-3xl" />
+        <div className="absolute -right-24 -bottom-24 h-80 w-80 rounded-full bg-orange-200/50 blur-3xl" />
+        <div className="absolute top-1/2 left-1/2 h-96 w-96 -translate-x-1/2 -translate-y-1/2 rounded-full bg-orange-100/40 blur-3xl" />
+      </div>
 
-        <nav className="outfit-500 space-y-1 text-[14px]">
-          <Link
-            to={basePath}
-            onClick={() => {
-              setSelectedProgramFilter("All");
-              window.scrollTo({ top: 0, behavior: "smooth" });
-            }}
-            className={`flex w-full cursor-pointer items-center justify-between rounded-md px-3 py-2 text-left transition-colors ${
-              (location.pathname === "/dean/subjects" ||
-                location.pathname === "/program-chair/subjects") &&
-              location.pathname !== "/dean/subjects/archive" &&
-              selectedProgramFilter === "All"
-                ? "bg-gray-100 font-medium text-gray-900"
-                : "text-gray-600 hover:bg-gray-100"
-            }`}
-          >
-            <span className="flex items-center gap-2">
-              <img
-                src={
+      {/* MOUSE-TRACKING WRAPPER */}
+      <div onMouseMove={handleMouseMove} className="relative">
+        {/* MOUSE GLOW DOT */}
+        <div
+          className="pointer-events-none absolute h-4 w-4 rounded-full bg-orange-500 blur-md transition-transform duration-75 ease-out z-40"
+          style={{
+            transform: `translate(${mousePos.x - 8}px, ${mousePos.y - 8}px)`,
+          }}
+        />
+
+        <div className="flex min-h-screen">
+          {/* Left sidebar panel */}
+          <aside className="fixed top-0 left-[63px] hidden h-screen w-56 overflow-hidden border-r border-gray-200 bg-white px-4 py-4 lg:block lg:w-64">
+            <h2 className="outfit-500 mb-4 text-[16px] tracking-wide text-black">
+              Subjects
+            </h2>
+
+            <nav className="outfit-500 space-y-1 text-[14px]">
+              <Link
+                to={basePath}
+                onClick={() => {
+                  setSelectedProgramFilter("All");
+                  window.scrollTo({ top: 0, behavior: "smooth" });
+                }}
+                className={`flex w-full cursor-pointer items-center justify-between rounded-md px-3 py-2 text-left transition-colors ${
                   (location.pathname === "/dean/subjects" ||
                     location.pathname === "/program-chair/subjects") &&
                   location.pathname !== "/dean/subjects/archive" &&
                   selectedProgramFilter === "All"
-                    ? AllSubjectsIconH
-                    : AllSubjectsIcon
-                }
-                alt="All Subjects"
-                loading="lazy"
-                decoding="async"
-                className="h-4 w-4"
-              />
-              <span>All Subjects</span>
-            </span>
-          </Link>
-          <div className="my-4 h-px bg-gray-200" />
-          <div className="outfit-500 px-2 text-[12px] font-semibold text-gray-500">
-            PROGRAMS{" "}
-          </div>
-          {uniquePrograms.map((programName) => (
-            <button
-              key={programName}
-              type="button"
-              onClick={() => {
-                setSelectedProgramFilter(programName);
-              }}
-              className={`flex w-full cursor-pointer items-center justify-between rounded-md px-3 py-2 text-left transition-colors ${
-                selectedProgramFilter === programName
-                  ? "bg-gray-100 font-medium text-gray-900"
-                  : "text-gray-600 hover:bg-gray-100"
-              }`}
-            >
-              <span>{getDisplayProgramName(programName)}</span>
-            </button>
-          ))}
-        </nav>
-      </aside>
-
-      {/* Main content area */}
-      <div className="scrollbar-hide mt-10 ml-0 flex min-h-screen flex-1 flex-col gap-6 overflow-y-auto pb-0 [-ms-overflow-style:none] [scrollbar-width:none] lg:mt-0 lg:ml-64 [&::-webkit-scrollbar]:hidden">
-        <div className="min-w-0 space-y-4 px-4 pt-4 md:px-6 md:pt-6">
-          <SearchBar
-            value={searchTerm}
-            onChange={(e) => setSearchTerm(e.target.value)}
-            placeholder="Search subjects..."
-            mobileCollapsible
-            showMobileSearch={showMobileSearch}
-            onCloseMobileSearch={() => setShowMobileSearch(false)}
-            inputRef={mobileSearchInputRef}
-          />
-
-          <div className="my-4 hidden h-px bg-gray-200 md:block" />
-
-          {/* Header with title and action buttons */}
-          <div className="flex flex-wrap items-center justify-between gap-2">
-            <div className="min-w-0 flex-1">
-              <p className="outfit-500 mt-1 text-[18px] break-words text-black">
-                {searchTerm.trim() ? (
-                  <>
-                    Search results for &quot;{searchTerm}&quot;
-                    <span className="hidden md:inline">
-                      {" "}
-                      ({filteredSubjects.length})
-                    </span>
-                  </>
-                ) : selectedProgramFilter === "All" ? (
-                  <>
-                    Qualifying exam
-                    <span className="hidden md:inline">
-                      {" "}
-                      ({filteredSubjects.length})
-                    </span>
-                  </>
-                ) : (
-                  <>
-                    {getDisplayProgramName(selectedProgramFilter)}
-                    <span className="hidden md:inline">
-                      {" "}
-                      ({filteredSubjects.length})
-                    </span>
-                  </>
-                )}
-              </p>
-            </div>
-
-            <div className="flex flex-shrink-0 items-center gap-1 md:gap-2">
-              <SearchBarTrigger
-                isOpen={showMobileSearch}
-                onClick={() => setShowMobileSearch((prev) => !prev)}
-                title="Search subjects"
-              />
-              {/* Print / Generate exam - mobile only, beside search (hidden for faculty) */}
-              {Number(effectiveRoleId) !== 2 && (
-                <button
-                  type="button"
-                  onClick={() => setShowPrintModal(true)}
-                  title="Print generating exam"
-                  className="outfit-500 -mb-2 inline-flex cursor-pointer items-center rounded-xl p-2 text-[12px] font-medium text-gray-700 transition-colors hover:bg-gray-100 md:hidden md:text-[14px]"
-                  aria-label="Print generating exam"
-                >
-                  <i className="bx bx-printer text-[22px]" />
-                </button>
-              )}
-              {/* Reports - mobile only, beside print */}
-              <button
-                type="button"
-                onClick={() => navigate("/reports")}
-                title="Reports"
-                className="outfit-500 -mb-2 inline-flex cursor-pointer items-center rounded-xl p-2 text-[12px] font-medium text-gray-700 transition-colors hover:bg-gray-100 md:hidden md:text-[14px]"
-                aria-label="Reports"
+                    ? "bg-gray-100 font-medium text-gray-900"
+                    : "text-gray-600 hover:bg-gray-100"
+                }`}
               >
-                <img
-                  src={ReportsIcon}
-                  alt="Reports"
-                  loading="lazy"
-                  decoding="async"
-                  className="size-[24px] flex-shrink-0"
-                />
-              </button>
-
-              {/* Year Level Filter Dropdown - icon only on mobile, full button on desktop */}
-              <div className="relative" ref={yearLevelDropdownRef}>
-                <button
-                  type="button"
-                  onClick={() =>
-                    setShowYearLevelDropdown(!showYearLevelDropdown)
-                  }
-                  title={
-                    selectedYearLevelFilter === "All"
-                      ? "All Year Levels"
-                      : `${selectedYearLevelFilter}${selectedYearLevelFilter === "1" ? "st" : selectedYearLevelFilter === "2" ? "nd" : selectedYearLevelFilter === "3" ? "rd" : "th"} Year`
-                  }
-                  className="outfit-500 -mb-2 hidden cursor-pointer items-center rounded-xl border-gray-200 bg-white p-2 text-[12px] font-medium text-gray-700 transition-colors hover:bg-gray-100 md:mb-0 md:inline-flex md:border md:px-4 md:py-2 md:text-[14px]"
-                >
-                  <span className="hidden md:inline">
-                    {selectedYearLevelFilter === "All"
-                      ? "All Year Levels"
-                      : `${selectedYearLevelFilter}${selectedYearLevelFilter === "1" ? "st" : selectedYearLevelFilter === "2" ? "nd" : selectedYearLevelFilter === "3" ? "rd" : "th"} Year`}
-                  </span>
-                  <i
-                    className={`bx bx-chevron-down ml-2 hidden text-lg text-[22px] transition-transform ${
-                      showYearLevelDropdown ? "rotate-180" : ""
-                    }`}
+                <span className="flex items-center gap-2">
+                  <img
+                    src={
+                      (location.pathname === "/dean/subjects" ||
+                        location.pathname === "/program-chair/subjects") &&
+                      location.pathname !== "/dean/subjects/archive" &&
+                      selectedProgramFilter === "All"
+                        ? AllSubjectsIconH
+                        : AllSubjectsIcon
+                    }
+                    alt="All Subjects"
+                    loading="lazy"
+                    decoding="async"
+                    className="h-4 w-4"
                   />
+                  <span>All Subjects</span>
+                </span>
+              </Link>
+              <div className="my-4 h-px bg-gray-200" />
+              <div className="outfit-500 px-2 text-[12px] font-semibold text-gray-500">
+                PROGRAMS{" "}
+              </div>
+              {uniquePrograms.map((programName) => (
+                <button
+                  key={programName}
+                  type="button"
+                  onClick={() => {
+                    setSelectedProgramFilter(programName);
+                  }}
+                  className={`flex w-full cursor-pointer items-center justify-between rounded-md px-3 py-2 text-left transition-colors ${
+                    selectedProgramFilter === programName
+                      ? "bg-gray-100 font-medium text-gray-900"
+                      : "text-gray-600 hover:bg-gray-100"
+                  }`}
+                >
+                  <span>{getDisplayProgramName(programName)}</span>
                 </button>
+              ))}
+            </nav>
+          </aside>
 
-                {showYearLevelDropdown && (
-                  <div className="outfit-500 fade-in absolute right-0 z-99 mt-3 min-w-[150px] rounded-xl border border-gray-200 bg-white p-1 shadow-lg">
+          {/* Main content area */}
+          <div className="scrollbar-hide mt-10 ml-0 flex min-h-screen flex-1 flex-col gap-6 overflow-y-auto pb-0 [-ms-overflow-style:none] [scrollbar-width:none] lg:mt-0 lg:ml-64 [&::-webkit-scrollbar]:hidden">
+            <div className="min-w-0 space-y-4 px-4 pt-4 md:px-6 md:pt-6">
+              <SearchBar
+                value={searchTerm}
+                onChange={(e) => setSearchTerm(e.target.value)}
+                placeholder="Search subjects..."
+                mobileCollapsible
+                showMobileSearch={showMobileSearch}
+                onCloseMobileSearch={() => setShowMobileSearch(false)}
+                inputRef={mobileSearchInputRef}
+              />
+
+              <div className="my-4 hidden h-px bg-gray-200 md:block" />
+
+              {/* Header with title and action buttons */}
+              <div className="flex flex-wrap items-center justify-between gap-2">
+                <div className="min-w-0 flex-1">
+                  <p className="outfit-500 mt-1 text-[18px] break-words text-black">
+                    {searchTerm.trim() ? (
+                      <>
+                        Search results for &quot;{searchTerm}&quot;
+                        <span className="hidden md:inline">
+                          {" "}
+                          ({filteredSubjects.length})
+                        </span>
+                      </>
+                    ) : selectedProgramFilter === "All" ? (
+                      <>
+                        Qualifying exam
+                        <span className="hidden md:inline">
+                          {" "}
+                          ({filteredSubjects.length})
+                        </span>
+                      </>
+                    ) : (
+                      <>
+                        {getDisplayProgramName(selectedProgramFilter)}
+                        <span className="hidden md:inline">
+                          {" "}
+                          ({filteredSubjects.length})
+                        </span>
+                      </>
+                    )}
+                  </p>
+                </div>
+
+                <div className="flex flex-shrink-0 items-center gap-1 md:gap-2">
+                  <SearchBarTrigger
+                    isOpen={showMobileSearch}
+                    onClick={() => setShowMobileSearch((prev) => !prev)}
+                    title="Search subjects"
+                  />
+                  {/* Print / Generate exam - mobile only, beside search (hidden for faculty) */}
+                  {Number(effectiveRoleId) !== 2 && (
+                    <button
+                      type="button"
+                      onClick={() => setShowPrintModal(true)}
+                      title="Print generating exam"
+                      className="outfit-500 -mb-2 inline-flex cursor-pointer items-center rounded-xl p-2 text-[12px] font-medium text-gray-700 transition-colors hover:bg-gray-100 md:hidden md:text-[14px]"
+                      aria-label="Print generating exam"
+                    >
+                      <i className="bx bx-printer text-[22px]" />
+                    </button>
+                  )}
+                  {/* Reports - mobile only, beside print */}
+                  <button
+                    type="button"
+                    onClick={() => navigate("/reports")}
+                    title="Reports"
+                    className="outfit-500 -mb-2 inline-flex cursor-pointer items-center rounded-xl p-2 text-[12px] font-medium text-gray-700 transition-colors hover:bg-gray-100 md:hidden md:text-[14px]"
+                    aria-label="Reports"
+                  >
+                    <img
+                      src={ReportsIcon}
+                      alt="Reports"
+                      loading="lazy"
+                      decoding="async"
+                      className="size-[24px] flex-shrink-0"
+                    />
+                  </button>
+
+                  {/* Year Level Filter Dropdown - icon only on mobile, full button on desktop */}
+                  <div className="relative" ref={yearLevelDropdownRef}>
+                    <button
+                      type="button"
+                      onClick={() =>
+                        setShowYearLevelDropdown(!showYearLevelDropdown)
+                      }
+                      title={
+                        selectedYearLevelFilter === "All"
+                          ? "All Year Levels"
+                          : `${selectedYearLevelFilter}${selectedYearLevelFilter === "1" ? "st" : selectedYearLevelFilter === "2" ? "nd" : selectedYearLevelFilter === "3" ? "rd" : "th"} Year`
+                      }
+                      className="outfit-500 -mb-2 hidden cursor-pointer items-center rounded-xl border-gray-200 bg-white p-2 text-[12px] font-medium text-gray-700 transition-colors hover:bg-gray-100 md:mb-0 md:inline-flex md:border md:px-4 md:py-2 md:text-[14px]"
+                    >
+                      <span className="hidden md:inline">
+                        {selectedYearLevelFilter === "All"
+                          ? "All Year Levels"
+                          : `${selectedYearLevelFilter}${selectedYearLevelFilter === "1" ? "st" : selectedYearLevelFilter === "2" ? "nd" : selectedYearLevelFilter === "3" ? "rd" : "th"} Year`}
+                      </span>
+                      <i
+                        className={`bx bx-chevron-down ml-2 hidden text-lg text-[22px] transition-transform ${
+                          showYearLevelDropdown ? "rotate-180" : ""
+                        }`}
+                      />
+                    </button>
+
+                    {showYearLevelDropdown && (
+                      <div className="outfit-500 fade-in absolute right-0 z-99 mt-3 min-w-[150px] rounded-xl border border-gray-200 bg-white p-1 shadow-lg">
+                        <button
+                          type="button"
+                          onClick={() => {
+                            setSelectedYearLevelFilter("All");
+                            setShowYearLevelDropdown(false);
+                          }}
+                          className={`outfit-500 mb-1 flex w-full cursor-pointer items-center gap-2 rounded-md px-3 py-2 text-left text-[14px] transition-colors ${
+                            selectedYearLevelFilter === "All"
+                              ? "bg-gray-100 text-black"
+                              : "text-gray-600 hover:bg-gray-200"
+                          }`}
+                        >
+                          <i className="bx bx-layer text-sm"></i>
+                          All Year Levels
+                        </button>
+                        {yearLevelOptions.map((yearLevel) => (
+                          <button
+                            key={yearLevel}
+                            type="button"
+                            onClick={() => {
+                              setSelectedYearLevelFilter(yearLevel);
+                              setShowYearLevelDropdown(false);
+                            }}
+                            className={`outfit-500 mb-1 flex w-full cursor-pointer items-center gap-2 rounded-md px-3 py-2 text-left text-sm transition-colors ${
+                              selectedYearLevelFilter === yearLevel
+                                ? "bg-gray-100 text-black"
+                                : "text-gray-600 hover:bg-gray-200"
+                            }`}
+                          >
+                            <i className="bx bx-layer text-sm"></i>
+                            {yearLevel}
+                            {yearLevel === "1"
+                              ? "st"
+                              : yearLevel === "2"
+                                ? "nd"
+                                : yearLevel === "3"
+                                  ? "rd"
+                                  : "th"}{" "}
+                            Year
+                          </button>
+                        ))}
+                      </div>
+                    )}
+                  </div>
+
+                  {Number(effectiveRoleId) !== 3 && (
                     <button
                       type="button"
                       onClick={() => {
-                        setSelectedYearLevelFilter("All");
-                        setShowYearLevelDropdown(false);
+                        if (Number(effectiveRoleId) === 2) {
+                          setShowAssignModal(true);
+                          fetchAvailableSubjects();
+                        } else {
+                          setShowAddModal(true);
+                        }
                       }}
-                      className={`outfit-500 mb-1 flex w-full cursor-pointer items-center gap-2 rounded-md px-3 py-2 text-left text-[14px] transition-colors ${
-                        selectedYearLevelFilter === "All"
-                          ? "bg-gray-100 text-black"
-                          : "text-gray-600 hover:bg-gray-200"
-                      }`}
+                      title={
+                        Number(effectiveRoleId) === 2
+                          ? "Assign subject"
+                          : "Create subject"
+                      }
+                      className="outfit-500 -mb-2 hidden cursor-pointer items-center rounded-xl bg-orange-500 p-2 text-[12px] font-medium text-white transition-colors hover:bg-orange-600 md:mb-0 md:inline-flex md:px-4 md:py-2 md:text-[14px]"
                     >
-                      <i className="bx bx-layer text-sm"></i>
-                      All Year Levels
+                      <i className="bx bx-plus text-[20px] md:mr-2 md:text-[16px]" />
+                      <span className="hidden md:inline">
+                        {Number(roleId) === 2 ? "Assign subject" : "Create subject"}
+                      </span>
                     </button>
-                    {yearLevelOptions.map((yearLevel) => (
-                      <button
-                        key={yearLevel}
-                        type="button"
-                        onClick={() => {
-                          setSelectedYearLevelFilter(yearLevel);
-                          setShowYearLevelDropdown(false);
-                        }}
-                        className={`outfit-500 mb-1 flex w-full cursor-pointer items-center gap-2 rounded-md px-3 py-2 text-left text-sm transition-colors ${
-                          selectedYearLevelFilter === yearLevel
-                            ? "bg-gray-100 text-black"
-                            : "text-gray-600 hover:bg-gray-200"
-                        }`}
-                      >
-                        <i className="bx bx-layer text-sm"></i>
-                        {yearLevel}
-                        {yearLevel === "1"
-                          ? "st"
-                          : yearLevel === "2"
-                            ? "nd"
-                            : yearLevel === "3"
-                              ? "rd"
-                              : "th"}{" "}
-                        Year
-                      </button>
-                    ))}
-                  </div>
-                )}
-              </div>
-
-              {Number(effectiveRoleId) !== 3 && (
-                <button
-                  type="button"
-                  onClick={() => {
-                    if (Number(effectiveRoleId) === 2) {
-                      setShowAssignModal(true);
-                      fetchAvailableSubjects();
-                    } else {
-                      setShowAddModal(true);
-                    }
-                  }}
-                  title={
-                    Number(effectiveRoleId) === 2
-                      ? "Assign subject"
-                      : "Create subject"
-                  }
-                  className="outfit-500 -mb-2 hidden cursor-pointer items-center rounded-xl bg-orange-500 p-2 text-[12px] font-medium text-white transition-colors hover:bg-orange-600 md:mb-0 md:inline-flex md:px-4 md:py-2 md:text-[14px]"
-                >
-                  <i className="bx bx-plus text-[20px] md:mr-2 md:text-[16px]" />
-                  <span className="hidden md:inline">
-                    {Number(roleId) === 2 ? "Assign subject" : "Create subject"}
-                  </span>
-                </button>
-              )}
-            </div>
-          </div>
-        </div>
-
-        {/* Subjects List */}
-        <div className="md:px-4">
-          {subjectLoading ? (
-            <div className="outfit-400 flex h-64 items-center justify-center">
-              <div className="text-center">
-                <div className="loader mx-auto mb-2"></div>
-                <p className="text-[14px] text-gray-600">Loading subjects...</p>
-              </div>
-            </div>
-          ) : networkError ? (
-            <div className="outfit-400 flex flex-col items-center justify-center py-10">
-              <img
-                src={noInternetImage}
-                alt="No internet connection"
-                loading="lazy"
-                decoding="async"
-                className="mb-3 h-32 w-32 opacity-80"
-              />
-              <span className="text-[14px] font-semibold text-gray-500">
-                Unstable Connection
-              </span>
-            </div>
-          ) : filteredSubjects.length === 0 ? (
-            <div className="outfit-400 flex h-80 flex-1 items-center justify-center rounded-2xl border-dashed border-gray-300 bg-gray-50/60 py-16 md:h-130 md:border">
-              <div className="text-center">
-                <img
-                  src={emptyImage}
-                  alt="No subjects available"
-                  loading="lazy"
-                  decoding="async"
-                  className="mx-auto mb-3 h-32 w-32 opacity-80"
-                />
-                <p className="outfit-400 text-[14px] text-gray-600">
-                  {selectedProgramFilter === "All" ? (
-                    Number(effectiveRoleId) === 2 ? (
-                      <>
-                        No subjects assigned.
-                        <br />
-                        Use the Assign Subject button to assign one.
-                      </>
-                    ) : (
-                      <>
-                        No subjects found.
-                        <br />
-                        Use the Create Subject button to create one.
-                      </>
-                    )
-                  ) : (
-                    <>
-                      No subjects found for{" "}
-                      {getDisplayProgramName(selectedProgramFilter)}.
-                      <br />
-                      Use the Create Subject button to create one.
-                    </>
                   )}
-                </p>
+                </div>
               </div>
             </div>
-          ) : (
-            <>
-              <div className="space-y-8">
-                {sortedPrograms.map((programName) => {
-                  const programSubjects = groupedSubjects[programName];
-                  const subjectCount = programSubjects.length;
 
-                  return (
-                    <div
-                      key={programName}
-                      id={`program-${programName}`}
-                      className="scroll-mt-4"
-                    >
-                      {/* Program Header - Only show when "All" is selected */}
-                      <div className="px-4">
-                        {selectedProgramFilter === "All" && (
-                          <div className="mb-4">
-                            <h3 className="outfit-500 text-[14px] text-gray-600">
-                              {getDisplayProgramName(programName)}
-                            </h3>
+            {/* Subjects List */}
+            <div className="md:px-4">
+              {subjectLoading ? (
+                <div className="outfit-400 flex h-64 items-center justify-center">
+                  <div className="text-center">
+                    <div className="loader mx-auto mb-2"></div>
+                    <p className="text-[14px] text-gray-600">Loading subjects...</p>
+                  </div>
+                </div>
+              ) : networkError ? (
+                <div className="outfit-400 flex flex-col items-center justify-center py-10">
+                  <img
+                    src={noInternetImage}
+                    alt="No internet connection"
+                    loading="lazy"
+                    decoding="async"
+                    className="mb-3 h-32 w-32 opacity-80"
+                  />
+                  <span className="text-[14px] font-semibold text-gray-500">
+                    Unstable Connection
+                  </span>
+                </div>
+              ) : filteredSubjects.length === 0 ? (
+                <div className="outfit-400 flex h-80 flex-1 items-center justify-center rounded-2xl border-dashed border-gray-300 bg-gray-50/60 py-16 md:h-130 md:border">
+                  <div className="text-center">
+                    <img
+                      src={emptyImage}
+                      alt="No subjects available"
+                      loading="lazy"
+                      decoding="async"
+                      className="mx-auto mb-3 h-32 w-32 opacity-80"
+                    />
+                    <p className="outfit-400 text-[14px] text-gray-600">
+                      {selectedProgramFilter === "All" ? (
+                        Number(effectiveRoleId) === 2 ? (
+                          <>
+                            No subjects assigned.
+                            <br />
+                            Use the Assign Subject button to assign one.
+                          </>
+                        ) : (
+                          <>
+                            No subjects found.
+                            <br />
+                            Use the Create Subject button to create one.
+                          </>
+                        )
+                      ) : (
+                        <>
+                          No subjects found for{" "}
+                          {getDisplayProgramName(selectedProgramFilter)}.
+                          <br />
+                          Use the Create Subject button to create one.
+                        </>
+                      )}
+                    </p>
+                  </div>
+                </div>
+              ) : (
+                <>
+                  <div className="space-y-8">
+                    {sortedPrograms.map((programName) => {
+                      const programSubjects = groupedSubjects[programName];
+                      const subjectCount = programSubjects.length;
+
+                      return (
+                        <div
+                          key={programName}
+                          id={`program-${programName}`}
+                          className="scroll-mt-4"
+                        >
+                          {/* Program Header - Only show when "All" is selected */}
+                          <div className="px-4">
+                            {selectedProgramFilter === "All" && (
+                              <div className="mb-4">
+                                <h3 className="outfit-500 text-[14px] text-gray-600">
+                                  {getDisplayProgramName(programName)}
+                                </h3>
+                              </div>
+                            )}
                           </div>
-                        )}
-                      </div>
 
-                      {/* Subjects Grid for this Program */}
-                      <div className="mt-4 grid grid-cols-1 space-y-2 space-x-2 px-2 md:grid-cols-[repeat(auto-fill,minmax(20rem,20rem))] md:gap-2 lg:px-4">
-                        {programSubjects.map((subject) => {
-                          const headerBackground = getHeaderBackground(
-                            subject.subjectID,
-                          );
-
-                          // Format dates
-                          const createdDate =
-                            subject.created_at || subject.createdAt
-                              ? new Date(
-                                  subject.created_at || subject.createdAt,
-                                ).toLocaleDateString("en-US", {
-                                  year: "numeric",
-                                  month: "short",
-                                  day: "numeric",
-                                })
-                              : "—";
-
-                          const createdTime =
-                            subject.created_at || subject.createdAt
-                              ? new Date(
-                                  subject.created_at || subject.createdAt,
-                                ).toLocaleTimeString("en-US", {
-                                  hour: "2-digit",
-                                  minute: "2-digit",
-                                })
-                              : "—";
-
-                          const updatedDate =
-                            subject.updated_at || subject.updatedAt
-                              ? new Date(
-                                  subject.updated_at || subject.updatedAt,
-                                ).toLocaleDateString("en-US", {
-                                  year: "numeric",
-                                  month: "short",
-                                  day: "numeric",
-                                })
-                              : "—";
-
-                          const updatedTime =
-                            subject.updated_at || subject.updatedAt
-                              ? new Date(
-                                  subject.updated_at || subject.updatedAt,
-                                ).toLocaleTimeString("en-US", {
-                                  hour: "2-digit",
-                                  minute: "2-digit",
-                                })
-                              : "—";
-
-                          // Format lastQuestionAdded date (for all roles)
-                          let lastQuestionAddedDate = "—";
-                          let lastQuestionAddedTime = "—";
-
-                          // Check if lastQuestionAdded exists and is not null/empty
-                          if (
-                            subject.lastQuestionAdded != null &&
-                            subject.lastQuestionAdded !== "" &&
-                            subject.lastQuestionAdded !== "null"
-                          ) {
-                            try {
-                              // Handle format: "2026-02-20 08:00:00" or datetime string
-                              let dateStr = String(
-                                subject.lastQuestionAdded,
-                              ).trim();
-
-                              // Replace space with T to make it ISO-compatible
-                              // Format: "2026-02-20 08:00:00" -> "2026-02-20T08:00:00"
-                              if (dateStr.includes(" ")) {
-                                dateStr = dateStr.replace(" ", "T");
-                              }
-
-                              const date = new Date(dateStr);
-                              const timestamp = date.getTime();
-
-                              // Check if date is valid
-                              if (!isNaN(timestamp) && timestamp > 0) {
-                                lastQuestionAddedDate = date.toLocaleDateString(
-                                  "en-US",
-                                  {
-                                    year: "numeric",
-                                    month: "short",
-                                    day: "numeric",
-                                  },
-                                );
-                                lastQuestionAddedTime = date.toLocaleTimeString(
-                                  "en-US",
-                                  {
-                                    hour: "2-digit",
-                                    minute: "2-digit",
-                                  },
-                                );
-                              } else {
-                                console.warn(
-                                  "Invalid date for subject:",
-                                  subject.subjectCode,
-                                  "Value:",
-                                  subject.lastQuestionAdded,
-                                  "Parsed:",
-                                  dateStr,
-                                );
-                              }
-                            } catch (err) {
-                              console.error(
-                                "Error parsing lastQuestionAdded for subject:",
-                                subject.subjectCode,
-                                "Error:",
-                                err,
-                                "Value:",
-                                subject.lastQuestionAdded,
+                          {/* Subjects Grid for this Program */}
+                          <div className="mt-4 grid grid-cols-1 space-y-2 space-x-2 px-2 md:grid-cols-[repeat(auto-fill,minmax(20rem,20rem))] md:gap-2 lg:px-4">
+                            {programSubjects.map((subject) => {
+                              const headerBackground = getHeaderBackground(
+                                subject.subjectID,
                               );
-                            }
-                          }
 
-                          return (
-                            <>
-                              <div
-                                key={subject.subjectID}
-                                className="group outfit-400 relative flex w-full flex-col overflow-hidden rounded-xl bg-transparent transition-all md:h-[270px] md:w-80 md:border md:border-gray-200 md:bg-white md:shadow-sm md:hover:shadow-xl"
-                              >
-                                {/* Background Image Header Section */}
-                                <div
-                                  className="relative cursor-pointer overflow-hidden px-4 pt-4 pb-4 md:h-[150px]"
-                                  onClick={() => handleSubjectClick(subject)}
-                                >
-                                  <img
-                                    src={headerBackground}
-                                    alt=""
-                                    aria-hidden="true"
-                                    loading="lazy"
-                                    decoding="async"
-                                    className="absolute inset-0 h-full w-full object-cover"
-                                  />
+                              // Format dates
+                              const createdDate =
+                                subject.created_at || subject.createdAt
+                                  ? new Date(
+                                      subject.created_at || subject.createdAt,
+                                    ).toLocaleDateString("en-US", {
+                                      year: "numeric",
+                                      month: "short",
+                                      day: "numeric",
+                                    })
+                                  : "—";
+
+                              const createdTime =
+                                subject.created_at || subject.createdAt
+                                  ? new Date(
+                                      subject.created_at || subject.createdAt,
+                                    ).toLocaleTimeString("en-US", {
+                                      hour: "2-digit",
+                                      minute: "2-digit",
+                                    })
+                                  : "—";
+
+                              const updatedDate =
+                                subject.updated_at || subject.updatedAt
+                                  ? new Date(
+                                      subject.updated_at || subject.updatedAt,
+                                    ).toLocaleDateString("en-US", {
+                                      year: "numeric",
+                                      month: "short",
+                                      day: "numeric",
+                                    })
+                                  : "—";
+
+                              const updatedTime =
+                                subject.updated_at || subject.updatedAt
+                                  ? new Date(
+                                      subject.updated_at || subject.updatedAt,
+                                    ).toLocaleTimeString("en-US", {
+                                      hour: "2-digit",
+                                      minute: "2-digit",
+                                    })
+                                  : "—";
+
+                              // Format lastQuestionAdded date (for all roles)
+                              let lastQuestionAddedDate = "—";
+                              let lastQuestionAddedTime = "—";
+
+                              // Check if lastQuestionAdded exists and is not null/empty
+                              if (
+                                subject.lastQuestionAdded != null &&
+                                subject.lastQuestionAdded !== "" &&
+                                subject.lastQuestionAdded !== "null"
+                              ) {
+                                try {
+                                  // Handle format: "2026-02-20 08:00:00" or datetime string
+                                  let dateStr = String(
+                                    subject.lastQuestionAdded,
+                                  ).trim();
+
+                                  // Replace space with T to make it ISO-compatible
+                                  // Format: "2026-02-20 08:00:00" -> "2026-02-20T08:00:00"
+                                  if (dateStr.includes(" ")) {
+                                    dateStr = dateStr.replace(" ", "T");
+                                  }
+
+                                  const date = new Date(dateStr);
+                                  const timestamp = date.getTime();
+
+                                  // Check if date is valid
+                                  if (!isNaN(timestamp) && timestamp > 0) {
+                                    lastQuestionAddedDate = date.toLocaleDateString(
+                                      "en-US",
+                                      {
+                                        year: "numeric",
+                                        month: "short",
+                                        day: "numeric",
+                                      },
+                                    );
+                                    lastQuestionAddedTime = date.toLocaleTimeString(
+                                      "en-US",
+                                      {
+                                        hour: "2-digit",
+                                        minute: "2-digit",
+                                      },
+                                    );
+                                  } else {
+                                    console.warn(
+                                      "Invalid date for subject:",
+                                      subject.subjectCode,
+                                      "Value:",
+                                      subject.lastQuestionAdded,
+                                      "Parsed:",
+                                      dateStr,
+                                    );
+                                  }
+                                } catch (err) {
+                                  console.error(
+                                    "Error parsing lastQuestionAdded for subject:",
+                                    subject.subjectCode,
+                                    "Error:",
+                                    err,
+                                    "Value:",
+                                    subject.lastQuestionAdded,
+                                  );
+                                }
+                              }
+
+                              return (
+                                <>
                                   <div
-                                    className="absolute inset-0 bg-black/10"
-                                    aria-hidden="true"
-                                  />
-                                  <div className="relative z-10 pr-16 md:flex md:h-full md:flex-col md:justify-between md:pr-0">
-                                    <div>
-                                      <div className="mb-4 hidden text-xs font-medium text-white opacity-90 md:block">
-                                        Subject
-                                      </div>
-                                      <div className="mb-4">
-                                        <div
-                                          className="min-h-0 overflow-hidden leading-6 font-semibold text-white"
-                                          style={{
-                                            display: "-webkit-box",
-                                            WebkitLineClamp: 2,
-                                            WebkitBoxOrient: "vertical",
-                                            overflow: "hidden",
-                                            textOverflow: "ellipsis",
-                                          }}
-                                        >
-                                          <span className="outfit-500 text-[20px] text-white drop-shadow-[0_2px_4px_rgba(0,0,0,0.6)]">
-                                            {subject.subjectName}
+                                    key={subject.subjectID}
+                                    className="group outfit-400 relative flex w-full flex-col overflow-hidden rounded-xl bg-transparent transition-all md:h-[270px] md:w-80 md:border md:border-gray-200 md:bg-white md:shadow-sm md:hover:shadow-xl"
+                                  >
+                                    {/* Background Image Header Section */}
+                                    <div
+                                      className="relative cursor-pointer overflow-hidden px-4 pt-4 pb-4 md:h-[150px]"
+                                      onClick={() => handleSubjectClick(subject)}
+                                    >
+                                      <img
+                                        src={headerBackground}
+                                        alt=""
+                                        aria-hidden="true"
+                                        loading="lazy"
+                                        decoding="async"
+                                        className="absolute inset-0 h-full w-full object-cover"
+                                      />
+                                      <div
+                                        className="absolute inset-0 bg-black/10"
+                                        aria-hidden="true"
+                                      />
+                                      <div className="relative z-10 pr-16 md:flex md:h-full md:flex-col md:justify-between md:pr-0">
+                                        <div>
+                                          <div className="mb-4 hidden text-xs font-medium text-white opacity-90 md:block">
+                                            Subject
+                                          </div>
+                                          <div className="mb-4">
+                                            <div
+                                              className="min-h-0 overflow-hidden leading-6 font-semibold text-white"
+                                              style={{
+                                                display: "-webkit-box",
+                                                WebkitLineClamp: 2,
+                                                WebkitBoxOrient: "vertical",
+                                                overflow: "hidden",
+                                                textOverflow: "ellipsis",
+                                              }}
+                                            >
+                                              <span className="outfit-500 text-[20px] text-white drop-shadow-[0_2px_4px_rgba(0,0,0,0.6)]">
+                                                {subject.subjectName}
+                                              </span>
+                                            </div>
+                                            {subject.yearLevel && (
+                                              <div className="mt-1 flex items-center gap-1 text-[12px] text-white md:hidden">
+                                                <i className="bx bx-people-diversity text-sm"></i>
+                                                <span className="truncate">
+                                                  {subject.yearLevel}
+                                                </span>
+                                              </div>
+                                            )}
+                                          </div>
+                                        </div>
+
+                                        <div className="mt-7 inline-flex w-fit max-w-full items-center rounded-full bg-white px-3 py-0.5 md:mt-0">
+                                          <span className="truncate text-xs font-semibold whitespace-nowrap text-black uppercase">
+                                            {subject.subjectCode}
                                           </span>
                                         </div>
+                                      </div>
+
+                                      {/* Last modified badge - mobile only (like student count in Class) */}
+                                      <div className="absolute right-3 bottom-3 z-20 flex items-center gap-1 rounded-full bg-black/60 px-2 py-1 text-[11px] font-medium text-white md:hidden">
+                                        <i className="bx bx-time-five text-sm"></i>
+                                        <span className="max-w-[120px] truncate">
+                                          {lastQuestionAddedDate !== "—"
+                                            ? `Modified: ${lastQuestionAddedDate}`
+                                            : "No questions yet"}
+                                        </span>
+                                      </div>
+
+                                      {/* Edit and Archive Buttons - Top Right (only for Admin/Dean, not faculty) */}
+                                      {Number(roleId) !== 3 &&
+                                        Number(roleId) !== 2 && (
+                                          <div className="absolute top-2 right-2 z-20 hidden items-center gap-1 md:flex">
+                                            <button
+                                              onClick={(e) => {
+                                                e.stopPropagation();
+                                                handleEditClick(subject, e);
+                                              }}
+                                              className="flex h-8 w-8 cursor-pointer items-center justify-center rounded-lg text-white transition-colors hover:bg-white/20"
+                                              title="Edit Subject"
+                                            >
+                                              <i className="bx bx-edit text-lg"></i>
+                                            </button>
+                                            <button
+                                              onClick={(e) => {
+                                                e.stopPropagation();
+                                                handleDeleteClick(subject, e);
+                                              }}
+                                              className="flex h-8 w-8 cursor-pointer items-center justify-center rounded-lg text-white transition-colors hover:bg-white/20"
+                                              title="Remove Subject"
+                                            >
+                                              <i className="bx bx-trash text-lg"></i>
+                                            </button>
+                                          </div>
+                                        )}
+                                    </div>
+
+                                    {/* White Body Section - hidden on mobile */}
+                                    <div
+                                      className="hidden flex-1 cursor-pointer flex-col px-4 py-4 md:flex"
+                                      onClick={() => handleSubjectClick(subject)}
+                                    >
+                                      {/* Metadata */}
+                                      <div className="mb-3 space-y-1">
                                         {subject.yearLevel && (
-                                          <div className="mt-1 flex items-center gap-1 text-[12px] text-white md:hidden">
-                                            <i className="bx bx-people-diversity text-sm"></i>
-                                            <span className="truncate">
-                                              {subject.yearLevel}
-                                            </span>
+                                          <div className="outfit-400 flex items-center gap-2 text-[12px] text-gray-700">
+                                            <i className="bx bx-people-diversity text-sm text-gray-500"></i>
+                                            <span>{subject.yearLevel}</span>
+                                          </div>
+                                        )}
+                                        {subject.programName && (
+                                          <div className="outfit-400 flex items-center gap-2 text-[12px] text-gray-700">
+                                            <i className="bx bx-book text-sm text-gray-500"></i>
+                                            <span>{subject.programName}</span>
                                           </div>
                                         )}
                                       </div>
+
+                                      {/* Separator */}
+                                      <div className="mb-3 h-px bg-gray-200"></div>
+
+                                      {/* Date Information */}
+                                      <div className="outfit-400 space-y-1 text-[12px] text-gray-600">
+                                        {lastQuestionAddedDate !== "—" ? (
+                                          // Show last question added date if available
+                                          <div>
+                                            Last modified: {lastQuestionAddedDate}{" "}
+                                            {lastQuestionAddedTime !== "—" &&
+                                              `at ${lastQuestionAddedTime}`}
+                                          </div>
+                                        ) : (
+                                          // Show message when no questions have been added yet
+                                          <div>Last modified: No questions yet</div>
+                                        )}
+                                      </div>
                                     </div>
-
-                                    <div className="mt-7 inline-flex w-fit max-w-full items-center rounded-full bg-white px-3 py-0.5 md:mt-0">
-                                      <span className="truncate text-xs font-semibold whitespace-nowrap text-black uppercase">
-                                        {subject.subjectCode}
-                                      </span>
-                                    </div>
                                   </div>
+                                </>
+                              );
+                            })}
+                          </div>
+                        </div>
+                      );
+                    })}
+                  </div>
+                  <div className="pb-28 lg:pb-12" aria-hidden="true" />
+                </>
+              )}
+            </div>
+          </div>
 
-                                  {/* Last modified badge - mobile only (like student count in Class) */}
-                                  <div className="absolute right-3 bottom-3 z-20 flex items-center gap-1 rounded-full bg-black/60 px-2 py-1 text-[11px] font-medium text-white md:hidden">
-                                    <i className="bx bx-time-five text-sm"></i>
-                                    <span className="max-w-[120px] truncate">
-                                      {lastQuestionAddedDate !== "—"
-                                        ? `Modified: ${lastQuestionAddedDate}`
-                                        : "No questions yet"}
-                                    </span>
-                                  </div>
+          {/* Floating Create/Assign subject button (mobile only) - same as Class.jsx */}
+          {Number(effectiveRoleId) !== 3 && (
+            <div className="fixed right-4 bottom-[110px] z-50 md:hidden">
+              <button
+                type="button"
+                onClick={() => {
+                  if (Number(effectiveRoleId) === 2) {
+                    setShowAssignModal(true);
+                    fetchAvailableSubjects();
+                  } else {
+                    setShowAddModal(true);
+                  }
+                }}
+                className="outfit-400 flex cursor-pointer items-center gap-2 rounded-full bg-orange-500 p-4 text-[14px] font-medium text-white shadow-xl transition-colors hover:bg-orange-600"
+              >
+                <i className="bx bx-plus text-[22px]" />
+              </button>
+            </div>
+          )}
 
-                                  {/* Edit and Archive Buttons - Top Right (only for Admin/Dean, not faculty) */}
-                                  {Number(roleId) !== 3 &&
-                                    Number(roleId) !== 2 && (
-                                      <div className="absolute top-2 right-2 z-20 hidden items-center gap-1 md:flex">
-                                        <button
-                                          onClick={(e) => {
-                                            e.stopPropagation();
-                                            handleEditClick(subject, e);
-                                          }}
-                                          className="flex h-8 w-8 cursor-pointer items-center justify-center rounded-lg text-white transition-colors hover:bg-white/20"
-                                          title="Edit Subject"
-                                        >
-                                          <i className="bx bx-edit text-lg"></i>
-                                        </button>
-                                        <button
-                                          onClick={(e) => {
-                                            e.stopPropagation();
-                                            handleDeleteClick(subject, e);
-                                          }}
-                                          className="flex h-8 w-8 cursor-pointer items-center justify-center rounded-lg text-white transition-colors hover:bg-white/20"
-                                          title="Remove Subject"
-                                        >
-                                          <i className="bx bx-trash text-lg"></i>
-                                        </button>
-                                      </div>
-                                    )}
-                                </div>
+          {/* Assign Subject Modal (for Faculty) */}
+          {showAssignModal && (
+            <>
+              <div className="lightbox-bg fixed inset-0 z-100 flex items-end justify-center min-[448px]:items-center">
+                <div className="animate-fade-in-up relative max-h-[90vh] w-full max-w-md rounded-t-2xl bg-white shadow-2xl min-[448px]:mx-5 min-[448px]:rounded-md">
+                  <div className="border-color flex items-center justify-between border-b px-4 py-2">
+                    <h2 className="text-[16px] font-semibold text-black">
+                      Assign a Subject
+                    </h2>
 
-                                {/* White Body Section - hidden on mobile */}
-                                <div
-                                  className="hidden flex-1 cursor-pointer flex-col px-4 py-4 md:flex"
-                                  onClick={() => handleSubjectClick(subject)}
-                                >
-                                  {/* Metadata */}
-                                  <div className="mb-3 space-y-1">
-                                    {subject.yearLevel && (
-                                      <div className="outfit-400 flex items-center gap-2 text-[12px] text-gray-700">
-                                        <i className="bx bx-people-diversity text-sm text-gray-500"></i>
-                                        <span>{subject.yearLevel}</span>
-                                      </div>
-                                    )}
-                                    {subject.programName && (
-                                      <div className="outfit-400 flex items-center gap-2 text-[12px] text-gray-700">
-                                        <i className="bx bx-book text-sm text-gray-500"></i>
-                                        <span>{subject.programName}</span>
-                                      </div>
-                                    )}
-                                  </div>
+                    <button
+                      onClick={() => {
+                        setShowAssignModal(false);
+                        setSearchUnassigned("");
+                        setSelectedSubjectForAssignment(null);
+                      }}
+                      className="flex h-8 w-8 cursor-pointer items-center justify-center rounded-full text-gray-700 transition duration-100 hover:bg-gray-100 hover:text-gray-900"
+                    >
+                      <i className="bx bx-x text-lg"></i>
+                    </button>
+                  </div>
 
-                                  {/* Separator */}
-                                  <div className="mb-3 h-px bg-gray-200"></div>
-
-                                  {/* Date Information */}
-                                  <div className="outfit-400 space-y-1 text-[12px] text-gray-600">
-                                    {lastQuestionAddedDate !== "—" ? (
-                                      // Show last question added date if available
-                                      <div>
-                                        Last modified: {lastQuestionAddedDate}{" "}
-                                        {lastQuestionAddedTime !== "—" &&
-                                          `at ${lastQuestionAddedTime}`}
-                                      </div>
-                                    ) : (
-                                      // Show message when no questions have been added yet
-                                      <div>Last modified: No questions yet</div>
-                                    )}
-                                  </div>
-                                </div>
-                              </div>
-                            </>
-                          );
-                        })}
+                  <div className="px-5 py-4">
+                    <div className="mt-2 flex w-full items-center gap-2">
+                      <div className="w-4/5">
+                        <input
+                          type="text"
+                          placeholder="Search subject..."
+                          value={searchUnassigned}
+                          onChange={(e) => setSearchUnassigned(e.target.value)}
+                          className="relative w-full cursor-text rounded-md border border-gray-300 bg-white px-4 py-[7px] text-[14px] transition-all duration-200 ease-in-out outline-none hover:border-gray-500 focus:border-transparent focus:ring-1 focus:ring-orange-500 focus:ring-offset-1"
+                        />
                       </div>
+                      <button
+                        className="border-color flex cursor-pointer items-center gap-1 rounded-md border px-3 py-[7px] text-sm hover:bg-gray-200"
+                        onClick={fetchAvailableSubjects}
+                      >
+                        <i className="bx bx-refresh-ccw text-[18px]"></i> Refresh
+                      </button>
                     </div>
-                  );
-                })}
+
+                    <div className="mt-4 mb-3 h-[0.5px] bg-[rgb(200,200,200)]" />
+
+                    {/* Subject List for Assigning */}
+                    <div className="mb-3">
+                      <ul className="max-h-[200px] overflow-y-auto">
+                        {loadingAvailableSubjects ? (
+                          <div className="flex items-center justify-center text-[rgb(168,168,168)]">
+                            <div className="loader"></div>
+                          </div>
+                        ) : unassignedSubjects.length > 0 ? (
+                          [...unassignedSubjects]
+                            .filter((subject) =>
+                              `${subject.programName} ${subject.subjectName} ${subject.subjectCode}`
+                                .toLowerCase()
+                                .includes(searchUnassigned.toLowerCase()),
+                            )
+                            .sort((a, b) =>
+                              a.programName.localeCompare(b.programName),
+                            )
+                            .map((subject) => (
+                              <li
+                                key={subject.subjectID}
+                                className={`mt-2 mr-[6px] flex cursor-pointer items-center justify-between rounded-md p-[5px] text-[15px] transition-all duration-100 ease-in-out ${
+                                  selectedSubjectForAssignment &&
+                                  selectedSubjectForAssignment.subjectID ===
+                                    subject.subjectID
+                                    ? "bg-orange-500 text-white"
+                                    : "hover:bg-[rgb(255,230,214)]"
+                                }`}
+                                onClick={() =>
+                                  setSelectedSubjectForAssignment(subject)
+                                }
+                              >
+                                <span className="mb-[1px] pl-1 break-words">
+                                  {subject.programName} - ({subject.subjectCode}){" "}
+                                  {subject.subjectName}
+                                </span>
+                              </li>
+                            ))
+                        ) : (
+                          <li className="p-2 text-center text-[14px] text-[rgb(168,168,168)]">
+                            All subjects already assigned.
+                          </li>
+                        )}
+                      </ul>
+                    </div>
+
+                    <div className="mt-5 mb-3 h-[0.5px] bg-[rgb(200,200,200)]" />
+
+                    <div className="mb-1 flex justify-end gap-2">
+                      <button
+                        className="flex cursor-pointer items-center gap-1 rounded-md border px-2 py-1.5 text-gray-700 hover:bg-gray-200"
+                        onClick={() => {
+                          setShowAssignModal(false);
+                          setSearchUnassigned("");
+                          setSelectedSubjectForAssignment(null);
+                        }}
+                      >
+                        <span className="px-1 text-[16px]">Cancel</span>
+                      </button>
+
+                      <button
+                        className="flex w-[80px] cursor-pointer items-center justify-center rounded-md bg-orange-500 px-[12px] py-[6px] text-[14px] text-white hover:bg-orange-700 disabled:cursor-not-allowed disabled:opacity-50"
+                        onClick={() =>
+                          handleAssignSubject(selectedSubjectForAssignment)
+                        }
+                        disabled={!selectedSubjectForAssignment}
+                      >
+                        {isAssigning ? (
+                          <span className="loader-white"></span>
+                        ) : (
+                          "Assign"
+                        )}
+                      </button>
+                    </div>
+                  </div>
+                </div>
               </div>
-              <div className="pb-28 lg:pb-12" aria-hidden="true" />
             </>
           )}
+
+          {/* Add Subject Modal */}
+          {showAddModal && (
+            <>
+              <div
+                className="lightbox-bg fixed inset-0 z-100 flex items-center justify-center p-4"
+                onClick={closeAddModal}
+              >
+                <div
+                  className="animate-fade-in-up relative mx-auto flex w-full max-w-xl overflow-hidden rounded-2xl bg-white shadow-2xl"
+                  style={{ minHeight: "480px" }}
+                  onClick={(e) => e.stopPropagation()}
+                >
+                  <div className="flex flex-1 flex-col">
+                    {/* Header */}
+                    <div className="outfit-400 flex items-start justify-between border-b border-gray-200 px-6 py-5">
+                      <div className="flex items-start gap-3">
+                        <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-orange-500 text-white">
+                          <i className="bx bx-pen-plus text-2xl" />
+                        </div>
+                        <div>
+                          <h2 className="outfit-700 text-[16px] text-gray-900">
+                            Create a Subject
+                          </h2>
+                          <p className="text-xs text-gray-500">
+                            Enter the details for a new subject.
+                          </p>
+                        </div>
+                      </div>
+
+                      <button
+                        type="button"
+                        onClick={closeAddModal}
+                        className="ml-4 flex h-8 w-8 flex-shrink-0 cursor-pointer items-center justify-center rounded-lg text-gray-400 transition-colors hover:bg-gray-100 hover:text-gray-600"
+                        aria-label="Close modal"
+                      >
+                        <i className="bx bx-x text-xl"></i>
+                      </button>
+                    </div>
+
+                    {/* Body */}
+                    <div className="outfit-400 flex-1 overflow-y-auto px-6 py-5">
+                      {(validationError || newSubjectCode.length > 20) && (
+                        <div className="mb-4 flex items-center gap-2 rounded-xl border border-red-200 bg-red-50 px-4 py-2.5 text-[13px] text-red-700">
+                          <i className="bx bx-error-circle text-base"></i>
+                          {validationError || "Code must be 20 characters or less."}
+                        </div>
+                      )}
+
+                      <form
+                        id="subject-create-form"
+                        onSubmit={(e) => e.preventDefault()}
+                      >
+                        <div className="space-y-5">
+                          <div>
+                            <label className="mb-1.5 block text-[13px] font-semibold text-gray-700">
+                              Subject Name <span className="text-red-500">*</span>
+                            </label>
+                            <div className="relative">
+                              <i className="bx bx-book-open absolute top-1/2 left-3 -translate-y-1/2 text-gray-400"></i>
+                              <input
+                                type="text"
+                                placeholder="e.g. Calculus 1"
+                                value={newSubjectName}
+                                onChange={(e) => setNewSubjectName(e.target.value)}
+                                className="w-full rounded-xl border border-gray-200 py-2.5 pr-3 pl-9 text-sm transition focus:border-orange-400 focus:ring-2 focus:ring-orange-100 focus:outline-none"
+                              />
+                            </div>
+                          </div>
+
+                          <div>
+                            <label className="mb-1.5 block text-[13px] font-semibold text-gray-700">
+                              Subject Code <span className="text-red-500">*</span>
+                            </label>
+                            <div className="relative">
+                              <i className="bx bx-edit absolute top-1/2 left-3 -translate-y-1/2 text-gray-400"></i>
+                              <input
+                                type="text"
+                                placeholder="e.g. MATH123"
+                                value={newSubjectCode}
+                                onChange={(e) => setNewSubjectCode(e.target.value)}
+                                className="w-full rounded-xl border border-gray-200 py-2.5 pr-3 pl-9 text-sm transition focus:border-orange-400 focus:ring-2 focus:ring-orange-100 focus:outline-none"
+                              />
+                            </div>
+                            <p className="mt-1 text-[11px] text-gray-400">
+                              Enter the subject code (max 20 characters).
+                            </p>
+                          </div>
+
+                          <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
+                            <div>
+                              <label className="mb-1.5 block text-[13px] font-semibold text-gray-700">
+                                Program <span className="text-red-500">*</span>
+                              </label>
+                              <RegisterDropDownSmall
+                                name="Program"
+                                value={selectedProgramID}
+                                onChange={(e) =>
+                                  setSelectedProgramID(e.target.value)
+                                }
+                                placeholder="Select Program"
+                                options={programs.map((program) => ({
+                                  value: program.programID,
+                                  label: getDisplayProgramName(program.programName),
+                                }))}
+                              />
+                              <p className="mt-1 text-[11px] text-gray-400">
+                                Select the program for this subject.
+                              </p>
+                            </div>
+
+                            <div>
+                              <label className="mb-1.5 block text-[13px] font-semibold text-gray-700">
+                                Year Level <span className="text-red-500">*</span>
+                              </label>
+                              <RegisterDropDownSmall
+                                name="Year Level"
+                                value={selectedYearLevelID}
+                                onChange={(e) =>
+                                  setSelectedYearLevelID(e.target.value)
+                                }
+                                placeholder="Select Year Level"
+                                options={yearLevelOptions.map((yearLevel) => ({
+                                  value: yearLevel,
+                                  label: `${yearLevel}${yearLevel === "1" ? "st" : yearLevel === "2" ? "nd" : yearLevel === "3" ? "rd" : "th"} Year`,
+                                }))}
+                              />
+                              <p className="mt-1 text-[11px] text-gray-400">
+                                Select the year level for this subject.
+                              </p>
+                            </div>
+                          </div>
+                        </div>
+                      </form>
+                    </div>
+
+                    {/* Footer */}
+                    <div className="outfit-400 flex items-center justify-between border-t border-gray-100 px-6 py-4">
+                      <button
+                        type="button"
+                        onClick={closeAddModal}
+                        disabled={isAdding}
+                        className="cursor-pointer text-[14px] font-medium text-gray-500 hover:text-gray-700 disabled:opacity-50"
+                      >
+                        Cancel
+                      </button>
+
+                      <button
+                        type="button"
+                        disabled={isAdding}
+                        onClick={async () => {
+                          const valid =
+                            newSubjectName.trim() !== "" &&
+                            newSubjectCode.trim() !== "" &&
+                            newSubjectCode.length <= 20 &&
+                            selectedProgramID &&
+                            selectedYearLevelID;
+
+                          if (!valid) {
+                            setValidationError(
+                              "Please fill in all required fields",
+                            );
+                            return;
+                          }
+
+                          setValidationError("");
+                          await handleAddSubject();
+                        }}
+                        className="outfit-500 inline-flex cursor-pointer items-center gap-2 rounded-xl bg-orange-500 px-5 py-2.5 text-[14px] font-medium text-white shadow-sm transition hover:bg-orange-600 active:scale-95 disabled:cursor-not-allowed disabled:opacity-70"
+                      >
+                        {isAdding ? (
+                          <>
+                            <i className="bx bx-loader-alt animate-spin text-lg"></i>
+                            Saving...
+                          </>
+                        ) : (
+                          <>Add Subject</>
+                        )}
+                      </button>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </>
+          )}
+
+          {/* Edit Subject Modal */}
+          {showEditModal && editingSubject && (
+            <>
+              <div
+                className="lightbox-bg fixed inset-0 z-100 flex items-center justify-center p-4"
+                onClick={closeEditModal}
+              >
+                <div
+                  className="animate-fade-in-up relative mx-auto flex w-full max-w-xl overflow-hidden rounded-2xl bg-white shadow-2xl"
+                  style={{ minHeight: "480px" }}
+                  onClick={(e) => e.stopPropagation()}
+                >
+                  <div className="flex flex-1 flex-col">
+                    {/* Header */}
+                    <div className="outfit-400 flex items-start justify-between border-b border-gray-200 px-6 py-5">
+                      <div className="flex items-start gap-3">
+                        <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-orange-500 text-white">
+                          <i className="bx bx-edit text-2xl" />
+                        </div>
+                        <div>
+                          <h2 className="outfit-700 text-[16px] text-gray-900">
+                            Edit Subject
+                          </h2>
+                          <p className="text-xs text-gray-500">
+                            Update the details for this subject.
+                          </p>
+                        </div>
+                      </div>
+
+                      <button
+                        type="button"
+                        onClick={closeEditModal}
+                        className="ml-4 flex h-8 w-8 flex-shrink-0 cursor-pointer items-center justify-center rounded-lg text-gray-400 transition-colors hover:bg-gray-100 hover:text-gray-600"
+                        aria-label="Close modal"
+                      >
+                        <i className="bx bx-x text-xl"></i>
+                      </button>
+                    </div>
+
+                    {/* Body */}
+                    <div className="outfit-400 flex-1 overflow-y-auto px-6 py-5">
+                      {(validationError ||
+                        editedSubject.subjectCode.length > 20) && (
+                        <div className="mb-4 flex items-center gap-2 rounded-xl border border-red-200 bg-red-50 px-4 py-2.5 text-[13px] text-red-700">
+                          <i className="bx bx-error-circle text-base"></i>
+                          {validationError || "Code must be 20 characters or less."}
+                        </div>
+                      )}
+
+                      <form
+                        id="subject-edit-form"
+                        onSubmit={(e) => e.preventDefault()}
+                      >
+                        <div className="space-y-5">
+                          <div>
+                            <label className="mb-1.5 block text-[13px] font-semibold text-gray-700">
+                              Subject Name <span className="text-red-500">*</span>
+                            </label>
+                            <div className="relative">
+                              <i className="bx bx-book-open absolute top-1/2 left-3 -translate-y-1/2 text-gray-400"></i>
+                              <input
+                                type="text"
+                                placeholder="e.g. Calculus 1"
+                                value={editedSubject.subjectName}
+                                onChange={(e) =>
+                                  setEditedSubject({
+                                    ...editedSubject,
+                                    subjectName: e.target.value,
+                                  })
+                                }
+                                className="w-full rounded-xl border border-gray-200 py-2.5 pr-3 pl-9 text-sm transition focus:border-orange-400 focus:ring-2 focus:ring-orange-100 focus:outline-none"
+                              />
+                            </div>
+                          </div>
+
+                          <div>
+                            <label className="mb-1.5 block text-[13px] font-semibold text-gray-700">
+                              Subject Code <span className="text-red-500">*</span>
+                            </label>
+                            <div className="relative">
+                              <i className="bx bx-edit absolute top-1/2 left-3 -translate-y-1/2 text-gray-400"></i>
+
+                              <input
+                                type="text"
+                                placeholder="e.g. MATH123"
+                                value={editedSubject.subjectCode}
+                                onChange={(e) =>
+                                  setEditedSubject({
+                                    ...editedSubject,
+                                    subjectCode: e.target.value,
+                                  })
+                                }
+                                className="w-full rounded-xl border border-gray-200 py-2.5 pr-3 pl-9 text-sm transition focus:border-orange-400 focus:ring-2 focus:ring-orange-100 focus:outline-none"
+                              />
+                            </div>
+                            <p className="mt-1 text-[11px] text-gray-400">
+                              Enter the subject code (max 20 characters).
+                            </p>
+                          </div>
+
+                          <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
+                            <div>
+                              <label className="mb-1.5 block text-[13px] font-semibold text-gray-700">
+                                Program <span className="text-red-500">*</span>
+                              </label>
+                              <RegisterDropDownSmall
+                                name="Program"
+                                value={editedSubject.programID}
+                                onChange={(e) =>
+                                  setEditedSubject({
+                                    ...editedSubject,
+                                    programID: e.target.value,
+                                  })
+                                }
+                                placeholder="Select Program"
+                                options={programs.map((program) => ({
+                                  value: program.programID,
+                                  label: getDisplayProgramName(program.programName),
+                                }))}
+                              />
+                            </div>
+
+                            <div>
+                              <label className="mb-1.5 block text-[13px] font-semibold text-gray-700">
+                                Year Level <span className="text-red-500">*</span>
+                              </label>
+                              <RegisterDropDownSmall
+                                name="Year Level"
+                                value={editedSubject.yearLevelID}
+                                onChange={(e) =>
+                                  setEditedSubject({
+                                    ...editedSubject,
+                                    yearLevelID: e.target.value,
+                                  })
+                                }
+                                placeholder="Select Year Level"
+                                options={yearLevelOptions.map((yearLevel) => ({
+                                  value: yearLevel,
+                                  label: `${yearLevel}${yearLevel === "1" ? "st" : yearLevel === "2" ? "nd" : yearLevel === "3" ? "rd" : "th"} Year`,
+                                }))}
+                              />
+                            </div>
+                          </div>
+                        </div>
+                      </form>
+                    </div>
+
+                    {/* Footer */}
+                    <div className="outfit-400 flex items-center justify-between border-t border-gray-100 px-6 py-4">
+                      <button
+                        type="button"
+                        onClick={closeEditModal}
+                        disabled={isEditing}
+                        className="cursor-pointer text-[14px] font-medium text-gray-500 hover:text-gray-700 disabled:opacity-50"
+                      >
+                        Cancel
+                      </button>
+
+                      <button
+                        type="button"
+                        disabled={isEditing}
+                        onClick={handleSaveEdit}
+                        className="outfit-500 inline-flex cursor-pointer items-center gap-2 rounded-xl bg-orange-500 px-5 py-2.5 text-[14px] font-medium text-white shadow-sm transition hover:bg-orange-600 active:scale-95 disabled:cursor-not-allowed disabled:opacity-70"
+                      >
+                        {isEditing ? (
+                          <>
+                            <i className="bx bx-loader-alt animate-spin text-lg"></i>
+                            Saving...
+                          </>
+                        ) : (
+                          <>Save Changes</>
+                        )}
+                      </button>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </>
+          )}
+
+          {/* Delete Confirmation Modal */}
+          {showDeleteModal && subjectToDelete && (
+            <>
+              <WarningModal
+                isOpen={showDeleteModal}
+                onClose={() => {
+                  if (isDeleting) return;
+                  setShowDeleteModal(false);
+                  setSubjectToDelete(null);
+                }}
+                title="Delete Subject"
+                subtitle="This action cannot be undone."
+                description={
+                  <span>
+                    Are you sure you want to delete{" "}
+                    <span className="font-semibold text-gray-900">
+                      {subjectToDelete.subjectCode} - {subjectToDelete.subjectName}
+                    </span>
+                    ?
+                  </span>
+                }
+                confirmLabel="Delete"
+                confirmIcon={<i className="bx bx-trash text-[18px]" />}
+                onConfirm={handleDeleteSubject}
+                cancelLabel="Cancel"
+                onCancel={() => {
+                  if (isDeleting) return;
+                  setShowDeleteModal(false);
+                  setSubjectToDelete(null);
+                }}
+                isConfirmLoading={isDeleting}
+                isCancelLoading={false}
+              />
+            </>
+          )}
+
+          {/* Print / Generate exam modal - used by mobile button */}
+          <PrintExamModal
+            isOpen={showPrintModal}
+            onClose={() => setShowPrintModal(false)}
+          />
+
+          {/* Toast */}
+          <Toast message={toast.message} type={toast.type} show={toast.show} />
         </div>
       </div>
-
-      {/* Floating Create/Assign subject button (mobile only) - same as Class.jsx */}
-      {Number(effectiveRoleId) !== 3 && (
-        <div className="fixed right-4 bottom-[110px] z-50 md:hidden">
-          <button
-            type="button"
-            onClick={() => {
-              if (Number(effectiveRoleId) === 2) {
-                setShowAssignModal(true);
-                fetchAvailableSubjects();
-              } else {
-                setShowAddModal(true);
-              }
-            }}
-            className="outfit-400 flex cursor-pointer items-center gap-2 rounded-full bg-orange-500 p-4 text-[14px] font-medium text-white shadow-xl transition-colors hover:bg-orange-600"
-          >
-            <i className="bx bx-plus text-[22px]" />
-          </button>
-        </div>
-      )}
-
-      {/* Assign Subject Modal (for Faculty) */}
-      {showAssignModal && (
-        <>
-          <div className="lightbox-bg fixed inset-0 z-100 flex items-end justify-center min-[448px]:items-center">
-            <div className="animate-fade-in-up relative max-h-[90vh] w-full max-w-md rounded-t-2xl bg-white shadow-2xl min-[448px]:mx-5 min-[448px]:rounded-md">
-              <div className="border-color flex items-center justify-between border-b px-4 py-2">
-                <h2 className="text-[16px] font-semibold text-black">
-                  Assign a Subject
-                </h2>
-
-                <button
-                  onClick={() => {
-                    setShowAssignModal(false);
-                    setSearchUnassigned("");
-                    setSelectedSubjectForAssignment(null);
-                  }}
-                  className="flex h-8 w-8 cursor-pointer items-center justify-center rounded-full text-gray-700 transition duration-100 hover:bg-gray-100 hover:text-gray-900"
-                >
-                  <i className="bx bx-x text-lg"></i>
-                </button>
-              </div>
-
-              <div className="px-5 py-4">
-                <div className="mt-2 flex w-full items-center gap-2">
-                  <div className="w-4/5">
-                    <input
-                      type="text"
-                      placeholder="Search subject..."
-                      value={searchUnassigned}
-                      onChange={(e) => setSearchUnassigned(e.target.value)}
-                      className="relative w-full cursor-text rounded-md border border-gray-300 bg-white px-4 py-[7px] text-[14px] transition-all duration-200 ease-in-out outline-none hover:border-gray-500 focus:border-transparent focus:ring-1 focus:ring-orange-500 focus:ring-offset-1"
-                    />
-                  </div>
-                  <button
-                    className="border-color flex cursor-pointer items-center gap-1 rounded-md border px-3 py-[7px] text-sm hover:bg-gray-200"
-                    onClick={fetchAvailableSubjects}
-                  >
-                    <i className="bx bx-refresh-ccw text-[18px]"></i> Refresh
-                  </button>
-                </div>
-
-                <div className="mt-4 mb-3 h-[0.5px] bg-[rgb(200,200,200)]" />
-
-                {/* Subject List for Assigning */}
-                <div className="mb-3">
-                  <ul className="max-h-[200px] overflow-y-auto">
-                    {loadingAvailableSubjects ? (
-                      <div className="flex items-center justify-center text-[rgb(168,168,168)]">
-                        <div className="loader"></div>
-                      </div>
-                    ) : unassignedSubjects.length > 0 ? (
-                      [...unassignedSubjects]
-                        .filter((subject) =>
-                          `${subject.programName} ${subject.subjectName} ${subject.subjectCode}`
-                            .toLowerCase()
-                            .includes(searchUnassigned.toLowerCase()),
-                        )
-                        .sort((a, b) =>
-                          a.programName.localeCompare(b.programName),
-                        )
-                        .map((subject) => (
-                          <li
-                            key={subject.subjectID}
-                            className={`mt-2 mr-[6px] flex cursor-pointer items-center justify-between rounded-md p-[5px] text-[15px] transition-all duration-100 ease-in-out ${
-                              selectedSubjectForAssignment &&
-                              selectedSubjectForAssignment.subjectID ===
-                                subject.subjectID
-                                ? "bg-orange-500 text-white"
-                                : "hover:bg-[rgb(255,230,214)]"
-                            }`}
-                            onClick={() =>
-                              setSelectedSubjectForAssignment(subject)
-                            }
-                          >
-                            <span className="mb-[1px] pl-1 break-words">
-                              {subject.programName} - ({subject.subjectCode}){" "}
-                              {subject.subjectName}
-                            </span>
-                          </li>
-                        ))
-                    ) : (
-                      <li className="p-2 text-center text-[14px] text-[rgb(168,168,168)]">
-                        All subjects already assigned.
-                      </li>
-                    )}
-                  </ul>
-                </div>
-
-                <div className="mt-5 mb-3 h-[0.5px] bg-[rgb(200,200,200)]" />
-
-                <div className="mb-1 flex justify-end gap-2">
-                  <button
-                    className="flex cursor-pointer items-center gap-1 rounded-md border px-2 py-1.5 text-gray-700 hover:bg-gray-200"
-                    onClick={() => {
-                      setShowAssignModal(false);
-                      setSearchUnassigned("");
-                      setSelectedSubjectForAssignment(null);
-                    }}
-                  >
-                    <span className="px-1 text-[16px]">Cancel</span>
-                  </button>
-
-                  <button
-                    className="flex w-[80px] cursor-pointer items-center justify-center rounded-md bg-orange-500 px-[12px] py-[6px] text-[14px] text-white hover:bg-orange-700 disabled:cursor-not-allowed disabled:opacity-50"
-                    onClick={() =>
-                      handleAssignSubject(selectedSubjectForAssignment)
-                    }
-                    disabled={!selectedSubjectForAssignment}
-                  >
-                    {isAssigning ? (
-                      <span className="loader-white"></span>
-                    ) : (
-                      "Assign"
-                    )}
-                  </button>
-                </div>
-              </div>
-            </div>
-          </div>
-        </>
-      )}
-
-      {/* Add Subject Modal */}
-      {showAddModal && (
-        <>
-          <div
-            className="lightbox-bg fixed inset-0 z-100 flex items-center justify-center p-4"
-            onClick={closeAddModal}
-          >
-            <div
-              className="animate-fade-in-up relative mx-auto flex w-full max-w-xl overflow-hidden rounded-2xl bg-white shadow-2xl"
-              style={{ minHeight: "480px" }}
-              onClick={(e) => e.stopPropagation()}
-            >
-              <div className="flex flex-1 flex-col">
-                {/* Header */}
-                <div className="outfit-400 flex items-start justify-between border-b border-gray-200 px-6 py-5">
-                  <div className="flex items-start gap-3">
-                    <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-orange-500 text-white">
-                      <i className="bx bx-pen-plus text-2xl" />
-                    </div>
-                    <div>
-                      <h2 className="outfit-700 text-[16px] text-gray-900">
-                        Create a Subject
-                      </h2>
-                      <p className="text-xs text-gray-500">
-                        Enter the details for a new subject.
-                      </p>
-                    </div>
-                  </div>
-
-                  <button
-                    type="button"
-                    onClick={closeAddModal}
-                    className="ml-4 flex h-8 w-8 flex-shrink-0 cursor-pointer items-center justify-center rounded-lg text-gray-400 transition-colors hover:bg-gray-100 hover:text-gray-600"
-                    aria-label="Close modal"
-                  >
-                    <i className="bx bx-x text-xl"></i>
-                  </button>
-                </div>
-
-                {/* Body */}
-                <div className="outfit-400 flex-1 overflow-y-auto px-6 py-5">
-                  {(validationError || newSubjectCode.length > 20) && (
-                    <div className="mb-4 flex items-center gap-2 rounded-xl border border-red-200 bg-red-50 px-4 py-2.5 text-[13px] text-red-700">
-                      <i className="bx bx-error-circle text-base"></i>
-                      {validationError || "Code must be 20 characters or less."}
-                    </div>
-                  )}
-
-                  <form
-                    id="subject-create-form"
-                    onSubmit={(e) => e.preventDefault()}
-                  >
-                    <div className="space-y-5">
-                      <div>
-                        <label className="mb-1.5 block text-[13px] font-semibold text-gray-700">
-                          Subject Name <span className="text-red-500">*</span>
-                        </label>
-                        <div className="relative">
-                          <i className="bx bx-book-open absolute top-1/2 left-3 -translate-y-1/2 text-gray-400"></i>
-                          <input
-                            type="text"
-                            placeholder="e.g. Calculus 1"
-                            value={newSubjectName}
-                            onChange={(e) => setNewSubjectName(e.target.value)}
-                            className="w-full rounded-xl border border-gray-200 py-2.5 pr-3 pl-9 text-sm transition focus:border-orange-400 focus:ring-2 focus:ring-orange-100 focus:outline-none"
-                          />
-                        </div>
-                      </div>
-
-                      <div>
-                        <label className="mb-1.5 block text-[13px] font-semibold text-gray-700">
-                          Subject Code <span className="text-red-500">*</span>
-                        </label>
-                        <div className="relative">
-                          <i className="bx bx-edit absolute top-1/2 left-3 -translate-y-1/2 text-gray-400"></i>
-                          <input
-                            type="text"
-                            placeholder="e.g. MATH123"
-                            value={newSubjectCode}
-                            onChange={(e) => setNewSubjectCode(e.target.value)}
-                            className="w-full rounded-xl border border-gray-200 py-2.5 pr-3 pl-9 text-sm transition focus:border-orange-400 focus:ring-2 focus:ring-orange-100 focus:outline-none"
-                          />
-                        </div>
-                        <p className="mt-1 text-[11px] text-gray-400">
-                          Enter the subject code (max 20 characters).
-                        </p>
-                      </div>
-
-                      <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
-                        <div>
-                          <label className="mb-1.5 block text-[13px] font-semibold text-gray-700">
-                            Program <span className="text-red-500">*</span>
-                          </label>
-                          <RegisterDropDownSmall
-                            name="Program"
-                            value={selectedProgramID}
-                            onChange={(e) =>
-                              setSelectedProgramID(e.target.value)
-                            }
-                            placeholder="Select Program"
-                            options={programs.map((program) => ({
-                              value: program.programID,
-                              label: getDisplayProgramName(program.programName),
-                            }))}
-                          />
-                          <p className="mt-1 text-[11px] text-gray-400">
-                            Select the program for this subject.
-                          </p>
-                        </div>
-
-                        <div>
-                          <label className="mb-1.5 block text-[13px] font-semibold text-gray-700">
-                            Year Level <span className="text-red-500">*</span>
-                          </label>
-                          <RegisterDropDownSmall
-                            name="Year Level"
-                            value={selectedYearLevelID}
-                            onChange={(e) =>
-                              setSelectedYearLevelID(e.target.value)
-                            }
-                            placeholder="Select Year Level"
-                            options={yearLevelOptions.map((yearLevel) => ({
-                              value: yearLevel,
-                              label: `${yearLevel}${yearLevel === "1" ? "st" : yearLevel === "2" ? "nd" : yearLevel === "3" ? "rd" : "th"} Year`,
-                            }))}
-                          />
-                          <p className="mt-1 text-[11px] text-gray-400">
-                            Select the year level for this subject.
-                          </p>
-                        </div>
-                      </div>
-                    </div>
-                  </form>
-                </div>
-
-                {/* Footer */}
-                <div className="outfit-400 flex items-center justify-between border-t border-gray-100 px-6 py-4">
-                  <button
-                    type="button"
-                    onClick={closeAddModal}
-                    disabled={isAdding}
-                    className="cursor-pointer text-[14px] font-medium text-gray-500 hover:text-gray-700 disabled:opacity-50"
-                  >
-                    Cancel
-                  </button>
-
-                  <button
-                    type="button"
-                    disabled={isAdding}
-                    onClick={async () => {
-                      const valid =
-                        newSubjectName.trim() !== "" &&
-                        newSubjectCode.trim() !== "" &&
-                        newSubjectCode.length <= 20 &&
-                        selectedProgramID &&
-                        selectedYearLevelID;
-
-                      if (!valid) {
-                        setValidationError(
-                          "Please fill in all required fields",
-                        );
-                        return;
-                      }
-
-                      setValidationError("");
-                      await handleAddSubject();
-                    }}
-                    className="outfit-500 inline-flex cursor-pointer items-center gap-2 rounded-xl bg-orange-500 px-5 py-2.5 text-[14px] font-medium text-white shadow-sm transition hover:bg-orange-600 active:scale-95 disabled:cursor-not-allowed disabled:opacity-70"
-                  >
-                    {isAdding ? (
-                      <>
-                        <i className="bx bx-loader-alt animate-spin text-lg"></i>
-                        Saving...
-                      </>
-                    ) : (
-                      <>Add Subject</>
-                    )}
-                  </button>
-                </div>
-              </div>
-            </div>
-          </div>
-        </>
-      )}
-
-      {/* Edit Subject Modal */}
-      {showEditModal && editingSubject && (
-        <>
-          <div
-            className="lightbox-bg fixed inset-0 z-100 flex items-center justify-center p-4"
-            onClick={closeEditModal}
-          >
-            <div
-              className="animate-fade-in-up relative mx-auto flex w-full max-w-xl overflow-hidden rounded-2xl bg-white shadow-2xl"
-              style={{ minHeight: "480px" }}
-              onClick={(e) => e.stopPropagation()}
-            >
-              <div className="flex flex-1 flex-col">
-                {/* Header */}
-                <div className="outfit-400 flex items-start justify-between border-b border-gray-200 px-6 py-5">
-                  <div className="flex items-start gap-3">
-                    <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-orange-500 text-white">
-                      <i className="bx bx-edit text-2xl" />
-                    </div>
-                    <div>
-                      <h2 className="outfit-700 text-[16px] text-gray-900">
-                        Edit Subject
-                      </h2>
-                      <p className="text-xs text-gray-500">
-                        Update the details for this subject.
-                      </p>
-                    </div>
-                  </div>
-
-                  <button
-                    type="button"
-                    onClick={closeEditModal}
-                    className="ml-4 flex h-8 w-8 flex-shrink-0 cursor-pointer items-center justify-center rounded-lg text-gray-400 transition-colors hover:bg-gray-100 hover:text-gray-600"
-                    aria-label="Close modal"
-                  >
-                    <i className="bx bx-x text-xl"></i>
-                  </button>
-                </div>
-
-                {/* Body */}
-                <div className="outfit-400 flex-1 overflow-y-auto px-6 py-5">
-                  {(validationError ||
-                    editedSubject.subjectCode.length > 20) && (
-                    <div className="mb-4 flex items-center gap-2 rounded-xl border border-red-200 bg-red-50 px-4 py-2.5 text-[13px] text-red-700">
-                      <i className="bx bx-error-circle text-base"></i>
-                      {validationError || "Code must be 20 characters or less."}
-                    </div>
-                  )}
-
-                  <form
-                    id="subject-edit-form"
-                    onSubmit={(e) => e.preventDefault()}
-                  >
-                    <div className="space-y-5">
-                      <div>
-                        <label className="mb-1.5 block text-[13px] font-semibold text-gray-700">
-                          Subject Name <span className="text-red-500">*</span>
-                        </label>
-                        <div className="relative">
-                          <i className="bx bx-book-open absolute top-1/2 left-3 -translate-y-1/2 text-gray-400"></i>
-                          <input
-                            type="text"
-                            placeholder="e.g. Calculus 1"
-                            value={editedSubject.subjectName}
-                            onChange={(e) =>
-                              setEditedSubject({
-                                ...editedSubject,
-                                subjectName: e.target.value,
-                              })
-                            }
-                            className="w-full rounded-xl border border-gray-200 py-2.5 pr-3 pl-9 text-sm transition focus:border-orange-400 focus:ring-2 focus:ring-orange-100 focus:outline-none"
-                          />
-                        </div>
-                      </div>
-
-                      <div>
-                        <label className="mb-1.5 block text-[13px] font-semibold text-gray-700">
-                          Subject Code <span className="text-red-500">*</span>
-                        </label>
-                        <div className="relative">
-                          <i className="bx bx-edit absolute top-1/2 left-3 -translate-y-1/2 text-gray-400"></i>
-
-                          <input
-                            type="text"
-                            placeholder="e.g. MATH123"
-                            value={editedSubject.subjectCode}
-                            onChange={(e) =>
-                              setEditedSubject({
-                                ...editedSubject,
-                                subjectCode: e.target.value,
-                              })
-                            }
-                            className="w-full rounded-xl border border-gray-200 py-2.5 pr-3 pl-9 text-sm transition focus:border-orange-400 focus:ring-2 focus:ring-orange-100 focus:outline-none"
-                          />
-                        </div>
-                        <p className="mt-1 text-[11px] text-gray-400">
-                          Enter the subject code (max 20 characters).
-                        </p>
-                      </div>
-
-                      <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
-                        <div>
-                          <label className="mb-1.5 block text-[13px] font-semibold text-gray-700">
-                            Program <span className="text-red-500">*</span>
-                          </label>
-                          <RegisterDropDownSmall
-                            name="Program"
-                            value={editedSubject.programID}
-                            onChange={(e) =>
-                              setEditedSubject({
-                                ...editedSubject,
-                                programID: e.target.value,
-                              })
-                            }
-                            placeholder="Select Program"
-                            options={programs.map((program) => ({
-                              value: program.programID,
-                              label: getDisplayProgramName(program.programName),
-                            }))}
-                          />
-                        </div>
-
-                        <div>
-                          <label className="mb-1.5 block text-[13px] font-semibold text-gray-700">
-                            Year Level <span className="text-red-500">*</span>
-                          </label>
-                          <RegisterDropDownSmall
-                            name="Year Level"
-                            value={editedSubject.yearLevelID}
-                            onChange={(e) =>
-                              setEditedSubject({
-                                ...editedSubject,
-                                yearLevelID: e.target.value,
-                              })
-                            }
-                            placeholder="Select Year Level"
-                            options={yearLevelOptions.map((yearLevel) => ({
-                              value: yearLevel,
-                              label: `${yearLevel}${yearLevel === "1" ? "st" : yearLevel === "2" ? "nd" : yearLevel === "3" ? "rd" : "th"} Year`,
-                            }))}
-                          />
-                        </div>
-                      </div>
-                    </div>
-                  </form>
-                </div>
-
-                {/* Footer */}
-                <div className="outfit-400 flex items-center justify-between border-t border-gray-100 px-6 py-4">
-                  <button
-                    type="button"
-                    onClick={closeEditModal}
-                    disabled={isEditing}
-                    className="cursor-pointer text-[14px] font-medium text-gray-500 hover:text-gray-700 disabled:opacity-50"
-                  >
-                    Cancel
-                  </button>
-
-                  <button
-                    type="button"
-                    disabled={isEditing}
-                    onClick={handleSaveEdit}
-                    className="outfit-500 inline-flex cursor-pointer items-center gap-2 rounded-xl bg-orange-500 px-5 py-2.5 text-[14px] font-medium text-white shadow-sm transition hover:bg-orange-600 active:scale-95 disabled:cursor-not-allowed disabled:opacity-70"
-                  >
-                    {isEditing ? (
-                      <>
-                        <i className="bx bx-loader-alt animate-spin text-lg"></i>
-                        Saving...
-                      </>
-                    ) : (
-                      <>Save Changes</>
-                    )}
-                  </button>
-                </div>
-              </div>
-            </div>
-          </div>
-        </>
-      )}
-
-      {/* Delete Confirmation Modal */}
-      {showDeleteModal && subjectToDelete && (
-        <>
-          <WarningModal
-            isOpen={showDeleteModal}
-            onClose={() => {
-              if (isDeleting) return;
-              setShowDeleteModal(false);
-              setSubjectToDelete(null);
-            }}
-            title="Delete Subject"
-            subtitle="This action cannot be undone."
-            description={
-              <span>
-                Are you sure you want to delete{" "}
-                <span className="font-semibold text-gray-900">
-                  {subjectToDelete.subjectCode} - {subjectToDelete.subjectName}
-                </span>
-                ?
-              </span>
-            }
-            confirmLabel="Delete"
-            confirmIcon={<i className="bx bx-trash text-[18px]" />}
-            onConfirm={handleDeleteSubject}
-            cancelLabel="Cancel"
-            onCancel={() => {
-              if (isDeleting) return;
-              setShowDeleteModal(false);
-              setSubjectToDelete(null);
-            }}
-            isConfirmLoading={isDeleting}
-            isCancelLoading={false}
-          />
-        </>
-      )}
-
-      {/* Print / Generate exam modal - used by mobile button */}
-      <PrintExamModal
-        isOpen={showPrintModal}
-        onClose={() => setShowPrintModal(false)}
-      />
-
-      {/* Toast */}
-      <Toast message={toast.message} type={toast.type} show={toast.show} />
-    </div>
+    </>
   );
 }
 

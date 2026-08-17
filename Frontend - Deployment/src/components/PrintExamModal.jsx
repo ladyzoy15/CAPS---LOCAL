@@ -393,7 +393,7 @@ export default function ExamGenerator({
           />
           <div className="animate-fade-in-up relative z-10 mx-0 w-full rounded-t-2xl bg-white shadow-2xl">
             <div className="border-color flex items-center justify-between border-b px-4 py-2">
-              <h2 className="text-[16px] outfit-500 text-black sm:text-[14px]">
+              <h2 className="text-[16px] outfit-500 text-amber sm:text-[14px]">
                 Generate Qualifying Exam
               </h2>
               <button

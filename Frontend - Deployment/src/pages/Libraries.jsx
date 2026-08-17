@@ -1083,7 +1083,7 @@ function Libraries() {
             onClick={() => navigate("/archived-quiz")}
             className={`flex w-full cursor-pointer items-center justify-between rounded-md px-3 py-2 text-left text-[14px] transition-colors ${
               activeView === "archive"
-                ? "bg-gray-100 font-medium text-gray-900"
+                ? "bg-gray-100 font-medium text-amber-900"
                 : "text-gray-600 hover:bg-gray-100"
             }`}
           >
@@ -1168,7 +1168,7 @@ function Libraries() {
                     setShowForm(true);
                   }}
                   title="Create quiz"
-                  className="outfit-500 -mb-2 inline-flex cursor-pointer items-center rounded-xl p-2 text-[12px] font-medium text-gray-700 transition-colors hover:bg-gray-100 md:text-[14px] lg:hidden"
+                  className="outfit-500 -mb-2 inline-flex cursor-pointer items-center rounded-xl p-2 text-[12px] font-medium text-amber-700 transition-colors hover:bg-gray-100 md:text-[14px] lg:hidden"
                 >
                   <i className="bxx bx-plus text-[20px]"></i>
                 </button>

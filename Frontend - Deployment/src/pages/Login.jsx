@@ -129,7 +129,7 @@ export default function LoginPage() {
   return (
     <>
       {/* =========================================================
-          DESKTOP LOGIN
+          DESKTOP LOGIN - ORANGE & WHITE BACKGROUND
       ========================================================= */}
       <div
         className="
@@ -138,16 +138,11 @@ export default function LoginPage() {
           min-h-screen
           w-full
           overflow-hidden
-          bg-[url('/login-bg.png')]
-          bg-cover
-          bg-center
-          bg-no-repeat
+          bg-gradient-to-br from-orange-50 via-white to-orange-100
           lg:block
         "
       >
-        {/* =====================================================
-            GLASS BACKGROUND OVERLAY
-        ===================================================== */}
+        {/* Background Glows */}
         <div className="pointer-events-none absolute inset-0 bg-white/10 backdrop-blur-[2px]" />
 
         {/* Orange Glow */}
@@ -160,12 +155,12 @@ export default function LoginPage() {
             h-[450px]
             w-[450px]
             rounded-full
-            bg-orange-400/20
+            bg-orange-300/30
             blur-[120px]
           "
         />
 
-        {/* Blue Glow */}
+        {/* White Glow */}
         <div
           className="
             pointer-events-none
@@ -175,7 +170,7 @@ export default function LoginPage() {
             h-[450px]
             w-[450px]
             rounded-full
-            bg-sky-400/20
+            bg-white/60
             blur-[120px]
           "
         />
@@ -192,7 +187,7 @@ export default function LoginPage() {
             -translate-x-1/2
             -translate-y-1/2
             rounded-full
-            bg-white/10
+            bg-orange-200/20
             blur-[100px]
           "
         />
@@ -211,7 +206,6 @@ export default function LoginPage() {
               items-center
               justify-center
               p-6
-              text-white
               lg:w-1/2
             "
           >
@@ -226,8 +220,8 @@ export default function LoginPage() {
                 space-x-2
                 rounded-2xl
                 border
-                border-white/20
-                bg-white/10
+                border-orange-200/50
+                bg-white/70
                 px-3
                 py-2
                 shadow-lg
@@ -246,7 +240,7 @@ export default function LoginPage() {
                 className="size-8"
               />
 
-              <h1 className="outfit-500 text-xs text-white drop-shadow-md lg:text-lg">
+              <h1 className="outfit-500 text-xs text-gray-800 drop-shadow-md lg:text-lg">
                 JOSE RIZAL MEMORIAL STATE UNIVERSITY
               </h1>
             </div>
@@ -263,20 +257,20 @@ export default function LoginPage() {
                 lg:flex
               "
             >
-              <h1 className="text-3xl leading-snug drop-shadow-lg lg:text-4xl">
-                <span className="text-5xl text-orange-400">C</span>
+              <h1 className="text-3xl leading-snug drop-shadow-lg text-gray-900 lg:text-4xl">
+                <span className="text-5xl text-orange-500">C</span>
                 OMPREHENSIVE
                 <br />
 
-                <span className="text-5xl text-orange-400">A</span>
+                <span className="text-5xl text-orange-500">A</span>
                 SSESSMENT AND
                 <br />
 
-                <span className="text-5xl text-orange-400">P</span>
+                <span className="text-5xl text-orange-500">P</span>
                 REPARATION
                 <br />
 
-                <span className="text-5xl text-orange-400">S</span>
+                <span className="text-5xl text-orange-500">S</span>
                 YSTEM
               </h1>
 
@@ -289,7 +283,7 @@ export default function LoginPage() {
                   max-w-xs
                   text-center
                   text-sm
-                  text-white/75
+                  text-gray-600
                   drop-shadow
                   lg:block
                 "
@@ -310,18 +304,18 @@ export default function LoginPage() {
                   font-bold
                   tracking-wide
                   whitespace-nowrap
-                  text-white
+                  text-gray-900
                   drop-shadow-lg
                   sm:text-[30px]
                 "
               >
                 <span>
-                  <span className="text-3xl text-orange-400">C</span>
+                  <span className="text-3xl text-orange-500">C</span>
                   OMPREHENSIVE
                 </span>
 
                 <span>
-                  <span className="text-3xl text-orange-400"> A</span>
+                  <span className="text-3xl text-orange-500"> A</span>
                   SSESSMENT
                 </span>
 
@@ -330,12 +324,12 @@ export default function LoginPage() {
                 <span>AND</span>
 
                 <span>
-                  <span className="text-3xl text-orange-400"> P</span>
+                  <span className="text-3xl text-orange-500"> P</span>
                   REPARATION
                 </span>
 
                 <span>
-                  <span className="text-3xl text-orange-400"> S</span>
+                  <span className="text-3xl text-orange-500"> S</span>
                   YSTEM
                 </span>
               </h1>
@@ -368,10 +362,10 @@ export default function LoginPage() {
                 overflow-hidden
                 rounded-[30px]
                 border
-                border-white/60
-                bg-white/35
+                border-orange-200/50
+                bg-white/80
                 p-7
-                shadow-[0_25px_70px_rgba(0,0,0,0.18)]
+                shadow-[0_25px_70px_rgba(0,0,0,0.08)]
                 backdrop-blur-2xl
                 sm:p-9
               "
@@ -386,7 +380,7 @@ export default function LoginPage() {
                   h-px
                   bg-gradient-to-r
                   from-transparent
-                  via-white
+                  via-orange-300/50
                   to-transparent
                 "
               />
@@ -402,7 +396,7 @@ export default function LoginPage() {
                   w-40
                   -translate-x-1/2
                   rounded-full
-                  bg-white/20
+                  bg-orange-200/20
                   blur-3xl
                 "
               />
@@ -419,8 +413,8 @@ export default function LoginPage() {
                     justify-center
                     rounded-2xl
                     border
-                    border-white/70
-                    bg-white/40
+                    border-orange-200/50
+                    bg-orange-100
                     shadow-lg
                     backdrop-blur-xl
                   "
@@ -437,12 +431,11 @@ export default function LoginPage() {
                     text-gray-900
                   "
                 >
-                  LOG IN ACCOUNT
+                  Welcome Back
                 </h2>
 
                 <p className="mt-2 text-sm leading-relaxed text-gray-600">
-                  Welcome! Please enter your code and password
-                  to access your account.
+                  Please enter your details to login.
                 </p>
 
                 <form
@@ -463,8 +456,8 @@ export default function LoginPage() {
                           w-full
                           rounded-2xl
                           border
-                          border-white/70
-                          bg-white/45
+                          border-orange-200/50
+                          bg-white/60
                           px-4
                           py-[12px]
                           text-base
@@ -475,14 +468,14 @@ export default function LoginPage() {
                           transition-all
                           duration-200
                           placeholder-transparent
-                          hover:bg-white/55
+                          hover:bg-white/80
                           hover:shadow-md
                           focus:border-orange-400/70
-                          focus:bg-white/60
+                          focus:bg-white/80
                           focus:ring-4
                           focus:ring-orange-400/10
                         "
-                        placeholder="User Code"
+                        placeholder="ID Code"
                         value={idCode}
                         onChange={(e) => setIdCode(e.target.value)}
                       />
@@ -509,7 +502,7 @@ export default function LoginPage() {
 
                           peer-focus:top-2
                           peer-focus:mt-0
-                          peer-focus:bg-white/70
+                          peer-focus:bg-white/80
                           peer-focus:text-xs
                           peer-focus:text-orange-500
 
@@ -517,7 +510,7 @@ export default function LoginPage() {
                           peer-[&:not(:placeholder-shown)]:text-xs
                         "
                       >
-                        Instructor Code/Student ID Number
+                        ID Code
                       </label>
                     </div>
                   </div>
@@ -538,8 +531,8 @@ export default function LoginPage() {
                           w-full
                           rounded-2xl
                           border
-                          border-white/70
-                          bg-white/45
+                          border-orange-200/50
+                          bg-white/60
                           px-4
                           py-[12px]
                           pr-12
@@ -551,10 +544,10 @@ export default function LoginPage() {
                           transition-all
                           duration-200
                           placeholder-transparent
-                          hover:bg-white/55
+                          hover:bg-white/80
                           hover:shadow-md
                           focus:border-orange-400/70
-                          focus:bg-white/60
+                          focus:bg-white/80
                           focus:ring-4
                           focus:ring-orange-400/10
                         "
@@ -588,7 +581,7 @@ export default function LoginPage() {
 
                           peer-focus:top-2
                           peer-focus:mt-0
-                          peer-focus:bg-white/70
+                          peer-focus:bg-white/80
                           peer-focus:text-xs
                           peer-focus:text-orange-500
 
@@ -632,41 +625,59 @@ export default function LoginPage() {
                   </div>
 
                   {/* =================================================
-                      REMEMBER ME
+                      REMEMBER ME & FORGOT PASSWORD - BROWN
                   ================================================= */}
-                  <label
-                    className="
-                      outfit-400
-                      mb-4
-                      flex
-                      cursor-pointer
-                      items-center
-                      gap-2
-                      text-sm
-                      text-gray-600
-                    "
-                  >
-                    <input
-                      type="checkbox"
-                      checked={rememberMe}
-                      onChange={(e) =>
-                        setRememberMe(e.target.checked)
-                      }
+                  <div className="flex items-center justify-between mb-4">
+                    <label
                       className="
-                        h-4
-                        w-4
+                        outfit-400
+                        flex
                         cursor-pointer
-                        rounded
-                        border-gray-300
-                        accent-orange-500
+                        items-center
+                        gap-2
+                        text-sm
+                        text-gray-600
                       "
-                    />
+                    >
+                      <input
+                        type="checkbox"
+                        checked={rememberMe}
+                        onChange={(e) =>
+                          setRememberMe(e.target.checked)
+                        }
+                        className="
+                          h-4
+                          w-4
+                          cursor-pointer
+                          rounded
+                          border-gray-300
+                          accent-orange-500
+                        "
+                      />
 
-                    Remember me
-                  </label>
+                      Remember me
+                    </label>
+
+                    <button
+                      type="button"
+                      className="
+                        cursor-pointer
+                        text-sm
+                        text-[#8B6914]
+                        transition
+                        hover:text-[#6B4F12]
+                        hover:underline
+                      "
+                      onClick={() =>
+                        navigate("/forgot-password")
+                      }
+                    >
+                      Forgot password?
+                    </button>
+                  </div>
 
                   {/* =================================================
-                      LOGIN BUTTON
+                      LOGIN BUTTON - ORANGE
                   ================================================= */}
                   <button
                     type="submit"
@@ -682,20 +693,20 @@ export default function LoginPage() {
                       border
                       border-orange-300/40
                       bg-gradient-to-r
-                      from-[#ed3700]/95
-                      to-[#FE6902]/95
+                      from-orange-500
+                      to-orange-600
                       py-[12px]
                       text-base
                       font-semibold
                       text-white
-                      shadow-[0_8px_25px_rgba(249,105,2,0.25)]
+                      shadow-[0_8px_25px_rgba(249,115,22,0.25)]
                       backdrop-blur-md
                       transition-all
                       duration-300
                       ease-in-out
                       hover:-translate-y-0.5
                       hover:brightness-110
-                      hover:shadow-[0_12px_30px_rgba(249,105,2,0.35)]
+                      hover:shadow-[0_12px_30px_rgba(249,115,22,0.35)]
                       active:scale-[0.98]
                       disabled:cursor-not-allowed
                       disabled:opacity-60
@@ -706,30 +717,13 @@ export default function LoginPage() {
                         <span className="loader-white"></span>
                       </div>
                     ) : (
-                      "Log in"
+                      "Login"
                     )}
                   </button>
 
-                  {/* Forgot Password */}
-                  <button
-                    type="button"
-                    className="
-                      mt-2
-                      cursor-pointer
-                      text-sm
-                      text-orange-500
-                      transition
-                      hover:text-orange-600
-                      hover:underline
-                    "
-                    onClick={() =>
-                      navigate("/forgot-password")
-                    }
-                  >
-                    Forgot your password?
-                  </button>
-
-                  {/* Register */}
+                  {/* =================================================
+                      REGISTER - BROWN
+                  ================================================= */}
                   <p
                     className="
                       mt-5
@@ -745,11 +739,13 @@ export default function LoginPage() {
                       className="
                         cursor-pointer
                         font-medium
-                        text-orange-500
+                        text-[#8B6914]
+                        transition
+                        hover:text-[#6B4F12]
                         hover:underline
                       "
                     >
-                      Register here
+                      Register
                     </span>
                   </p>
 
@@ -783,7 +779,7 @@ export default function LoginPage() {
               transform
               items-center
               space-x-2
-              text-gray-300
+              text-gray-400
               lg:left-8
             "
           >
@@ -793,7 +789,7 @@ export default function LoginPage() {
       </div>
 
       {/* =========================================================
-          MOBILE LOGIN
+          MOBILE LOGIN - ORANGE & WHITE BACKGROUND
       ========================================================= */}
       <div
         className="
@@ -802,10 +798,7 @@ export default function LoginPage() {
           min-h-screen
           flex-col
           overflow-hidden
-          bg-gradient-to-br
-          from-[#101010]
-          via-[#252525]
-          to-[#3c3c3c]
+          bg-gradient-to-br from-orange-50 via-white to-orange-100
           lg:hidden
         "
       >
@@ -819,7 +812,7 @@ export default function LoginPage() {
             h-72
             w-72
             rounded-full
-            bg-orange-500/20
+            bg-orange-300/30
             blur-[90px]
           "
         />
@@ -833,7 +826,7 @@ export default function LoginPage() {
             h-72
             w-72
             rounded-full
-            bg-sky-500/10
+            bg-orange-200/20
             blur-[90px]
           "
         />
@@ -851,14 +844,14 @@ export default function LoginPage() {
             items-center
             justify-center
             border-b
-            border-white/10
-            bg-white/5
+            border-orange-200/30
+            bg-white/60
             backdrop-blur-xl
           "
         >
-          {/* Register */}
+          {/* Register - BROWN */}
           <div className="outfit absolute top-5 right-5">
-            <span className="mr-2 text-[12px] text-white/70">
+            <span className="mr-2 text-[12px] text-gray-600">
               Don't have an account?
             </span>
 
@@ -868,17 +861,17 @@ export default function LoginPage() {
                 cursor-pointer
                 rounded-xl
                 border
-                border-white/20
-                bg-white/10
+                border-[#8B6914]/30
+                bg-[#8B6914]/10
                 px-4
                 py-1.5
                 text-[14px]
                 font-medium
-                text-white
+                text-[#8B6914]
                 shadow-md
                 backdrop-blur-md
                 transition
-                hover:bg-white/20
+                hover:bg-[#8B6914]/20
               "
             >
               Sign in
@@ -897,8 +890,8 @@ export default function LoginPage() {
               gap-3
               rounded-xl
               border
-              border-white/10
-              bg-white/10
+              border-orange-200/50
+              bg-white/70
               px-2
               py-1.5
               backdrop-blur-md
@@ -926,7 +919,7 @@ export default function LoginPage() {
                 font-bold
                 tracking-wide
                 whitespace-nowrap
-                text-white
+                text-gray-900
                 drop-shadow-lg
                 sm:text-[30px]
               "
@@ -981,8 +974,8 @@ export default function LoginPage() {
             rounded-t-[30px]
             border
             border-b-0
-            border-white/30
-            bg-white/10
+            border-orange-200/50
+            bg-white/60
             shadow-lg
             backdrop-blur-xl
           "
@@ -1004,12 +997,12 @@ export default function LoginPage() {
             justify-start
             rounded-t-[32px]
             border-t
-            border-white/70
-            bg-white/70
+            border-orange-200/50
+            bg-white/80
             px-6
             pt-7
             pb-8
-            shadow-[0_-15px_40px_rgba(0,0,0,0.15)]
+            shadow-[0_-15px_40px_rgba(0,0,0,0.06)]
             backdrop-blur-2xl
           "
         >
@@ -1025,7 +1018,7 @@ export default function LoginPage() {
               -translate-x-1/2
               bg-gradient-to-r
               from-transparent
-              via-white
+              via-orange-300/50
               to-transparent
             "
           />
@@ -1040,8 +1033,8 @@ export default function LoginPage() {
               justify-center
               rounded-2xl
               border
-              border-white
-              bg-white/50
+              border-orange-200/50
+              bg-orange-100
               shadow-md
               backdrop-blur-xl
             "
@@ -1050,12 +1043,11 @@ export default function LoginPage() {
           </div>
 
           <h2 className="mb-1 text-[20px] font-bold text-gray-900">
-            LOG IN ACCOUNT
+            Welcome Back
           </h2>
 
           <p className="mb-5 max-w-80 text-center text-xs leading-relaxed text-gray-500 md:max-w-full">
-            Welcome! Please enter your code and password
-            to access your account.
+            Please enter your details to login.
           </p>
 
           <form
@@ -1082,8 +1074,8 @@ export default function LoginPage() {
                     w-full
                     rounded-2xl
                     border
-                    border-white/80
-                    bg-white/50
+                    border-orange-200/50
+                    bg-white/60
                     px-4
                     py-[12px]
                     text-base
@@ -1095,11 +1087,11 @@ export default function LoginPage() {
                     duration-200
                     placeholder-transparent
                     focus:border-orange-400/70
-                    focus:bg-white/70
+                    focus:bg-white/80
                     focus:ring-4
                     focus:ring-orange-400/10
                   "
-                  placeholder="User Code"
+                  placeholder="ID Code"
                   value={idCode}
                   onChange={(e) => setIdCode(e.target.value)}
                 />
@@ -1126,7 +1118,7 @@ export default function LoginPage() {
 
                     peer-focus:top-2
                     peer-focus:mt-0
-                    peer-focus:bg-white/70
+                    peer-focus:bg-white/80
                     peer-focus:text-xs
                     peer-focus:text-orange-500
 
@@ -1134,7 +1126,7 @@ export default function LoginPage() {
                     peer-[&:not(:placeholder-shown)]:text-xs
                   "
                 >
-                  Instructor Code/Student ID Number
+                  ID Code
                 </label>
               </div>
             </div>
@@ -1153,8 +1145,8 @@ export default function LoginPage() {
                     w-full
                     rounded-2xl
                     border
-                    border-white/80
-                    bg-white/50
+                    border-orange-200/50
+                    bg-white/60
                     px-4
                     py-[12px]
                     pr-12
@@ -1167,7 +1159,7 @@ export default function LoginPage() {
                     duration-200
                     placeholder-transparent
                     focus:border-orange-400/70
-                    focus:bg-white/70
+                    focus:bg-white/80
                     focus:ring-4
                     focus:ring-orange-400/10
                   "
@@ -1201,7 +1193,7 @@ export default function LoginPage() {
 
                     peer-focus:top-2
                     peer-focus:mt-0
-                    peer-focus:bg-white/70
+                    peer-focus:bg-white/80
                     peer-focus:text-xs
                     peer-focus:text-orange-500
 
@@ -1244,38 +1236,57 @@ export default function LoginPage() {
               </p>
             )}
 
-            {/* Remember Me */}
-            <label
-              className="
-                outfit-400
-                flex
-                cursor-pointer
-                items-center
-                gap-2
-                text-sm
-                text-gray-600
-              "
-            >
-              <input
-                type="checkbox"
-                checked={rememberMe}
-                onChange={(e) =>
-                  setRememberMe(e.target.checked)
-                }
+            {/* Remember Me & Forgot Password - BROWN */}
+            <div className="flex items-center justify-between">
+              <label
                 className="
-                  h-4
-                  w-4
+                  outfit-400
+                  flex
                   cursor-pointer
-                  rounded
-                  border-gray-300
-                  accent-orange-500
+                  items-center
+                  gap-2
+                  text-sm
+                  text-gray-600
                 "
-              />
+              >
+                <input
+                  type="checkbox"
+                  checked={rememberMe}
+                  onChange={(e) =>
+                    setRememberMe(e.target.checked)
+                  }
+                  className="
+                    h-4
+                    w-4
+                    cursor-pointer
+                    rounded
+                    border-gray-300
+                    accent-orange-500
+                  "
+                />
 
-              Remember me
-            </label>
+                Remember me
+              </label>
 
-            {/* Login */}
+              <button
+                type="button"
+                className="
+                  cursor-pointer
+                  text-sm
+                  text-[#8B6914]
+                  transition
+                  hover:text-[#6B4F12]
+                  hover:underline
+                "
+                onClick={() =>
+                  navigate("/forgot-password")
+                }
+              >
+                Forgot password?
+              </button>
+            </div>
+
+            {/* Login - ORANGE */}
             <button
               type="submit"
               disabled={isLogIn}
@@ -1291,13 +1302,13 @@ export default function LoginPage() {
                 border
                 border-orange-300/40
                 bg-gradient-to-r
-                from-[#ed3700]/95
-                to-[#FE6902]/95
+                from-orange-500
+                to-orange-600
                 py-3
                 text-base
                 font-semibold
                 text-white
-                shadow-[0_8px_25px_rgba(249,105,2,0.25)]
+                shadow-[0_8px_25px_rgba(249,115,22,0.25)]
                 transition-all
                 duration-300
                 hover:-translate-y-0.5
@@ -1311,38 +1322,46 @@ export default function LoginPage() {
                   <span className="loader-white"></span>
                 </div>
               ) : (
-                "LOG IN"
+                "Login"
               )}
             </button>
           </form>
 
-          {/* Forgot Password */}
-          <button
-            type="button"
+          {/* Register - BROWN */}
+          <p
             className="
-              mt-3
-              mb-5
-              cursor-pointer
-              text-sm
-              text-orange-500
-              hover:underline
+              mt-5
+              mb-4
+              text-center
+              text-[14px]
+              text-gray-600
             "
-            onClick={() =>
-              navigate("/forgot-password")
-            }
           >
-            Forgot your password?
-          </button>
+            Don't have an account?{" "}
+            <span
+              onClick={() => navigate("/register")}
+              className="
+                cursor-pointer
+                font-medium
+                text-[#8B6914]
+                transition
+                hover:text-[#6B4F12]
+                hover:underline
+              "
+            >
+              Register
+            </span>
+          </p>
 
           {/* App Version */}
           <div className="my-2 flex w-full items-center">
-            <div className="h-px flex-1 bg-gray-200/70"></div>
+            <div className="h-px flex-1 bg-orange-200/50"></div>
 
             <span className="mx-2 text-xs text-gray-400">
               <AppVersion />
             </span>
 
-            <div className="h-px flex-1 bg-gray-200/70"></div>
+            <div className="h-px flex-1 bg-orange-200/50"></div>
           </div>
 
           {/* Developer */}
