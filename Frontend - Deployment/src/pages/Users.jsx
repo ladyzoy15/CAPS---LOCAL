@@ -117,6 +117,34 @@ const CustomSelect = ({
 };
 
 const UserList = () => {
+  // =========================================================
+  // DARK MODE
+  // Watches <html class="dark"> so this page follows the
+  // global dark-mode switch immediately.
+  // =========================================================
+  const [isDarkMode, setIsDarkMode] = useState(() =>
+    document.documentElement.classList.contains("dark"),
+  );
+
+  useEffect(() => {
+    const html = document.documentElement;
+
+    const updateTheme = () => {
+      setIsDarkMode(html.classList.contains("dark"));
+    };
+
+    updateTheme();
+
+    const observer = new MutationObserver(updateTheme);
+
+    observer.observe(html, {
+      attributes: true,
+      attributeFilter: ["class"],
+    });
+
+    return () => observer.disconnect();
+  }, []);
+
   
   // State for user data and loading
   const [users, setUsers] = useState([]);
@@ -166,14 +194,6 @@ const UserList = () => {
   const [isLoadingModalOptions, setIsLoadingModalOptions] = useState(false);
   const [isSavingCredentials, setIsSavingCredentials] = useState(false);
   const [credentialError, setCredentialError] = useState("");
-
-  // Mouse-follow glow position
-  const [mousePos, setMousePos] = useState({ x: 0, y: 0 });
-
-  const handleMouseMove = (e) => {
-    setMousePos({ x: e.clientX, y: e.clientY });
-  };
-
   // Hide mobile sidebar when banner is displayed (only on mobile)
   useEffect(() => {
     const mobileNav = document.getElementById("mobile-bottom-nav");
@@ -1443,25 +1463,15 @@ const UserList = () => {
 
   return (
   <div
-    className="relative flex min-h-screen"
-    onMouseMove={handleMouseMove}
+    className={`caps-users-page relative flex min-h-screen ${
+      isDarkMode ? "is-dark" : ""
+    }`}
   >
-    {/* Background layer */}
-    <div className="pointer-events-none fixed inset-0 z-0 overflow-hidden bg-gradient-to-br from-orange-50 via-white to-orange-100">
-      <div className="absolute -top-24 -left-24 h-80 w-80 rounded-full bg-orange-200/50 blur-3xl" />
-      <div className="absolute -top-24 -right-24 h-80 w-80 rounded-full bg-orange-200/50 blur-3xl" />
-      <div className="absolute -bottom-24 -left-24 h-80 w-80 rounded-full bg-orange-200/50 blur-3xl" />
-      <div className="absolute -bottom-24 -right-24 h-80 w-80 rounded-full bg-orange-200/50 blur-3xl" />
-      <div className="absolute top-1/2 left-1/2 h-96 w-96 -translate-x-1/2 -translate-y-1/2 rounded-full bg-orange-100/40 blur-3xl" />
-
-      {/* Mouse-follow glow */}
-      <div
-        className="pointer-events-none absolute h-4 w-4 rounded-full bg-orange-500/100 blur-md transition-transform duration-75 ease-out"
-        style={{
-          transform: `translate(${mousePos.x - 8}px, ${mousePos.y - 8}px)`,
-        }}
-      />
-    </div>
+    {/* Plain background - no orange reflection or mouse glow */}
+    <div
+      className="users-background pointer-events-none fixed inset-0 z-0"
+      aria-hidden="true"
+    />
       {/* Main content area */}
     <div className="relative z-10 mt-10 flex min-h-screen flex-1 flex-col gap-6 overflow-y-auto px-4 pt-4 md:px-6 md:pt-6 lg:mt-0">
         <div className="min-w-0 space-y-4">
@@ -3142,6 +3152,207 @@ const UserList = () => {
         </div>
       )}
 
+      {/* =========================================================
+          USERS PAGE DARK MODE
+          Scoped only to this page so other pages are untouched.
+          ========================================================= */}
+      <style>{`
+        .caps-users-page {
+          min-height: 100vh;
+          background: #fff8ef;
+          background-image: none;
+          color: #1f2937;
+          transition: background-color .3s ease, color .3s ease;
+        }
+
+        .caps-users-page.is-dark {
+          background: #0b0f14 !important;
+          background-image: none !important;
+          color: #f3f4f6 !important;
+        }
+
+        .caps-users-page.is-dark .users-background {
+          background: #0b0f14 !important;
+          background-image: none !important;
+        }
+/* Light surfaces -> dark surfaces */
+        .caps-users-page.is-dark .bg-white {
+          background-color: #171d25 !important;
+          color: #f3f4f6 !important;
+        }
+
+        .caps-users-page.is-dark .bg-gray-50,
+        .caps-users-page.is-dark .bg-gray-50\\/40,
+        .caps-users-page.is-dark .bg-gray-50\\/60 {
+          background-color: #11161d !important;
+        }
+
+        .caps-users-page.is-dark .bg-gray-100 {
+          background-color: #1b222c !important;
+        }
+
+        .caps-users-page.is-dark .bg-gray-200 {
+          background-color: #252d38 !important;
+        }
+
+        /* Text */
+        .caps-users-page.is-dark .text-gray-900,
+        .caps-users-page.is-dark .text-gray-800 {
+          color: #f3f4f6 !important;
+        }
+
+        .caps-users-page.is-dark .text-gray-700 {
+          color: #e5e7eb !important;
+        }
+
+        .caps-users-page.is-dark .text-gray-600 {
+          color: #d1d5db !important;
+        }
+
+        .caps-users-page.is-dark .text-gray-500 {
+          color: #9ca3af !important;
+        }
+
+        .caps-users-page.is-dark .text-gray-400 {
+          color: #6b7280 !important;
+        }
+
+        .caps-users-page.is-dark .text-amber-900 {
+          color: #fbbf24 !important;
+        }
+
+        /* Borders */
+        .caps-users-page.is-dark .border-gray-100 {
+          border-color: #252d38 !important;
+        }
+
+        .caps-users-page.is-dark .border-gray-200 {
+          border-color: #303946 !important;
+        }
+
+        .caps-users-page.is-dark .border-gray-300 {
+          border-color: #374151 !important;
+        }
+
+        .caps-users-page.is-dark .divide-gray-200 > :not([hidden]) ~ :not([hidden]) {
+          border-color: #303946 !important;
+        }
+
+        /* Inputs, textareas, selects and custom select buttons */
+        .caps-users-page.is-dark input,
+        .caps-users-page.is-dark textarea,
+        .caps-users-page.is-dark select {
+          background-color: #171d25 !important;
+          color: #f3f4f6 !important;
+          border-color: #374151 !important;
+        }
+
+        .caps-users-page.is-dark input::placeholder,
+        .caps-users-page.is-dark textarea::placeholder {
+          color: #6b7280 !important;
+        }
+
+        /* Table */
+        .caps-users-page.is-dark table,
+        .caps-users-page.is-dark thead,
+        .caps-users-page.is-dark tbody {
+          background-color: #171d25 !important;
+          color: #f3f4f6 !important;
+        }
+
+        .caps-users-page.is-dark th {
+          background-color: #11161d !important;
+          color: #d1d5db !important;
+          border-color: #303946 !important;
+        }
+
+        .caps-users-page.is-dark td {
+          background-color: #171d25 !important;
+          color: #e5e7eb !important;
+          border-color: #303946 !important;
+        }
+
+        .caps-users-page.is-dark tr:hover td {
+          background-color: #1b222c !important;
+        }
+
+        /* Hover states */
+        .caps-users-page.is-dark .hover\\:bg-gray-50:hover {
+          background-color: #1b222c !important;
+        }
+
+        .caps-users-page.is-dark .hover\\:bg-gray-100:hover {
+          background-color: #252d38 !important;
+        }
+
+        .caps-users-page.is-dark .hover\\:bg-gray-700:hover {
+          background-color: #374151 !important;
+        }
+
+        /* Modal/filter cards */
+        .caps-users-page.is-dark .edit-profile-modal-scrollbar,
+        .caps-users-page.is-dark .lightbox-bg .bg-white {
+          background-color: #171d25 !important;
+          color: #f3f4f6 !important;
+        }
+
+        .caps-users-page.is-dark .lightbox-bg .bg-gray-50\\/40 {
+          background-color: #11161d !important;
+        }
+
+        /* Status text */
+        .caps-users-page.is-dark .text-green-700 {
+          color: #86efac !important;
+        }
+
+        .caps-users-page.is-dark .text-yellow-600 {
+          color: #fde68a !important;
+        }
+
+        .caps-users-page.is-dark .text-red-600 {
+          color: #fca5a5 !important;
+        }
+
+        /* Orange selected filter states */
+        .caps-users-page.is-dark .bg-orange-50 {
+          background-color: #3a2412 !important;
+        }
+
+        .caps-users-page.is-dark .text-orange-700,
+        .caps-users-page.is-dark .text-orange-800 {
+          color: #fdba74 !important;
+        }
+
+        .caps-users-page.is-dark .border-orange-300 {
+          border-color: #9a5b24 !important;
+        }
+
+        /* Pagination */
+        .caps-users-page.is-dark .inline-flex.items-center.rounded-full.border {
+          background-color: #171d25 !important;
+          border-color: #303946 !important;
+        }
+
+        /* Scrollbar */
+        .caps-users-page.is-dark ::-webkit-scrollbar {
+          width: 8px;
+          height: 8px;
+        }
+
+        .caps-users-page.is-dark ::-webkit-scrollbar-track {
+          background: #0b0f14;
+        }
+
+        .caps-users-page.is-dark ::-webkit-scrollbar-thumb {
+          background: #374151;
+          border-radius: 10px;
+        }
+
+        .caps-users-page.is-dark ::-webkit-scrollbar-thumb:hover {
+          background: #4b5563;
+        }
+      `}</style>
+
       <WarningModal
         isOpen={warningModal.isOpen}
         onClose={closeWarning}
@@ -3158,20 +3369,7 @@ const UserList = () => {
 
      <Toast message={toast.message} type={toast.type} show={toast.show} />
 
-      {/* Mouse-follow glow overlay - shows on top of all content */}
-      <div
-        className="pointer-events-none fixed inset-0 z-40 overflow-hidden"
-        style={{ mixBlendMode: "multiply" }}
-      >
-        
-        {/* Inner bright core - sits on top for more visibility */}
-        <div
-            className="pointer-events-none absolute h-4 w-4 rounded-full bg-orange-500/100 blur-md transition-transform duration-75 ease-out"
-            style={{
-              transform: `translate(${mousePos.x - 8}px, ${mousePos.y - 8}px)`,
-            }}
-          />
-        </div>
+
     </div>
   );
 };

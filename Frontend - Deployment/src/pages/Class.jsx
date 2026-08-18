@@ -48,6 +48,32 @@ const getHeaderBackground = (classId) => {
 const Class = () => {
   const navigate = useNavigate();
 
+  // ==========================================================
+  // DARK MODE
+  // ==========================================================
+  const [isDarkMode, setIsDarkMode] = useState(() => {
+    return document.documentElement.classList.contains("dark");
+  });
+
+  useEffect(() => {
+    const html = document.documentElement;
+
+    const updateTheme = () => {
+      setIsDarkMode(html.classList.contains("dark"));
+    };
+
+    updateTheme();
+
+    const observer = new MutationObserver(updateTheme);
+
+    observer.observe(html, {
+      attributes: true,
+      attributeFilter: ["class"],
+    });
+
+    return () => observer.disconnect();
+  }, []);
+
   const apiUrl = import.meta.env.VITE_API_BASE_URL;
 
   const { toast, showToast } = useToast();
@@ -94,15 +120,6 @@ const Class = () => {
 
   const [showMobileSearch, setShowMobileSearch] = useState(false);
 
-  // ==========================================================
-  // MOUSE FOLLOW
-  // ==========================================================
-
-  const [mousePos, setMousePos] = useState({
-    x: 0,
-    y: 0,
-  });
-
   const mobileSearchInputRef = useRef(null);
 
   const joinInputRefs = useRef([]);
@@ -114,19 +131,6 @@ const Class = () => {
   const WALKTHROUGH_KEY = "class_walkthrough_v1_seen";
 
   const [showWalkthrough, setShowWalkthrough] = useState(false);
-
-  // ==========================================================
-  // MOUSE MOVE HANDLER
-  // ==========================================================
-
-  const handleMouseMove = (e) => {
-    const rect = e.currentTarget.getBoundingClientRect();
-
-    setMousePos({
-      x: e.clientX - rect.left,
-      y: e.clientY - rect.top,
-    });
-  };
 
   // ==========================================================
   // JOIN CLASS OTP INPUT
@@ -849,43 +853,25 @@ const Class = () => {
       ======================================================= */}
 
       <div
-        onMouseMove={handleMouseMove}
         className="relative min-h-screen w-full overflow-hidden"
+        style={{
+          backgroundColor: isDarkMode ? "#0b0f14" : "#fff8ef",
+          backgroundImage: "none",
+          color: isDarkMode ? "#f3f4f6" : "#1f2937",
+          transition: "background-color 0.3s ease, color 0.3s ease",
+        }}
       >
         {/* ====================================================
-            FULL SCREEN BACKGROUND
+            PLAIN PAGE BACKGROUND
+            Dark mode is intentionally flat with NO orange glow,
+            gradients, reflections, or mouse-follow effects.
         ===================================================== */}
 
         <div
-          className="pointer-events-none absolute inset-0 z-0 overflow-hidden bg-gradient-to-br from-orange-50 via-white to-orange-100"
-          aria-hidden="true"
-        >
-          {/* Top-left */}
-          <div className="absolute -top-24 -left-24 h-80 w-80 rounded-full bg-orange-200/50 blur-3xl" />
-
-          {/* Top-right */}
-          <div className="absolute -top-24 -right-24 h-80 w-80 rounded-full bg-orange-200/50 blur-3xl" />
-
-          {/* Bottom-left */}
-          <div className="absolute -bottom-24 -left-24 h-80 w-80 rounded-full bg-orange-200/50 blur-3xl" />
-
-          {/* Bottom-right */}
-          <div className="absolute -right-24 -bottom-24 h-80 w-80 rounded-full bg-orange-200/50 blur-3xl" />
-
-          {/* Middle */}
-          <div className="absolute top-1/2 left-1/2 h-96 w-96 -translate-x-1/2 -translate-y-1/2 rounded-full bg-orange-100/40 blur-3xl" />
-        </div>
-
-        {/* ====================================================
-            MOUSE FOLLOW GLOW
-        ===================================================== */}
-
-        <div
-          className="pointer-events-none absolute z-4 h-4 w-4 rounded-full bg-orange-500/70 blur-md"
+          className="pointer-events-none absolute inset-0 z-0"
           style={{
-            left: `${mousePos.x}px`,
-            top: `${mousePos.y}px`,
-            transform: "translate(-50%, -50%)",
+            backgroundColor: isDarkMode ? "#0b0f14" : "#fff8ef",
+            backgroundImage: "none",
           }}
           aria-hidden="true"
         />
@@ -920,7 +906,11 @@ const Class = () => {
               {/* Header */}
               <div className="flex flex-wrap items-center justify-between gap-2">
                 <div className="min-w-0 flex-1">
-                  <p className="outfit-700 text-[20px] break-words text-amber-950 md:text-[20px]">
+                  <p
+                    className={`outfit-700 text-[20px] break-words md:text-[20px] ${
+                      isDarkMode ? "text-orange-300" : "text-amber-950"
+                    }`}
+                  >
                     {searchTerm.trim()
                       ? `Search results for "${searchTerm}"`
                       : `My Classes (${filteredClasses.length})`}
@@ -937,7 +927,11 @@ const Class = () => {
                           setIsCreateModalOpen(true)
                         }
                         title="Create class"
-                        className="outfit-500 -mb-2 inline-flex cursor-pointer items-center rounded-xl p-2 text-[12px] font-medium text-gray-700 transition-colors hover:bg-gray-100 md:text-[14px]"
+                        className={`outfit-500 -mb-2 inline-flex cursor-pointer items-center rounded-xl p-2 text-[12px] font-medium transition-colors md:text-[14px] ${
+                          isDarkMode
+                            ? "text-gray-200 hover:bg-white/10"
+                            : "text-gray-700 hover:bg-gray-100"
+                        }`}
                       >
                         <i className="bx bx-plus text-[20px]"></i>
                       </button>
@@ -958,7 +952,11 @@ const Class = () => {
                         onClick={() =>
                           navigate("/archived-class")
                         }
-                        className="outfit-500 -mb-2 inline-flex cursor-pointer items-center rounded-xl p-2 text-[12px] font-medium text-gray-700 transition-colors hover:bg-gray-100 md:text-[14px]"
+                        className={`outfit-500 -mb-2 inline-flex cursor-pointer items-center rounded-xl p-2 text-[12px] font-medium transition-colors md:text-[14px] ${
+                          isDarkMode
+                            ? "text-gray-200 hover:bg-white/10"
+                            : "text-gray-700 hover:bg-gray-100"
+                        }`}
                       >
                         <img
                           src={ArchiveIcon}
@@ -981,7 +979,11 @@ const Class = () => {
                         resetJoinForm();
                       }}
                       title="Join a class"
-                      className="outfit-500 -mb-2 inline-flex cursor-pointer items-center rounded-xl p-2 text-[12px] font-medium text-gray-700 transition-colors hover:bg-gray-100 md:text-[14px]"
+                      className={`outfit-500 -mb-2 inline-flex cursor-pointer items-center rounded-xl p-2 text-[12px] font-medium transition-colors md:text-[14px] ${
+                          isDarkMode
+                            ? "text-gray-200 hover:bg-white/10"
+                            : "text-gray-700 hover:bg-gray-100"
+                        }`}
                     >
                       <i className="bx bx-plus text-[20px]"></i>
                     </button>
@@ -997,7 +999,11 @@ const Class = () => {
             <div>
               {/* Error */}
               {error && (
-                <div className="mb-4 rounded-md border border-red-200 bg-red-50 px-4 py-2 text-sm text-red-700">
+                <div className={`mb-4 rounded-md px-4 py-2 text-sm ${
+                    isDarkMode
+                      ? "border border-red-900/60 bg-red-950/40 text-red-300"
+                      : "border border-red-200 bg-red-50 text-red-700"
+                  }`}>
                   {error}
                 </div>
               )}
@@ -1014,7 +1020,9 @@ const Class = () => {
                    EMPTY STATE
                 =================================================== */
                 <div className="px-4">
-                  <div className="outfit-400 flex h-80 flex-1 items-center justify-center rounded-2xl border-dashed border-gray-300 py-16 md:h-130 md:border">
+                  <div className={`outfit-400 flex h-80 flex-1 items-center justify-center rounded-2xl border-dashed py-16 md:h-130 md:border ${
+                      isDarkMode ? "border-[#303946]" : "border-gray-300"
+                    }`}>
                     <div className="text-center">
                       <img
                         src={emptyImage}
@@ -1024,7 +1032,9 @@ const Class = () => {
                         className="mx-auto mb-3 h-32 w-32 opacity-80"
                       />
 
-                      <p className="outfit-400 text-[14px] text-gray-600">
+                      <p className={`outfit-400 text-[14px] ${
+                          isDarkMode ? "text-gray-400" : "text-gray-600"
+                        }`}>
                         {searchTerm.trim()
                           ? `No classes found matching "${searchTerm}"`
                           : userRole === 1
@@ -1092,7 +1102,11 @@ const Class = () => {
                           classItem.classID ||
                           classItem.id
                         }
-                        className="group outfit-400 relative flex w-full flex-col overflow-hidden rounded-xl bg-transparent transition-all md:h-[270px] md:w-80 md:border md:border-gray-200 md:bg-white md:shadow-sm md:hover:shadow-xl"
+                        className={`group outfit-400 relative flex w-full flex-col overflow-hidden rounded-xl transition-all md:h-[270px] md:w-80 md:border md:shadow-sm md:hover:shadow-xl ${
+                          isDarkMode
+                            ? "border-[#303946] bg-[#171d25]"
+                            : "border-gray-200 bg-white"
+                        }`}
                       >
                         {/* ==================================================
                             HEADER IMAGE
@@ -1293,7 +1307,9 @@ const Class = () => {
                         =================================================== */}
 
                         <div
-                          className="hidden flex-1 cursor-pointer flex-col px-4 py-4 md:flex"
+                          className={`hidden flex-1 cursor-pointer flex-col px-4 py-4 md:flex ${
+                            isDarkMode ? "bg-[#171d25]" : "bg-white"
+                          }`}
                           onClick={() => {
                             const id =
                               classItem.classID ||
@@ -1318,7 +1334,9 @@ const Class = () => {
                           }}
                         >
                           {/* SCHEDULE */}
-                          <div className="outfit-400 mt-2 hidden items-center gap-2 text-[12px] text-gray-700 md:flex">
+                          <div className={`outfit-400 mt-2 hidden items-center gap-2 text-[12px] md:flex ${
+                                  isDarkMode ? "text-gray-300" : "text-gray-700"
+                                }`}>
                             <i className="bx bx-history text-sm text-gray-500"></i>
 
                             <span className="truncate">
@@ -1329,7 +1347,9 @@ const Class = () => {
 
                           {/* STUDENTS */}
                           {userRole !== 1 && (
-                            <div className="outfit-400 hidden items-center gap-2 text-[12px] text-gray-700 md:flex">
+                            <div className={`outfit-400 hidden items-center gap-2 text-[12px] md:flex ${
+                                  isDarkMode ? "text-gray-300" : "text-gray-700"
+                                }`}>
                               <i className="bx bx-group text-sm text-gray-500"></i>
 
                               <span>
@@ -1342,10 +1362,14 @@ const Class = () => {
                           )}
 
                           {/* SEPARATOR */}
-                          <div className="mt-2 mb-3 h-px bg-gray-200"></div>
+                          <div className={`mt-2 mb-3 h-px ${
+                            isDarkMode ? "bg-[#303946]" : "bg-gray-200"
+                          }`}></div>
 
                           {/* DATE */}
-                          <div className="outfit-400 space-y-1 text-[12px] text-gray-600">
+                          <div className={`outfit-400 space-y-1 text-[12px] ${
+                              isDarkMode ? "text-gray-400" : "text-gray-600"
+                            }`}>
                             <div>
                               Created:{" "}
                               {createdDate}
@@ -1458,7 +1482,11 @@ const Class = () => {
 
         {showJoinForm && (
           <div className="outfit-400 lightbox-bg fixed inset-0 z-[100] flex items-center justify-center bg-black/40">
-            <div className="relative mx-4 w-full max-w-[420px] rounded-2xl bg-[#ffffff] p-8 shadow-2xl">
+            <div className={`relative mx-4 w-full max-w-[420px] rounded-2xl p-8 shadow-2xl ${
+                isDarkMode
+                  ? "bg-[#171d25] text-gray-100"
+                  : "bg-[#ffffff] text-[#1a1f36]"
+              }`}>
               {/* CLOSE */}
               <button
                 onClick={() => {
@@ -1474,15 +1502,21 @@ const Class = () => {
 
               {/* ICON + TITLE */}
               <div className="mb-6 flex flex-col items-center">
-                <div className="mb-4 flex h-16 w-16 items-center justify-center rounded-full bg-orange-50">
+                <div className={`mb-4 flex h-16 w-16 items-center justify-center rounded-full ${
+                          isDarkMode ? "bg-orange-500/10" : "bg-orange-50"
+                        }`}>
                   <i className="bx bx-key text-3xl text-orange-500"></i>
                 </div>
 
-                <h2 className="mb-2 text-2xl font-bold text-[#1a1f36]">
+                <h2 className={`mb-2 text-2xl font-bold ${
+                          isDarkMode ? "text-gray-100" : "text-[#1a1f36]"
+                        }`}>
                   Join a New Class
                 </h2>
 
-                <p className="font-outfit max-w-[280px] text-center text-[14px] leading-relaxed text-gray-500">
+                <p className={`font-outfit max-w-[280px] text-center text-[14px] leading-relaxed ${
+                  isDarkMode ? "text-gray-400" : "text-gray-500"
+                }`}>
                   Enter the 6-character code provided by
                   your instructor to access the course
                   materials.
@@ -1510,8 +1544,12 @@ const Class = () => {
                           maxLength={1}
                           className={`h-12 w-10 rounded-xl border text-center text-xl font-bold uppercase transition-all focus:border-[#e85c15] focus:ring-1 focus:ring-[#e85c15] focus:outline-none sm:h-14 sm:w-12 ${
                             classCode[index]
-                              ? "border-gray-400 text-[#1a1f36]"
-                              : "border-gray-300 text-gray-400"
+                              ? isDarkMode
+                                ? "border-gray-500 bg-[#11161d] text-gray-100"
+                                : "border-gray-400 text-[#1a1f36]"
+                              : isDarkMode
+                                ? "border-gray-600 bg-[#11161d] text-gray-400"
+                                : "border-gray-300 text-gray-400"
                           }`}
                           value={
                             classCode[index] || ""

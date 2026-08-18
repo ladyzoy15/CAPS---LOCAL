@@ -3,19 +3,100 @@ import Sidebar from "./sideBar";
 import Header from "./header";
 import { Outlet, useLocation } from "react-router-dom";
 
-// Main Layout
 const Layout = () => {
   const [role_id, setRoleId] = useState(null);
-  // Load selectedSubject from localStorage on mount
+
   const [selectedSubject, setSelectedSubject] = useState(() => {
-    const saved = localStorage.getItem("selectedSubject");
-    return saved ? JSON.parse(saved) : null;
+    try {
+      const saved = localStorage.getItem("selectedSubject");
+      return saved ? JSON.parse(saved) : null;
+    } catch {
+      return null;
+    }
   });
+
   const [isExpanded, setIsExpanded] = useState(false);
   const [isSubjectExpanded, setIsSubjectExpanded] = useState(false);
   const [isMobile, setIsMobile] = useState(window.innerWidth < 1025);
+
   const location = useLocation();
 
+  // =========================================================
+  // DARK MODE
+  // =========================================================
+  const [isDarkMode, setIsDarkMode] = useState(() =>
+    document.documentElement.classList.contains("dark")
+  );
+
+  useEffect(() => {
+    const html = document.documentElement;
+
+    const checkDarkMode = () => {
+      setIsDarkMode(html.classList.contains("dark"));
+    };
+
+    checkDarkMode();
+
+    const observer = new MutationObserver(checkDarkMode);
+
+    observer.observe(html, {
+      attributes: true,
+      attributeFilter: ["class"],
+    });
+
+    return () => observer.disconnect();
+  }, []);
+
+  // =========================================================
+  // LOAD USER ROLE
+  // =========================================================
+  useEffect(() => {
+    try {
+      const user = JSON.parse(sessionStorage.getItem("user"));
+
+      if (
+        user &&
+        (user.roleID !== undefined || user.roleId !== undefined)
+      ) {
+        setRoleId(user.roleID ?? user.roleId);
+      }
+    } catch (error) {
+      console.error("Unable to load user:", error);
+    }
+  }, []);
+
+  // =========================================================
+  // RESPONSIVE
+  // =========================================================
+  useEffect(() => {
+    const handleResize = () => {
+      setIsMobile(window.innerWidth < 1025);
+    };
+
+    window.addEventListener("resize", handleResize);
+
+    return () => {
+      window.removeEventListener("resize", handleResize);
+    };
+  }, []);
+
+  // =========================================================
+  // SAVE SELECTED SUBJECT
+  // =========================================================
+  useEffect(() => {
+    if (selectedSubject) {
+      localStorage.setItem(
+        "selectedSubject",
+        JSON.stringify(selectedSubject)
+      );
+    } else {
+      localStorage.removeItem("selectedSubject");
+    }
+  }, [selectedSubject]);
+
+  // =========================================================
+  // ROLE
+  // =========================================================
   const roleMap = {
     1: "Student",
     2: "Faculty",
@@ -24,47 +105,35 @@ const Layout = () => {
     5: "Associate Dean",
   };
 
-  useEffect(() => {
-    const user = JSON.parse(sessionStorage.getItem("user"));
-    if (user && (user.roleID !== undefined || user.roleId !== undefined)) {
-      setRoleId(user.roleID ?? user.roleId);
-    }
-  }, []);
-
-  useEffect(() => {
-    const handleResize = () => setIsMobile(window.innerWidth < 1025);
-    window.addEventListener("resize", handleResize);
-    return () => window.removeEventListener("resize", handleResize);
-  }, []);
-
-  // Persist selectedSubject to localStorage whenever it changes
-  useEffect(() => {
-    if (selectedSubject) {
-      localStorage.setItem("selectedSubject", JSON.stringify(selectedSubject));
-    } else {
-      localStorage.removeItem("selectedSubject");
-    }
-  }, [selectedSubject]);
-
   const roleTitle =
-    role_id !== null && roleMap[role_id] ? roleMap[role_id] : "User";
+    role_id !== null && roleMap[role_id]
+      ? roleMap[role_id]
+      : "User";
 
-  const isStudent = Number(role_id) === 1;
-  const isStudentQuizPage = /^\/quiz\/[^/]+$/.test(location.pathname);
-  const isTutorialPage = location.pathname.includes("/help");
+  // =========================================================
+  // PAGE TYPES
+  // =========================================================
+  const isStudentQuizPage =
+    /^\/quiz\/[^/]+$/.test(location.pathname);
+
+  const isTutorialPage =
+    location.pathname.includes("/help");
+
   const isPrintQualifyingExam =
     location.pathname === "/print-qualification-exam";
-  const isPrintPersonalQuiz = location.pathname === "/print-personal-quiz";
-  // Hide sidebar for quiz info, quiz taking, and quiz result pages
+
+  const isPrintPersonalQuiz =
+    location.pathname === "/print-personal-quiz";
+
   const isQuizPage =
     location.pathname.includes("/quiz-info/") ||
     location.pathname.includes("/quiz/") ||
     location.pathname.includes("/quiz-result/");
-  // Hide sidebar for practice exam pages
+
   const isPracticeExamPage =
     location.pathname.includes("/practice-exam") ||
     location.pathname.includes("/exam-preview");
-  // Use collapsed sidebar layout for Libraries page, Archived Quiz page, and SubjectList pages
+
   const isLibrariesPage =
     location.pathname === "/libraries" ||
     location.pathname === "/archived-quiz" ||
@@ -82,9 +151,39 @@ const Layout = () => {
     location.pathname === "/faculty-dashboard" ||
     location.pathname === "/student-dashboard";
 
+  // =========================================================
+  // COLORS
+  // =========================================================
+  const backgroundColor = isDarkMode
+    ? "#0b0f14"
+    : "#fff8ef";
+
+  const textColor = isDarkMode
+    ? "#f3f4f6"
+    : "#1f2937";
+
+  // =========================================================
+  // RENDER
+  // =========================================================
   return (
-    <div className="min-h-screen">
-      <div className="flex min-h-screen">
+    <div
+      className="caps-layout min-h-screen w-full"
+      style={{
+        backgroundColor,
+        color: textColor,
+        transition:
+          "background-color 0.3s ease, color 0.3s ease",
+      }}
+    >
+      <div
+        className="flex min-h-screen w-full"
+        style={{
+          backgroundColor,
+        }}
+      >
+        {/* =====================================================
+            SIDEBAR
+            ===================================================== */}
         {!isTutorialPage &&
           !isPrintQualifyingExam &&
           !isPrintPersonalQuiz &&
@@ -100,8 +199,12 @@ const Layout = () => {
               setIsSubjectExpanded={setIsSubjectExpanded}
             />
           )}
+
+        {/* =====================================================
+            MAIN CONTENT
+            ===================================================== */}
         <div
-          className={`flex flex-1 flex-col ${
+          className={`flex min-h-screen flex-1 flex-col ${
             isTutorialPage ||
             isPrintQualifyingExam ||
             isPrintPersonalQuiz ||
@@ -113,14 +216,44 @@ const Layout = () => {
                 ? "ml-[63px]"
                 : "ml-[220px]"
           }`}
+          style={{
+            backgroundColor,
+            color: textColor,
+            transition:
+              "background-color 0.3s ease, color 0.3s ease",
+          }}
         >
+          {/* HEADER */}
           {!isStudentQuizPage && (
-            <Header title={roleTitle} className="lg:hidden" />
+            <Header
+              title={roleTitle}
+              className="lg:hidden"
+            />
           )}
+
+          {/* MAIN */}
           <main
-            className={`${isTutorialPage || isQuizPage || isPracticeExamPage || isDashboard ? "" : "lg:px-4"} h-full bg-white`}
+            className={`caps-main ${
+              isTutorialPage ||
+              isQuizPage ||
+              isPracticeExamPage ||
+              isDashboard
+                ? ""
+                : "lg:px-4"
+            } min-h-screen h-full w-full`}
+            style={{
+              backgroundColor,
+              color: textColor,
+              transition:
+                "background-color 0.3s ease, color 0.3s ease",
+            }}
           >
-            <Outlet context={{ selectedSubject, setSelectedSubject }} />
+            <Outlet
+              context={{
+                selectedSubject,
+                setSelectedSubject,
+              }}
+            />
           </main>
         </div>
       </div>
