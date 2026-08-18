@@ -64,6 +64,31 @@ const getHeaderBackground = (subjectId) => {
 
 function SubjectList() {
   const navigate = useNavigate();
+
+  // =========================================================
+  // DARK MODE
+  // =========================================================
+  const [isDarkMode, setIsDarkMode] = useState(() =>
+    document.documentElement.classList.contains("dark"),
+  );
+
+  useEffect(() => {
+    const html = document.documentElement;
+
+    const updateTheme = () => {
+      setIsDarkMode(html.classList.contains("dark"));
+    };
+
+    updateTheme();
+
+    const observer = new MutationObserver(updateTheme);
+    observer.observe(html, {
+      attributes: true,
+      attributeFilter: ["class"],
+    });
+
+    return () => observer.disconnect();
+  }, []);
   const location = useLocation();
   const { selectedSubject, setSelectedSubject } = useOutletContext();
   const params = new URLSearchParams(location.search);
@@ -242,18 +267,7 @@ function SubjectList() {
 
   const kebabButtonRefs = useRef({});
   const [dropdownButtonRect, setDropdownButtonRect] = useState(null);
-
-  // Mouse glow effect state
-  const [mousePos, setMousePos] = useState({ x: 0, y: 0 });
-  const handleMouseMove = (e) => {
-    const rect = e.currentTarget.getBoundingClientRect();
-    setMousePos({
-      x: e.clientX - rect.left,
-      y: e.clientY - rect.top,
-    });
-  };
-
-  // Close kebab menu when clicking outside or scrolling
+// Close kebab menu when clicking outside or scrolling
   useEffect(() => {
     const handleClickOutside = (event) => {
       const clickedButton = Object.values(kebabButtonRefs.current).find(
@@ -788,25 +802,30 @@ function SubjectList() {
 
   return (
     <>
-      {/* BACKGROUND */}
-      <div className="pointer-events-none fixed inset-0 -z-10 overflow-hidden bg-gradient-to-br from-orange-50 via-white to-orange-100">
-        <div className="absolute -top-24 -left-24 h-80 w-80 rounded-full bg-orange-200/50 blur-3xl" />
-        <div className="absolute -top-24 -right-24 h-80 w-80 rounded-full bg-orange-200/50 blur-3xl" />
-        <div className="absolute -bottom-24 -left-24 h-80 w-80 rounded-full bg-orange-200/50 blur-3xl" />
-        <div className="absolute -right-24 -bottom-24 h-80 w-80 rounded-full bg-orange-200/50 blur-3xl" />
-        <div className="absolute top-1/2 left-1/2 h-96 w-96 -translate-x-1/2 -translate-y-1/2 rounded-full bg-orange-100/40 blur-3xl" />
-      </div>
+      {/* =====================================================
+          PLAIN PAGE BACKGROUND
+          No orange gradient, blobs, reflection, or mouse glow.
+          Subject card header images are preserved.
+      ====================================================== */}
+      <div
+        className="pointer-events-none fixed inset-0 -z-10"
+        style={{
+          backgroundColor: isDarkMode ? "#0b0f14" : "#fff8ef",
+          backgroundImage: "none",
+        }}
+        aria-hidden="true"
+      />
 
-      {/* MOUSE-TRACKING WRAPPER */}
-      <div onMouseMove={handleMouseMove} className="relative">
-        {/* MOUSE GLOW DOT */}
-        <div
-          className="pointer-events-none absolute h-4 w-4 rounded-full bg-orange-500 blur-md transition-transform duration-75 ease-out z-40"
-          style={{
-            transform: `translate(${mousePos.x - 8}px, ${mousePos.y - 8}px)`,
-          }}
-        />
-
+      <div
+        className={`caps-subject-page relative min-h-screen ${
+          isDarkMode ? "is-dark" : ""
+        }`}
+        style={{
+          backgroundColor: isDarkMode ? "#0b0f14" : "#fff8ef",
+          backgroundImage: "none",
+          color: isDarkMode ? "#f3f4f6" : "#1f2937",
+        }}
+      >
         <div className="flex min-h-screen">
           {/* Left sidebar panel */}
           <aside className="fixed top-0 left-[63px] hidden h-screen w-56 overflow-hidden border-r border-gray-200 bg-white px-4 py-4 lg:block lg:w-64">
@@ -1956,6 +1975,151 @@ function SubjectList() {
           <Toast message={toast.message} type={toast.type} show={toast.show} />
         </div>
       </div>
+
+      {/* =====================================================
+          SUBJECT PAGE DARK MODE OVERRIDES
+          ===================================================== */}
+      <style>{`
+        html.dark .caps-subject-page,
+        html.dark .caps-subject-page > div {
+          background: #0b0f14 !important;
+          background-color: #0b0f14 !important;
+          background-image: none !important;
+          color: #f3f4f6 !important;
+        }
+
+        /* Sidebar */
+        html.dark .caps-subject-page aside {
+          background: #11161d !important;
+          background-color: #11161d !important;
+          background-image: none !important;
+          border-color: #303946 !important;
+          color: #f3f4f6 !important;
+        }
+
+        html.dark .caps-subject-page aside h2 {
+          color: #f3f4f6 !important;
+        }
+
+        html.dark .caps-subject-page aside .text-gray-600 {
+          color: #9ca3af !important;
+        }
+
+        html.dark .caps-subject-page aside .text-gray-500 {
+          color: #9ca3af !important;
+        }
+
+        html.dark .caps-subject-page aside .text-gray-900 {
+          color: #f3f4f6 !important;
+        }
+
+        html.dark .caps-subject-page aside .bg-gray-100 {
+          background-color: #252d38 !important;
+        }
+
+        html.dark .caps-subject-page aside .hover\\:bg-gray-100:hover {
+          background-color: #1b222c !important;
+        }
+
+        html.dark .caps-subject-page aside .bg-gray-200 {
+          background-color: #303946 !important;
+        }
+
+        /* Main separators and headings */
+        html.dark .caps-subject-page .bg-gray-200 {
+          background-color: #303946 !important;
+        }
+
+        html.dark .caps-subject-page .text-black,
+        html.dark .caps-subject-page .text-gray-900 {
+          color: #f3f4f6 !important;
+        }
+
+        html.dark .caps-subject-page .text-gray-700 {
+          color: #d1d5db !important;
+        }
+
+        html.dark .caps-subject-page .text-gray-600 {
+          color: #9ca3af !important;
+        }
+
+        html.dark .caps-subject-page .text-gray-500 {
+          color: #9ca3af !important;
+        }
+
+        /* Search / filter controls */
+        html.dark .caps-subject-page input,
+        html.dark .caps-subject-page select,
+        html.dark .caps-subject-page textarea {
+          background-color: #171d25 !important;
+          color: #f3f4f6 !important;
+          border-color: #374151 !important;
+        }
+
+        html.dark .caps-subject-page input::placeholder,
+        html.dark .caps-subject-page textarea::placeholder {
+          color: #6b7280 !important;
+        }
+
+        html.dark .caps-subject-page .bg-white {
+          background-color: #171d25 !important;
+          color: #f3f4f6 !important;
+        }
+
+        html.dark .caps-subject-page .border-gray-200 {
+          border-color: #303946 !important;
+        }
+
+        html.dark .caps-subject-page .border-gray-300 {
+          border-color: #374151 !important;
+        }
+
+        html.dark .caps-subject-page .hover\\:bg-gray-100:hover {
+          background-color: #252d38 !important;
+        }
+
+        html.dark .caps-subject-page .hover\\:bg-gray-200:hover {
+          background-color: #303946 !important;
+        }
+
+        /* Empty state */
+        html.dark .caps-subject-page .bg-gray-50\\/60 {
+          background-color: #11161d !important;
+        }
+
+        /* Keep colored subject header images intact. */
+        html.dark .caps-subject-page img {
+          background-color: transparent;
+        }
+
+        /* Modals */
+        html.dark .caps-subject-page .bg-white .text-gray-900 {
+          color: #f3f4f6 !important;
+        }
+
+        html.dark .caps-subject-page .bg-white .text-gray-700 {
+          color: #d1d5db !important;
+        }
+
+        /* Scrollbar */
+        html.dark .caps-subject-page ::-webkit-scrollbar {
+          width: 8px;
+          height: 8px;
+        }
+
+        html.dark .caps-subject-page ::-webkit-scrollbar-track {
+          background: #0b0f14;
+        }
+
+        html.dark .caps-subject-page ::-webkit-scrollbar-thumb {
+          background: #374151;
+          border-radius: 10px;
+        }
+
+        html.dark .caps-subject-page ::-webkit-scrollbar-thumb:hover {
+          background: #4b5563;
+        }
+      `}</style>
     </>
   );
 }
