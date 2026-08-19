@@ -5,27 +5,40 @@ import basicSsl from "@vitejs/plugin-basic-ssl";
 import { VitePWA } from "vite-plugin-pwa";
 
 const useHttps =
-  process.env.HTTPS === "1" || process.env.HTTPS === "true";
+  process.env.HTTPS === "1" ||
+  process.env.HTTPS === "true";
 
 export default defineConfig({
   plugins: [
     react(),
     tailwindcss(),
+
     ...(useHttps ? [basicSsl()] : []),
+
     VitePWA({
       registerType: "autoUpdate",
       injectRegister: false,
+
       manifest: {
         id: "/",
-        name: "Caps",
-        short_name: "CAPS JRMSU",
+
+        // APP NAME
+        name: "CAPS-REVIEW",
+
+        // SHORT APP NAME
+        short_name: "CAPS-REVIEW",
+
         description:
-          "CAPS JRMSU is the Comprehensive Assessment and Preparation System for JRMSU students.",
+          "CAPS-REVIEW - Comprehensive Assessment and Preparation System for JRMSU students.",
+
         theme_color: "#ffffff",
         background_color: "#ffffff",
+
         display: "standalone",
+
         scope: "/",
         start_url: "/",
+
         icons: [
           {
             src: "/pwa-192.png",
@@ -53,16 +66,19 @@ export default defineConfig({
           },
         ],
       },
+
       workbox: {
-        globPatterns: ["**/index.html"],
-        // SPA shell so the SW handles navigations (Chrome often needs this for installability).
+        globPatterns: ["**/*.{js,css,html,ico,png,svg}"],
+
         navigateFallback: "index.html",
+
         runtimeCaching: [],
+
         cleanupOutdatedCaches: true,
         skipWaiting: true,
         clientsClaim: true,
       },
-      // Required for `beforeinstallprompt` during `npm run dev` (SW + manifest must be active).
+
       devOptions: {
         enabled: true,
         disableRuntimeConfig: true,
@@ -70,6 +86,7 @@ export default defineConfig({
       },
     }),
   ],
+
   server: {
     host: "0.0.0.0",
   },
