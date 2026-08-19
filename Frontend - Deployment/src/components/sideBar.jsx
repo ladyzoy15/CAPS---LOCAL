@@ -28,14 +28,6 @@ import UsersIconH from "/src/assets/symbols/usershove.svg";
 import PrintIcon from "/src/assets/symbols/print.svg";
 import PrintIconH from "/src/assets/symbols/printhover.svg";
 
-import SessionsIcon from "/src/assets/symbols/sessions.svg";
-import SessionsIconH from "/src/assets/symbols/sessionshover.svg";
-
-import ReportsIcon from "/src/assets/symbols/reports.svg";
-import ReportsIconH from "/src/assets/symbols/reportshover.svg";
-
-import SupportIcon from "/src/assets/symbols/support.svg";
-import SupportIconH from "/src/assets/symbols/supporthover.svg";
 
 import SubjectsIcon from "/src/assets/symbols/subjects.svg";
 import SubjectsIconH from "/src/assets/symbols/subjectshover.svg";
@@ -426,11 +418,6 @@ const Sidebar = ({
   };
 
 
-  const sessionsItem = {
-    label: "Sessions",
-    path: "/sessions",
-  };
-
 
   const classItem = {
     label: "Classes",
@@ -462,7 +449,6 @@ const Sidebar = ({
     menuItems = [
       ...baseMenuItems,
       classItem,
-      sessionsItem,
     ];
   } else {
     menuItems = [
@@ -473,7 +459,6 @@ const Sidebar = ({
       menuItems = [
         ...menuItems,
         librariesItem,
-        sessionsItem,
         classItem,
         ...adminItems,
       ];
@@ -538,17 +523,6 @@ const Sidebar = ({
   };
 
 
-  // =========================================================
-  // SUPPORT
-  // =========================================================
-
-  const handleSupportClick = () => {
-    window.open(
-      "https://docs.google.com/spreadsheets/d/1YzHRRk4Y_LSc9-fazPL4tDginLq_V1-6/edit",
-      "_blank"
-    );
-  };
-
 
   // =========================================================
   // MOBILE
@@ -598,44 +572,6 @@ const Sidebar = ({
 
               {parsedRoleId === 1 ? (
                 <>
-                  {/* SESSIONS */}
-
-                  <div className="flex h-16 flex-col items-center justify-center">
-                    <Link
-                      to="/sessions"
-                      onClick={handleMenuClick}
-                      className={`flex flex-col items-center transition-colors ${
-                        isActive("/sessions")
-                          ? "text-orange-600"
-                          : "text-amber-700 dark:text-gray-400 hover:text-amber-900 dark:hover:text-orange-300"
-                      }`}
-                    >
-
-                      <span className="mb-1 flex h-6 w-6 items-center justify-center">
-
-                        <img
-                          src={
-                            isActive("/sessions")
-                              ? SessionsIconH
-                              : SessionsIcon
-                          }
-                          alt="Sessions"
-                          className="h-6 w-6 object-contain"
-                          style={getDarkIconStyle(
-                            isActive("/sessions")
-                          )}
-                        />
-
-                      </span>
-
-                      <span className="outfit-500 text-xs">
-                        Sessions
-                      </span>
-
-                    </Link>
-                  </div>
-
-
                   {/* HOME / EXAMS */}
 
                   {homeItem && (
@@ -1465,30 +1401,6 @@ const Sidebar = ({
                           </span>
 
                         ) : item.label ===
-                          "Sessions" ? (
-
-                          <span className="relative flex-shrink-0">
-
-                            <img
-                              src={
-                                isItemActive
-                                  ? SessionsIconH
-                                  : SessionsIcon
-                              }
-                              alt="Sessions"
-                              className={`${
-                                isUsersPage
-                                  ? "size-[20px]"
-                                  : "size-[18px]"
-                              } flex-shrink-0`}
-                              style={getDarkIconStyle(
-                                isItemActive
-                              )}
-                            />
-
-                          </span>
-
-                        ) : item.label ===
                           "Users" ? (
 
                           <span className="relative flex-shrink-0">
@@ -1826,82 +1738,6 @@ const Sidebar = ({
               )}
 
 
-              {/* =================================================
-                  REPORTS
-              ================================================= */}
-
-              <li className="group relative">
-
-                <div className="px-3">
-
-                  <button
-                    onClick={() => {
-                      setActiveMenu(
-                        "Reports"
-                      );
-
-                      navigate(
-                        "/reports"
-                      );
-                    }}
-                    className={`group flex w-full cursor-pointer items-center rounded-lg py-[6px] transition-colors hover:bg-amber-900/10 dark:hover:bg-orange-500/10 ${
-                      isUsersPage
-                        ? "justify-center"
-                        : "justify-start"
-                    }`}
-                  >
-
-                    <div
-                      className={`flex items-center ${
-                        isUsersPage
-                          ? "justify-center"
-                          : "ml-3 gap-[10px]"
-                      }`}
-                    >
-
-                      <img
-                        src={
-                          activeMenu ===
-                          "Reports"
-                            ? ReportsIconH
-                            : ReportsIcon
-                        }
-                        alt="Reports"
-                        className="size-[20px] flex-shrink-0"
-                        style={getDarkIconStyle(
-                          activeMenu ===
-                            "Reports"
-                        )}
-                      />
-
-
-                      {!isUsersPage && (
-                        <span
-                          className={`outfit-500 text-[15px] whitespace-nowrap ${
-                            activeMenu ===
-                            "Reports"
-                              ? "font-semibold text-amber-950 dark:text-gray-100"
-                              : "text-amber-700 dark:text-gray-400"
-                          }`}
-                        >
-                          Reports
-                        </span>
-                      )}
-
-                    </div>
-
-                  </button>
-
-
-                  {isUsersPage && (
-                    <span className="pointer-events-none absolute top-1/2 left-full ml-2 -translate-y-1/2 rounded-md bg-amber-950 px-2 py-1 text-xs whitespace-nowrap text-white opacity-0 shadow-lg transition-opacity duration-150 group-hover:opacity-100 dark:bg-gray-700">
-                      Reports
-                    </span>
-                  )}
-
-                </div>
-
-              </li>
 
             </ul>
 
@@ -1910,78 +1746,10 @@ const Sidebar = ({
 
 
         {/* =====================================================
-            SUPPORT + FOOTER
+            FOOTER
         ===================================================== */}
 
         <div className="absolute bottom-4 left-0 z-10 w-full">
-
-          {/* SUPPORT */}
-
-          <div className="px-3">
-
-            <button
-              onClick={() => {
-                setActiveMenu(
-                  "Support"
-                );
-
-                handleSupportClick();
-              }}
-              className={`group mb-2 flex w-full cursor-pointer items-center rounded-lg py-[8px] transition-colors hover:bg-amber-900/10 dark:hover:bg-orange-500/10 ${
-                isUsersPage
-                  ? "justify-center"
-                  : "justify-start"
-              } ${
-                activeMenu ===
-                "Support"
-                  ? "bg-amber-900/10 text-amber-950 dark:text-gray-100"
-                  : "text-amber-700 dark:text-gray-400"
-              }`}
-            >
-
-              <div
-                className={`flex items-center ${
-                  isUsersPage
-                    ? "justify-center"
-                    : "ml-3 gap-[10px]"
-                }`}
-              >
-
-                <img
-                  src={
-                    activeMenu ===
-                    "Support"
-                      ? SupportIconH
-                      : SupportIcon
-                  }
-                  alt="Support"
-                  className="size-[20px] flex-shrink-0"
-                  style={getDarkIconStyle(
-                    activeMenu ===
-                      "Support"
-                  )}
-                />
-
-
-                {!isUsersPage && (
-                  <span
-                    className={`outfit-500 text-[15px] whitespace-nowrap ${
-                      activeMenu ===
-                      "Support"
-                        ? "font-semibold text-amber-950 dark:text-gray-100"
-                        : "text-amber-700 dark:text-gray-400"
-                    }`}
-                  >
-                    Support
-                  </span>
-                )}
-
-              </div>
-
-            </button>
-
-          </div>
-
 
           {/* CAPS */}
 
@@ -1992,13 +1760,13 @@ const Sidebar = ({
             <button
               onClick={() =>
                 navigate(
-                  "/team-caps"
+                  "/team-rvw"
                 )
               }
               className={`group flex w-full cursor-pointer items-center rounded-lg px-3 py-[8px] transition-colors hover:bg-amber-900/10 dark:hover:bg-orange-500/10 ${
                 isUsersPage
                   ? "justify-center"
-                  : "justify-between"
+                  : "justify-start"
               }`}
             >
 
@@ -2019,19 +1787,15 @@ const Sidebar = ({
 
 
                 {!isUsersPage && (
-                  <span className="outfit-500 text-[15px] whitespace-nowrap text-amber-700 dark:text-gray-400">
-                    CAPS
+                  <span className="outfit-500 flex items-baseline gap-1 text-[15px] whitespace-nowrap text-amber-700 dark:text-gray-400">
+                    CAPS - REVIEW
+                    <span className="text-xs font-medium">
+                      <AppVersion />
+                    </span>
                   </span>
                 )}
 
               </div>
-
-
-              {!isUsersPage && (
-                <span className="text-xs font-medium text-amber-700 dark:text-gray-400">
-                  <AppVersion />
-                </span>
-              )}
 
             </button>
 

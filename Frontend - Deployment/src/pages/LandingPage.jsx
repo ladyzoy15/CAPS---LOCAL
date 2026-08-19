@@ -2,8 +2,6 @@
 import { useNavigate } from "react-router-dom";
 
 import collegeLogo from "/src/assets/college-logo.png";
-import heroImg from "/src/assets/landing/firstpic.png";
-import MobileheroImg from "/src/assets/landing/secondpic.png";
 import CogIcon from "/src/assets/landing/cog.svg";
 import ExportIcon from "/src/assets/landing/export.svg";
 import APlusIcon from "/src/assets/landing/a+.svg";
@@ -216,7 +214,7 @@ function LandingPage() {
             flex items-center gap-2
             rounded-full
             border border-orange-200/50
-            bg-white/70
+            bg-white/80
             px-4 py-2
             shadow-[0_8px_30px_rgba(0,0,0,0.08)]
             backdrop-blur-2xl
@@ -250,8 +248,7 @@ function LandingPage() {
         <button
           onClick={() => setIsSidebarOpen(true)}
           className="
-            absolute right-4 top-4 z-50
-            flex flex-col gap-1.5
+            hidden
             rounded-full
             border border-orange-200/50
             bg-white/70
@@ -273,15 +270,15 @@ function LandingPage() {
           className="
             outfit-500
             absolute right-4 top-4 z-50
-            hidden items-center
+            flex items-center
             rounded-full
             border border-orange-200/50
-            bg-white/70
+            bg-white/80
             px-6 py-3
             text-[13px] text-gray-700
             shadow-[0_8px_30px_rgba(0,0,0,0.08)]
             backdrop-blur-2xl
-            md:right-8 md:top-5 md:flex md:text-[14px]
+            md:right-8 md:top-5 md:text-[14px]
             lg:text-[15px]
             2xl:right-16
           "
@@ -336,1715 +333,236 @@ function LandingPage() {
               >
 
                 {/* =====================================================
-                    HERO CONTENT
+                    HERO CONTENT — REFERENCE DESIGN
                 ====================================================== */}
 
-                <div className="relative mx-auto flex min-h-[620px] max-w-[1280px] items-center">
+                <div className="relative mx-auto min-h-[790px] max-w-[1280px] text-center md:min-h-[820px]">
 
-                  {/* =================================================
-                      ORBITAL RINGS
-                  ================================================= */}
+                  {/* Large decorative orbit */}
+                  <div className="pointer-events-none absolute left-1/2 top-[-210px] h-[760px] w-[760px] -translate-x-1/2 rounded-full border border-orange-300/70" />
+                  <div className="pointer-events-none absolute left-1/2 top-[-175px] h-[690px] w-[690px] -translate-x-1/2 rounded-full border border-orange-200/70" />
+                  <div className="pointer-events-none absolute left-1/2 top-[-125px] h-[590px] w-[590px] -translate-x-1/2 rounded-full border border-orange-200/60 border-dashed" />
 
-                  <div className="pointer-events-none absolute right-[2%] top-[2%] hidden h-[520px] w-[520px] rounded-full border border-orange-800/30 md:block">
+                  <span className="pointer-events-none absolute left-[6%] top-[30%] h-3 w-3 rounded-full bg-slate-900" />
+                  <span className="pointer-events-none absolute right-[8%] top-[28%] h-3 w-3 rounded-full border-2 border-slate-900 bg-white" />
+                  <span className="pointer-events-none absolute right-[20%] top-[10%] h-2.5 w-2.5 rounded-full bg-orange-600" />
+                  <span className="pointer-events-none absolute left-[18%] top-[12%] h-6 w-6 rounded-full border-2 border-orange-600 bg-white" />
 
-                    <div className="absolute inset-8 rounded-full border border-orange-900/50" />
-
-                    <div className="absolute inset-24 rounded-full border border-orange-700/40 border-dashed" />
-
-                    <span className="absolute -left-1 top-[50%] h-2 w-2 rounded-full bg-orange-600 shadow-[0_0_16px_rgba(251,146,60,.6)]" />
-
-                    <span className="absolute right-[8%] top-[16%] h-2 w-2 rounded-full bg-orange-400 shadow-[0_0_16px_rgba(251,146,60,.6)]" />
-
-                    <span className="absolute bottom-[8%] right-[15%] h-2 w-2 rounded-full bg-orange-600 shadow-[0_0_16px_rgba(251,146,60,.6)]" />
-
+                  {/* CAPS-REVIEW Logo */}
+                  <div className="relative z-20 mx-auto flex h-20 w-20 items-center justify-center pt-4 md:h-24 md:w-24">
+                    <img
+                      src={collegeLogo}
+                      alt="CAPS-REVIEW"
+                      className="h-16 w-16 object-contain md:h-20 md:w-20"
+                    />
                   </div>
 
-                  {/* =================================================
-                      TECHNICAL CIRCUITS
-                  ================================================= */}
+                  {/* College label */}
+                  <div className="relative z-20 mx-auto mt-3 flex max-w-[620px] items-center justify-center gap-3">
+                    <div className="h-[2px] flex-1 bg-orange-300/80" />
+                    <span className="outfit-600 whitespace-nowrap text-[16px] font-semibold uppercase tracking-[2.6px] text-slate-800 md:text-[19px]">
+                      COLLEGE OF <span className="text-orange-600">ENGINEERING</span>
+                    </span>
+                    <div className="h-[2px] flex-1 bg-orange-300/80" />
+                  </div>
 
-                  <svg
-                    className="pointer-events-none absolute right-[-2%] top-[10%] hidden h-[540px] w-[580px] opacity-30 md:block"
-                    viewBox="0 0 560 520"
-                    fill="none"
-                  >
-
-                    <path
-                      d="M35 115H135V70H245"
-                      stroke="#fb923c"
-                      strokeOpacity="0.40"
-                      strokeWidth="1.5"
-                    />
-
-                    <path
-                      d="M330 80H450V135H530"
-                      stroke="#fb923c"
-                      strokeOpacity="0.35"
-                      strokeWidth="1.5"
-                    />
-
-                    <path
-                      d="M300 390H405V445H530"
-                      stroke="#fb923c"
-                      strokeOpacity="0.28"
-                      strokeWidth="1.5"
-                    />
-
-                    <path
-                      d="M30 430H125V380H220"
-                      stroke="#fb923c"
-                      strokeOpacity="0.28"
-                      strokeWidth="1.5"
-                    />
-
-                    <circle
-                      cx="135"
-                      cy="115"
-                      r="4"
-                      fill="#fb923c"
-                      fillOpacity="0.85"
-                    />
-
-                    <circle
-                      cx="245"
-                      cy="70"
-                      r="4"
-                      fill="#fb923c"
-                      fillOpacity="0.8"
-                    />
-
-                    <circle
-                      cx="450"
-                      cy="80"
-                      r="4"
-                      fill="#fb923c"
-                      fillOpacity="0.8"
-                    />
-
-                    <circle
-                      cx="405"
-                      cy="390"
-                      r="4"
-                      fill="#fb923c"
-                      fillOpacity="0.8"
-                    />
-
-                  </svg>
-
-                  {/* =================================================
-                      LEFT HERO TEXT
-                  ================================================= */}
-
-                  <div
-                    className="
-                      relative z-30
-                      w-full max-w-[560px]
-                      rounded-[34px]
-                      border border-orange-200/50
-                      bg-gradient-to-br from-white/90 via-white/80 to-orange-50/80
-                      p-7
-                      shadow-[0_20px_55px_rgba(0,0,0,.08)]
-                      backdrop-blur-2xl
-                      md:p-9
-                      lg:p-10
-                    "
-                  >
-
-                    <div className="pointer-events-none absolute inset-x-10 top-0 h-px bg-gradient-to-r from-transparent via-orange-300/50 to-transparent" />
-
-                    <div className="pointer-events-none absolute -bottom-24 -left-20 h-48 w-48 rounded-full bg-orange-200/30 blur-[75px]" />
-
-                    {/* COLLEGE OF ENGINEERING LABEL */}
-
-                    <div className="relative z-10 mb-5 flex flex-col items-start gap-2">
-
-                      <div className="h-[4px] w-[92px] rounded-full bg-gradient-to-r from-orange-400 via-orange-500 to-orange-600 shadow-[0_0_12px_rgba(251,146,60,.3)]" />
-
-                      <span className="outfit-600 text-[13px] font-semibold uppercase tracking-[2.2px] text-orange-600 md:text-[14px]">
-                        College of Engineering
-                      </span>
-
-                    </div>
-
-                    <h1
-                      className="
-                        relative z-10
-                        text-[42px] font-bold leading-[.98]
-                        tracking-[-1.5px]
-                        text-gray-900
-                        md:text-[48px]
-                        lg:text-[54px]
-                        xl:text-[58px]
-                      "
-                    >
-
-                      CREATE, PRACTICE &amp; REVIEW
-
+                  {/* Main heading with SLIDE ANIMATION - FIXED */}
+                  <div className="relative z-30 mx-auto mt-10 max-w-[980px] px-3 md:mt-11">
+                    <h1 className="outfit-700 text-[45px] font-extrabold leading-[0.94] tracking-[-2px] text-slate-900 sm:text-[56px] md:text-[72px] lg:text-[52px] xl:text-[70px] slide-in-left">
+                      CREATE, PRACTICE
                       <br />
-
-                      FOR{" "}
-
-                      <span className="bg-gradient-to-r from-orange-500 via-orange-400 to-orange-600 bg-clip-text text-transparent">
-                        EXAMS
-                      </span>
-
+                      &amp; REVIEW
+                      <br />
+                      <span className="text-orange-600">FOR EXAMS</span>
                     </h1>
-
-                    <div className="relative z-10 mt-7 h-1 w-20 rounded-full bg-gradient-to-r from-orange-400 via-orange-500 to-orange-600" />
-
-                    <p className="outfit-400 relative z-10 mt-7 max-w-md text-[15px] leading-6 text-gray-700 md:text-[16px]">
-
-                      A smart review platform that helps students
-                      <br className="hidden sm:block" />
-                      practice, review lessons, and prepare with confidence.
-
-                    </p>
-
-                    <div className="relative z-10 mt-8 flex flex-wrap items-center gap-5">
-
-                      <button
-                        onClick={() => setIsLoginOpen(true)}
-                        className="
-                          inline-flex cursor-pointer items-center justify-center gap-2
-                          rounded-full border border-orange-300/50
-                          bg-gradient-to-r from-orange-400 via-orange-500 to-orange-600
-                          px-7 py-3.5 text-[14px] font-medium text-white
-                          shadow-[0_10px_28px_rgba(251,146,60,.30)]
-                          transition-all duration-300
-                          hover:-translate-y-0.5
-                          hover:shadow-[0_14px_34px_rgba(251,146,60,.38)]
-                          active:scale-95
-                        "
-                      >
-
-                        <svg
-                          xmlns="http://www.w3.org/2000/svg"
-                          width="21"
-                          height="21"
-                          viewBox="0 0 24 24"
-                          fill="none"
-                          stroke="currentColor"
-                          strokeWidth="2"
-                          strokeLinecap="round"
-                          strokeLinejoin="round"
-                        >
-                          <path d="m10 17 5-5-5-5" />
-                          <path d="M15 12H3" />
-                          <path d="M15 3h4a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2h-4" />
-                        </svg>
-
-                        LOG IN
-
-                      </button>
-
-                      <button
-                        onClick={() => setIsRegisterOpen(true)}
-                        className="
-                          inline-flex cursor-pointer items-center justify-center gap-2
-                          rounded-full border border-orange-200/50 bg-white/60
-                          px-7 py-3.5 text-[14px] font-medium text-gray-800
-                          shadow-[0_8px_25px_rgba(0,0,0,.06)]
-                          backdrop-blur-xl
-                          transition-all duration-300
-                          hover:-translate-y-0.5
-                          hover:bg-white/80
-                          active:scale-95
-                        "
-                      >
-
-                        <svg
-                          xmlns="http://www.w3.org/2000/svg"
-                          width="21"
-                          height="21"
-                          viewBox="0 0 24 24"
-                          fill="none"
-                          stroke="currentColor"
-                          strokeWidth="2"
-                          strokeLinecap="round"
-                          strokeLinejoin="round"
-                        >
-                          <circle cx="12" cy="8" r="5" />
-                          <path d="M20 21a8 8 0 0 0-16 0" />
-                        </svg>
-
-                        SIGN UP
-
-                      </button>
-
-                    </div>
-
                   </div>
+
+                  {/* Custom CSS for slide animation - FIXED */}
+                  <style>{`
+                    @keyframes slideInLeft {
+                      0% {
+                        transform: translateX(-100%);
+                        opacity: 0;
+                      }
+                      100% {
+                        transform: translateX(0);
+                        opacity: 1;
+                      }
+                    }
+                    .slide-in-left {
+                      animation: slideInLeft 0.8s ease-out forwards;
+                    }
+                  `}</style>
+
+                  <div className="relative z-30 mx-auto mt-8 h-[4px] w-20 rounded-full bg-orange-500" />
+
+                  <p className="outfit-400 relative z-30 mx-auto mt-7 max-w-[650px] px-4 text-[16px] leading-7 text-slate-700 md:text-[18px]">
+                    A smart review platform that helps students
+                    <br className="hidden sm:block" />
+                    practice, review lessons, and prepare with confidence.
+                  </p>
 
                   {/* =====================================================
-                      RIGHT — 3D ENGINEERING COMPOSITION
+                      LOGIN / SIGN UP - WITH BOUNCE ANIMATION
                   ====================================================== */}
-
-                  <div
-                    className="
-                      absolute
-                      right-[-2%]
-                      top-[0%]
-                      z-20
-                      hidden
-                      h-[640px]
-                      w-[640px]
-                      md:block
-                      lg:right-[0%]
-                      lg:h-[680px]
-                      lg:w-[680px]
-                      xl:right-[2%]
-                      xl:h-[700px]
-                      xl:w-[700px]
-                    "
-                  >
-
-                    {/* =================================================
-                        AMBIENT LIGHT
-                    ================================================= */}
-
-                    <div className="pointer-events-none absolute right-[8%] top-[8%] h-[430px] w-[430px] rounded-full bg-orange-300/20 blur-[120px]" />
-
-                    <div className="pointer-events-none absolute bottom-[5%] right-[15%] h-[300px] w-[300px] rounded-full bg-orange-400/20 blur-[100px]" />
-
-                    {/* =================================================
-                        3D CIVIL BUILDING
-                    ================================================= */}
-
-                    <div
+                  <div className="relative z-50 mt-8 flex items-center justify-center gap-5 md:mt-7">
+                    <button
+                      onClick={() => setIsLoginOpen(true)}
                       className="
-                        absolute
-                        bottom-[8%]
-                        left-[0%]
-                        z-20
-                        h-[235px]
-                        w-[245px]
-                        rotate-[-4deg]
+                        animate-bounce
+                        inline-flex cursor-pointer items-center justify-center gap-3 
+                        rounded-full border-2 border-black bg-orange-500 
+                        px-9 py-4 text-[15px] font-semibold text-white 
+                        shadow-[0_6px_0_rgba(0,0,0,.22),0_10px_24px_rgba(0,0,0,.12)] 
+                        transition-all duration-300 
+                        hover:-translate-y-0.5 hover:bg-orange-600 
+                        hover:shadow-[0_7px_0_rgba(0,0,0,.24),0_12px_26px_rgba(0,0,0,.14)] 
+                        active:translate-y-0 active:scale-95 
+                        active:shadow-[0_2px_0_rgba(0,0,0,.2)]
                       "
                     >
-
-                      <svg
-                        viewBox="0 0 260 250"
-                        className="h-full w-full overflow-visible"
-                        fill="none"
-                      >
-
-                        <defs>
-
-                          <linearGradient
-                            id="buildingFront"
-                            x1="0"
-                            y1="0"
-                            x2="1"
-                            y2="1"
-                          >
-                            <stop offset="0%" stopColor="#fcd34d" />
-                            <stop offset="45%" stopColor="#f59e0b" />
-                            <stop offset="100%" stopColor="#d97706" />
-                          </linearGradient>
-
-                          <linearGradient
-                            id="buildingSide"
-                            x1="0"
-                            y1="0"
-                            x2="1"
-                            y2="0"
-                          >
-                            <stop offset="0%" stopColor="#fbbf24" />
-                            <stop offset="100%" stopColor="#f59e0b" />
-                          </linearGradient>
-
-                          <linearGradient
-                            id="buildingRoof"
-                            x1="0"
-                            y1="0"
-                            x2="0"
-                            y2="1"
-                          >
-                            <stop offset="0%" stopColor="#fcd34d" />
-                            <stop offset="100%" stopColor="#f59e0b" />
-                          </linearGradient>
-
-                          <linearGradient
-                            id="windowGlass"
-                            x1="0"
-                            y1="0"
-                            x2="1"
-                            y2="1"
-                          >
-                            <stop offset="0%" stopColor="#fef3c7" />
-                            <stop offset="35%" stopColor="#fcd34d" />
-                            <stop offset="100%" stopColor="#d97706" />
-                          </linearGradient>
-
-                          <filter id="buildingDropShadow">
-                            <feDropShadow
-                              dx="0"
-                              dy="12"
-                              stdDeviation="8"
-                              floodColor="#000000"
-                              floodOpacity="0.15"
-                            />
-                          </filter>
-
-                          <linearGradient
-                            id="buildingHighlight"
-                            x1="0"
-                            y1="0"
-                            x2="1"
-                            y2="1"
-                          >
-                            <stop offset="0%" stopColor="#ffffff" stopOpacity="0.34" />
-                            <stop offset="45%" stopColor="#ffffff" stopOpacity="0.05" />
-                            <stop offset="100%" stopColor="#000000" stopOpacity="0.10" />
-                          </linearGradient>
-
-                        </defs>
-
-                        {/* Ground shadow */}
-
-                        <ellipse
-                          cx="128"
-                          cy="232"
-                          rx="112"
-                          ry="10"
-                          fill="#000000"
-                          fillOpacity="0.15"
-                        />
-
-                        {/* Front */}
-
-                        <path
-                          d="M60 80L150 55V210H60Z"
-                          fill="url(#buildingFront)"
-                          filter="url(#buildingDropShadow)"
-                        />
-
-                        <path
-                          d="M60 80L150 55V210H60Z"
-                          fill="url(#buildingHighlight)"
-                          opacity="0.55"
-                        />
-
-                        {/* Side */}
-
-                        <path
-                          d="M150 55L205 78V210H150Z"
-                          fill="url(#buildingSide)"
-                        />
-
-                        {/* Roof */}
-
-                        <path
-                          d="M60 80L120 48L205 78L150 55Z"
-                          fill="url(#buildingRoof)"
-                        />
-
-                        {/* Roof edge */}
-
-                        <path
-                          d="M60 80L150 55L205 78"
-                          stroke="#fef3c7"
-                          strokeOpacity="0.35"
-                          strokeWidth="2"
-                        />
-
-                        {/* Windows */}
-
-                        <g fill="url(#windowGlass)">
-
-                          <rect x="75" y="92" width="19" height="25" rx="2" />
-
-                          <rect x="101" y="85" width="19" height="25" rx="2" />
-
-                          <rect x="127" y="78" width="14" height="25" rx="2" />
-
-                          <rect x="75" y="128" width="19" height="25" rx="2" />
-
-                          <rect x="101" y="121" width="19" height="25" rx="2" />
-
-                          <rect x="127" y="114" width="14" height="25" rx="2" />
-
-                          <rect x="75" y="164" width="19" height="25" rx="2" />
-
-                          <rect x="101" y="157" width="19" height="25" rx="2" />
-
-                          <rect x="127" y="150" width="14" height="25" rx="2" />
-
-                        </g>
-
-                        {/* Realistic glass reflections */}
-
-                        <g
-                          stroke="#ffffff"
-                          strokeOpacity="0.65"
-                          strokeWidth="2"
-                        >
-
-                          <path d="M77 101L88 97" />
-                          <path d="M103 94L114 90" />
-                          <path d="M77 137L88 133" />
-                          <path d="M103 130L114 126" />
-
-                        </g>
-
-                        {/* Window highlights */}
-
-                        <g
-                          stroke="#ffffff"
-                          strokeOpacity="0.35"
-                          strokeWidth="1.5"
-                        >
-
-                          <path d="M77 95L91 92" />
-                          <path d="M103 88L117 84" />
-
-                        </g>
-
-                        {/* Side windows */}
-
-                        <g fill="#fcd34d" fillOpacity="0.22">
-
-                          <path d="M162 86L191 97V119L162 110Z" />
-
-                          <path d="M162 124L191 135V157L162 148Z" />
-
-                          <path d="M162 162L191 173V195L162 186Z" />
-
-                        </g>
-
-                        {/* Floor lines */}
-
-                        <g
-                          stroke="#fef3c7"
-                          strokeOpacity="0.18"
-                          strokeWidth="1"
-                        >
-
-                          <path d="M60 120L150 98" />
-                          <path d="M60 155L150 133" />
-                          <path d="M60 190L150 168" />
-
-                        </g>
-
-                        {/* Structural columns */}
-
-                        <g
-                          stroke="#fef3c7"
-                          strokeOpacity="0.32"
-                          strokeWidth="3"
-                        >
-
-                          <path d="M65 80V210" />
-                          <path d="M150 57V210" />
-                          <path d="M204 79V210" />
-
-                        </g>
-
+                      <svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                        <path d="m10 17 5-5-5-5" />
+                        <path d="M15 12H3" />
+                        <path d="M15 3h4a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2h-4" />
                       </svg>
+                      LOG IN
+                    </button>
 
-                    </div>
-
-                    {/* =================================================
-                        3D CONSTRUCTION CRANE
-                    ================================================= */}
-
-                    <div
+                    <button
+                      onClick={() => setIsRegisterOpen(true)}
                       className="
-                        absolute
-                        bottom-[27%]
-                        left-[0%]
-                        z-30
-                        h-[310px]
-                        w-[290px]
+                        animate-bounce
+                        inline-flex cursor-pointer items-center justify-center gap-3 
+                        rounded-full border-2 border-black bg-amber3r2/90 
+                        px-9 py-4 text-[15px] font-semibold text-slate-800 
+                        shadow-[0_6px_0_rgba(0,0,0,.22),0_10px_24px_rgba(0,0,0,.12)] 
+                        transition-all duration-300 
+                        hover:-translate-y-0.5 hover:bg-white  
+                        hover:shadow-[0_7px_0_rgba(0,0,0,.24),0_12px_26px_rgba(0,0,0,.14)] 
+                        active:translate-y-0 active:scale-95 
+                        active:shadow-[0_2px_0_rgba(0,0,0,.2)]
                       "
                     >
-
-                      <svg
-                        viewBox="0 0 300 320"
-                        className="h-full w-full overflow-visible"
-                        fill="none"
-                      >
-
-                        <defs>
-
-                          <linearGradient
-                            id="craneMetal"
-                            x1="0"
-                            y1="0"
-                            x2="1"
-                            y2="1"
-                          >
-                            <stop offset="0%" stopColor="#fef3c7" />
-                            <stop offset="35%" stopColor="#fcd34d" />
-                            <stop offset="70%" stopColor="#f59e0b" />
-                            <stop offset="100%" stopColor="#d97706" />
-                          </linearGradient>
-
-                        </defs>
-
-                        {/* Shadow */}
-
-                        <ellipse
-                          cx="95"
-                          cy="308"
-                          rx="78"
-                          ry="7"
-                          fill="#000000"
-                          fillOpacity="0.15"
-                        />
-
-                        {/* Tower */}
-
-                        <path
-                          d="M80 300H105V70H80Z"
-                          fill="url(#craneMetal)"
-                          stroke="#d97706"
-                          strokeWidth="1"
-                        />
-
-                        {/* Lattice */}
-
-                        <g
-                          stroke="#f59e0b"
-                          strokeWidth="2"
-                        >
-
-                          <path d="M80 90L105 110L80 130L105 150L80 170L105 190L80 210L105 230L80 250L105 270L80 290" />
-
-                          <path d="M105 90L80 110L105 130L80 150L105 170L80 190L105 210L80 230L105 250L80 270L105 290" />
-
-                        </g>
-
-                        {/* Main boom */}
-
-                        <path
-                          d="M92 70H278"
-                          stroke="url(#craneMetal)"
-                          strokeWidth="8"
-                          strokeLinecap="round"
-                        />
-
-                        {/* Boom lattice */}
-
-                        <g
-                          stroke="#f59e0b"
-                          strokeWidth="1.5"
-                        >
-
-                          <path d="M110 70L122 88" />
-                          <path d="M135 70L147 88" />
-                          <path d="M160 70L172 88" />
-                          <path d="M185 70L197 88" />
-                          <path d="M210 70L222 88" />
-                          <path d="M235 70L247 88" />
-
-                        </g>
-
-                        {/* Counter boom */}
-
-                        <path
-                          d="M92 70L45 45"
-                          stroke="url(#craneMetal)"
-                          strokeWidth="7"
-                          strokeLinecap="round"
-                        />
-
-                        {/* Counterweight */}
-
-                        <rect
-                          x="28"
-                          y="37"
-                          width="27"
-                          height="18"
-                          rx="3"
-                          fill="#f59e0b"
-                          stroke="#fef3c7"
-                        />
-
-                        {/* Cabin */}
-
-                        <path
-                          d="M82 61H108V80H82Z"
-                          fill="#d97706"
-                          stroke="#fef3c7"
-                        />
-
-                        <path
-                          d="M86 65H103V75H86Z"
-                          fill="#fcd34d"
-                          fillOpacity="0.45"
-                        />
-
-                        {/* Cable */}
-
-                        <path
-                          d="M245 70V165"
-                          stroke="#fef3c7"
-                          strokeWidth="2"
-                        />
-
-                        {/* Hook */}
-
-                        <path
-                          d="M238 165C238 177 253 177 253 165"
-                          stroke="#fbbf24"
-                          strokeWidth="3"
-                        />
-
-                        <rect
-                          x="237"
-                          y="150"
-                          width="17"
-                          height="16"
-                          rx="2"
-                          fill="#f59e0b"
-                        />
-
-                        {/* Warning light */}
-
-                        <circle
-                          cx="92"
-                          cy="66"
-                          r="5"
-                          fill="#fbbf24"
-                        />
-
+                      <svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                        <circle cx="12" cy="8" r="5" />
+                        <path d="M20 21a8 8 0 0 0-16 0" />
                       </svg>
-
-                    </div>
-
-                    {/* =================================================
-                        ELECTRICAL — TRANSMISSION TOWER
-                    ================================================= */}
-
-                    <div
-                      className="
-                        absolute
-                        bottom-[5%]
-                        right-[1%]
-                        z-20
-                        h-[350px]
-                        w-[180px]
-                      "
-                    >
-
-                      <svg
-                        viewBox="0 0 190 370"
-                        className="h-full w-full overflow-visible"
-                        fill="none"
-                      >
-
-                        <defs>
-
-                          <linearGradient
-                            id="towerMetal"
-                            x1="0"
-                            y1="0"
-                            x2="1"
-                            y2="0"
-                          >
-                            <stop offset="0%" stopColor="#fef3c7" />
-                            <stop offset="35%" stopColor="#fcd34d" />
-                            <stop offset="65%" stopColor="#f59e0b" />
-                            <stop offset="100%" stopColor="#d97706" />
-                          </linearGradient>
-
-                        </defs>
-
-                        <ellipse
-                          cx="95"
-                          cy="360"
-                          rx="70"
-                          ry="7"
-                          fill="#000000"
-                          fillOpacity="0.15"
-                        />
-
-                        {/* Tower body */}
-
-                        <path
-                          d="M90 10L145 350H45Z"
-                          fill="#f59e0b"
-                          fillOpacity="0.15"
-                          stroke="url(#towerMetal)"
-                          strokeWidth="5"
-                        />
-
-                        {/* Tower lattice */}
-
-                        <g
-                          stroke="#f59e0b"
-                          strokeWidth="2"
-                        >
-
-                          <path d="M90 10L45 350" />
-                          <path d="M90 10L145 350" />
-
-                          <path d="M78 70H102" />
-                          <path d="M70 125H111" />
-                          <path d="M61 180H120" />
-                          <path d="M52 240H130" />
-                          <path d="M45 300H139" />
-
-                          <path d="M78 70L111 125" />
-                          <path d="M102 70L70 125" />
-
-                          <path d="M70 125L120 180" />
-                          <path d="M111 125L61 180" />
-
-                          <path d="M61 180L130 240" />
-                          <path d="M120 180L52 240" />
-
-                          <path d="M52 240L139 300" />
-                          <path d="M130 240L45 300" />
-
-                        </g>
-
-                        {/* Crossarms */}
-
-                        <path
-                          d="M20 75H165"
-                          stroke="url(#towerMetal)"
-                          strokeWidth="6"
-                          strokeLinecap="round"
-                        />
-
-                        <path
-                          d="M5 130H180"
-                          stroke="url(#towerMetal)"
-                          strokeWidth="6"
-                          strokeLinecap="round"
-                        />
-
-                        <path
-                          d="M0 185H190"
-                          stroke="url(#towerMetal)"
-                          strokeWidth="6"
-                          strokeLinecap="round"
-                        />
-
-                        {/* Insulators */}
-
-                        <g fill="#fef3c7">
-
-                          <circle cx="25" cy="75" r="5" />
-                          <circle cx="155" cy="75" r="5" />
-
-                          <circle cx="10" cy="130" r="5" />
-                          <circle cx="170" cy="130" r="5" />
-
-                          <circle cx="8" cy="185" r="5" />
-                          <circle cx="182" cy="185" r="5" />
-
-                        </g>
-
-                        {/* Power cables */}
-
-                        <path
-                          d="M25 75C-10 95 -10 155 25 185"
-                          stroke="#fef3c7"
-                          strokeOpacity="0.5"
-                          strokeWidth="1.5"
-                        />
-
-                        <path
-                          d="M155 75C195 100 195 155 155 185"
-                          stroke="#fef3c7"
-                          strokeOpacity="0.5"
-                          strokeWidth="1.5"
-                        />
-
-                        {/* Beacon */}
-
-                        <circle
-                          cx="90"
-                          cy="10"
-                          r="5"
-                          fill="#fbbf24"
-                        />
-
-                        <circle
-                          cx="90"
-                          cy="10"
-                          r="10"
-                          fill="#fbbf24"
-                          fillOpacity="0.18"
-                        />
-
-                      </svg>
-
-                    </div>
-
-                    {/* =================================================
-                        ELECTRICAL — 3D TRANSFORMER
-                    ================================================= */}
-
-                    <div
-                      className="
-                        absolute
-                        bottom-[8%]
-                        right-[17%]
-                        z-30
-                        h-[185px]
-                        w-[175px]
-                        rotate-[5deg]
-                      "
-                    >
-
-                      <svg
-                        viewBox="0 0 200 220"
-                        className="h-full w-full overflow-visible"
-                        fill="none"
-                      >
-
-                        <defs>
-
-                          <linearGradient
-                            id="transformerBody"
-                            x1="0"
-                            y1="0"
-                            x2="1"
-                            y2="1"
-                          >
-                            <stop offset="0%" stopColor="#fef08a" />
-                            <stop offset="35%" stopColor="#facc15" />
-                            <stop offset="70%" stopColor="#ca8a04" />
-                            <stop offset="100%" stopColor="#854d0e" />
-                          </linearGradient>
-
-                          <linearGradient
-                            id="transformerSide"
-                            x1="0"
-                            y1="0"
-                            x2="1"
-                            y2="0"
-                          >
-                            <stop offset="0%" stopColor="#a16207" />
-                            <stop offset="100%" stopColor="#713f12" />
-                          </linearGradient>
-
-                        </defs>
-
-                        <ellipse
-                          cx="100"
-                          cy="205"
-                          rx="75"
-                          ry="8"
-                          fill="#000000"
-                          fillOpacity="0.15"
-                        />
-
-                        {/* Main body */}
-
-                        <path
-                          d="M45 70L145 52L175 70V160L75 180L45 160Z"
-                          fill="url(#transformerBody)"
-                          stroke="#fef3c7"
-                        />
-
-                        <path
-                          d="M49 72L144 55L166 71V94L72 112L49 101Z"
-                          fill="#ffffff"
-                          fillOpacity="0.16"
-                        />
-
-                        {/* Side depth */}
-
-                        <path
-                          d="M145 52L175 70V160L145 145Z"
-                          fill="url(#transformerSide)"
-                        />
-
-                        {/* Cooling fins */}
-
-                        <g
-                          stroke="#92400e"
-                          strokeWidth="3"
-                          opacity="0.75"
-                        >
-
-                          <path d="M60 74V163" />
-                          <path d="M70 72V166" />
-                          <path d="M80 70V164" />
-                          <path d="M90 68V162" />
-                          <path d="M100 66V160" />
-                          <path d="M110 64V158" />
-                          <path d="M120 62V155" />
-                          <path d="M130 60V151" />
-
-                        </g>
-
-                        {/* Insulators */}
-
-                        <g fill="#fef3c7">
-
-                          <rect x="63" y="48" width="13" height="23" rx="4" />
-
-                          <rect x="94" y="42" width="13" height="23" rx="4" />
-
-                          <rect x="125" y="37" width="13" height="23" rx="4" />
-
-                        </g>
-
-                        <g
-                          stroke="#f59e0b"
-                          strokeWidth="2"
-                        >
-
-                          <path d="M60 54H79" />
-                          <path d="M91 48H110" />
-                          <path d="M122 43H141" />
-
-                        </g>
-
-                        {/* Supports */}
-
-                        <path
-                          d="M55 160V198M145 145V198"
-                          stroke="#f59e0b"
-                          strokeWidth="5"
-                        />
-
-                        <rect
-                          x="72"
-                          y="101"
-                          width="34"
-                          height="22"
-                          rx="3"
-                          fill="#fef3c7"
-                          fillOpacity="0.72"
-                          stroke="#92400e"
-                          strokeOpacity="0.55"
-                        />
-
-                        <circle
-                          cx="78"
-                          cy="107"
-                          r="2"
-                          fill="#dc2626"
-                        />
-
-                        <circle
-                          cx="78"
-                          cy="117"
-                          r="2"
-                          fill="#16a34a"
-                        />
-
-                        <text
-                          x="92"
-                          y="111"
-                          fontSize="6"
-                          fill="#422006"
-                          fontWeight="700"
-                          textAnchor="middle"
-                        >
-                          HIGH
-                        </text>
-
-                        <text
-                          x="92"
-                          y="118"
-                          fontSize="5"
-                          fill="#422006"
-                          textAnchor="middle"
-                        >
-                          VOLTAGE
-                        </text>
-
-                        <text
-                          x="86"
-                          y="138"
-                          fontSize="9"
-                          fill="#422006"
-                          fontWeight="700"
-                          textAnchor="middle"
-                        >
-                          POWER
-                        </text>
-
-                        <text
-                          x="86"
-                          y="137"
-                          fontSize="7"
-                          fill="#422006"
-                          textAnchor="middle"
-                        >
-                          TRANSFORMER
-                        </text>
-
-                      </svg>
-
-                    </div>
-
-                    {/* =================================================
-                        ELECTRONICS — 3D PCB
-                    ================================================= */}
-
-                    <div
-                      className="
-                        absolute
-                        bottom-[8%]
-                        right-[38%]
-                        z-40
-                        h-[120px]
-                        w-[215px]
-                        rotate-[-10deg]
-                        rounded-[18px]
-                        border
-                        border-orange-300/40
-                        bg-gradient-to-br
-                        from-orange-400
-                        via-orange-600
-                        to-orange-900
-                        shadow-[0_25px_45px_rgba(0,0,0,.15)]
-                      "
-                    >
-
-                      <div className="pointer-events-none absolute inset-0 rounded-[18px] bg-gradient-to-br from-white/15 via-transparent to-transparent" />
-
-                      <div className="pointer-events-none absolute inset-x-3 top-2 h-5 rounded-full bg-white/10 blur-md" />
-
-                      <div className="absolute left-2 top-2 h-2.5 w-2.5 rounded-full border border-amber-200/50 bg-slate-950/70 shadow-[inset_0_1px_2px_rgba(255,255,255,.25)]" />
-                      <div className="absolute bottom-2 right-2 h-2.5 w-2.5 rounded-full border border-amber-200/50 bg-slate-950/70 shadow-[inset_0_1px_2px_rgba(255,255,255,.25)]" />
-
-                      {/* PCB traces */}
-
-                      <svg
-                        className="absolute inset-0 h-full w-full"
-                        viewBox="0 0 220 125"
-                        fill="none"
-                      >
-
-                        <path
-                          d="M18 28H65L78 42H105"
-                          stroke="#fbbf24"
-                          strokeWidth="2"
-                        />
-
-                        <path
-                          d="M130 25H180V50H200"
-                          stroke="#fbbf24"
-                          strokeWidth="2"
-                        />
-
-                        <path
-                          d="M25 90H70V70H100"
-                          stroke="#fcd34d"
-                          strokeWidth="2"
-                        />
-
-                        <path
-                          d="M125 98H160L178 80H205"
-                          stroke="#f59e0b"
-                          strokeWidth="2"
-                        />
-
-                        <circle
-                          cx="65"
-                          cy="28"
-                          r="3"
-                          fill="#fbbf24"
-                        />
-
-                        <circle
-                          cx="180"
-                          cy="25"
-                          r="3"
-                          fill="#fbbf24"
-                        />
-
-                        <circle
-                          cx="70"
-                          cy="90"
-                          r="3"
-                          fill="#fcd34d"
-                        />
-
-                      </svg>
-
-                      {/* Solder points / components */}
-
-                      <div className="absolute left-5 top-[52px] h-2 w-2 rounded-full bg-amber-300 shadow-[0_0_6px_rgba(252,211,77,.45)]" />
-                      <div className="absolute left-5 top-[72px] h-2 w-2 rounded-full bg-cyan-300 shadow-[0_0_6px_rgba(103,232,249,.45)]" />
-                      <div className="absolute right-12 bottom-[31px] h-2 w-2 rounded-full bg-green-300 shadow-[0_0_6px_rgba(134,239,172,.45)]" />
-
-                      {/* Raised IC */}
-
-                      <div
-                        className="
-                          absolute
-                          left-[72px]
-                          top-[34px]
-                          h-[48px]
-                          w-[65px]
-                          rounded-[6px]
-                          border
-                          border-slate-500
-                          bg-gradient-to-br
-                          from-slate-600
-                          via-slate-900
-                          to-black
-                          shadow-[0_8px_12px_rgba(0,0,0,.6)]
-                        "
-                      >
-
-                        <div className="absolute inset-[7px] rounded-[3px] bg-black ring-1 ring-orange-400/30" />
-
-                        <div className="absolute left-2 top-1 h-1 w-7 rounded-full bg-white/20 blur-[1px]" />
-
-                        <div className="absolute -left-[5px] top-2 h-1 w-2 bg-slate-300 shadow-[0_7px_0_#cbd5e1,0_14px_0_#94a3b8,0_21px_0_#cbd5e1,0_28px_0_#94a3b8]" />
-
-                        <div className="absolute -right-[5px] top-2 h-1 w-2 bg-slate-300 shadow-[0_7px_0_#cbd5e1,0_14px_0_#94a3b8,0_21px_0_#cbd5e1,0_28px_0_#94a3b8]" />
-
+                      SIGN UP
+                    </button>
+                  </div>
+
+                  {/* Engineering disciplines — 4 display-only cards with BROWN BORDERS */}
+                  <div className="relative z-40 mx-auto mt-10 grid max-w-[1160px] grid-cols-2 gap-4 px-4 md:mt-12 md:grid-cols-4 md:gap-5 md:px-0">
+
+                    {/* CIVIL - Brown Border */}
+                    <div className="flex min-h-[205px] flex-col items-center justify-center rounded-[24px] border-2 border-amber-800/80 bg-white/90 px-4 py-6 shadow-[0_10px_30px_rgba(0,0,0,.06)] backdrop-blur-xl md:min-h-[220px]">
+                      <div className="mb-5 flex h-14 w-14 items-center justify-center text-amber-800 md:h-16 md:w-16">
+                        <svg viewBox="0 0 48 48" className="h-full w-full" fill="none">
+                          <circle cx="24" cy="24" r="16" stroke="currentColor" strokeWidth="3" />
+                          <circle cx="24" cy="24" r="8" stroke="currentColor" strokeWidth="3" />
+                          <path d="M24 5V10M24 38V43M5 24H10M38 24H43M10.5 10.5L14 14M34 34L37.5 37.5M37.5 10.5L34 14M14 34L10.5 37.5" stroke="currentColor" strokeWidth="3" strokeLinecap="round" />
+                        </svg>
                       </div>
+                      <h3 className="outfit-700 text-center text-[14px] font-bold leading-5 text-slate-900 md:text-[16px]">CIVIL<br />ENGINEERING</h3>
+                      <p className="outfit-400 mt-3 text-center text-[12px] leading-5 text-slate-700 md:text-[13px]">Build and shape<br />the future.</p>
+                    </div>
 
-                      {/* Capacitor */}
-
-                      <div
-                        className="
-                          absolute
-                          right-5
-                          top-5
-                          h-9
-                          w-9
-                          rounded-full
-                          border
-                          border-slate-300/60
-                          bg-gradient-to-br
-                          from-slate-200
-                          via-slate-500
-                          to-slate-900
-                          shadow-[0_5px_10px_rgba(0,0,0,.5)]
-                        "
-                      >
-
-                        <div className="absolute left-1/2 top-0 h-full w-[2px] -translate-x-1/2 bg-white/40" />
-
+                    {/* COMPUTER - Brown Border */}
+                    <div className="flex min-h-[205px] flex-col items-center justify-center rounded-[24px] border-2 border-amber-800/80 bg-white/90 px-4 py-6 shadow-[0_10px_30px_rgba(0,0,0,.06)] backdrop-blur-xl md:min-h-[220px]">
+                      <div className="mb-5 flex h-14 w-14 items-center justify-center text-amber-800 md:h-16 md:w-16">
+                        <svg viewBox="0 0 48 48" className="h-full w-full" fill="none">
+                          <rect x="6" y="9" width="36" height="25" rx="2" stroke="currentColor" strokeWidth="3" />
+                          <path d="M17 40H31M24 34V40" stroke="currentColor" strokeWidth="3" strokeLinecap="round" />
+                        </svg>
                       </div>
-
-                      {/* Resistors */}
-
-                      <div
-                        className="
-                          absolute
-                          bottom-4
-                          left-5
-                          h-2
-                          w-12
-                          rounded-full
-                          bg-gradient-to-r
-                          from-amber-900
-                          via-amber-400
-                          to-amber-900
-                        "
-                      />
-
-                      <div
-                        className="
-                          absolute
-                          bottom-4
-                          right-5
-                          h-2
-                          w-9
-                          rounded-full
-                          bg-gradient-to-r
-                          from-orange-900
-                          via-orange-400
-                          to-orange-900
-                        "
-                      />
-
+                      <h3 className="outfit-700 text-center text-[14px] font-bold leading-5 text-slate-900 md:text-[16px]">COMPUTER<br />ENGINEERING</h3>
+                      <p className="outfit-400 mt-3 text-center text-[12px] leading-5 text-slate-700 md:text-[13px]">Design. Code.<br />Innovate.</p>
                     </div>
 
-                    {/* =================================================
-                        ELECTRONICS — MICROCHIP
-                    ================================================= */}
-
-                    <div
-                      className="
-                        absolute
-                        bottom-[6%]
-                        right-[31%]
-                        z-50
-                        h-[68px]
-                        w-[68px]
-                        rotate-[12deg]
-                        rounded-[12px]
-                        border
-                        border-slate-400/50
-                        bg-gradient-to-br
-                        from-slate-600
-                        via-slate-900
-                        to-black
-                        shadow-[0_15px_30px_rgba(0,0,0,.6)]
-                      "
-                    >
-
-                      <div className="absolute inset-3 rounded-md bg-black ring-1 ring-orange-300/30" />
-
-                      <div className="absolute left-1/2 top-2 h-1 w-5 -translate-x-1/2 rounded-full bg-white/20" />
-
-                      <div className="absolute -left-2 top-3 h-[2px] w-2 bg-orange-300/70 shadow-[0_10px_0_rgba(251,146,60,.7),0_20px_0_rgba(251,146,60,.7),0_30px_0_rgba(251,146,60,.7),0_40px_0_rgba(251,146,60,.7)]" />
-
-                      <div className="absolute -right-2 top-3 h-[2px] w-2 bg-orange-300/70 shadow-[0_10px_0_rgba(251,146,60,.7),0_20px_0_rgba(251,146,60,.7),0_30px_0_rgba(251,146,60,.7),0_40px_0_rgba(251,146,60,.7)]" />
-
-                    </div>
-
-                    {/* =================================================
-                        PHONE
-                    ================================================= */}
-
-                    <div
-                      className="
-                        absolute
-                        left-[28%]
-                        top-[6%]
-                        z-[70]
-                        w-[290px]
-                        lg:w-[320px]
-                        xl:w-[335px]
-                      "
-                    >
-
-                      {/* Phone frame */}
-
-                      <div
-                        className="
-                          relative
-                          rounded-[48px]
-                          border-[3px]
-                          border-orange-200/40
-                          bg-gradient-to-br
-                          from-orange-100/40
-                          via-white/10
-                          to-orange-200/50
-                          p-[5px]
-                          shadow-[0_18px_38px_rgba(0,0,0,.10),inset_0_1px_1px_rgba(255,255,255,.45)]
-                          backdrop-blur-xl
-                          transition-transform
-                          duration-500
-                          hover:-translate-y-2
-                        "
-                      >
-
-                        {/* Metallic highlight */}
-
-                        <div className="pointer-events-none absolute inset-0 rounded-[48px] bg-gradient-to-br from-white/30 via-transparent to-orange-200/30" />
-
-                        <div
-                          className="
-                            relative
-                            overflow-hidden
-                            rounded-[42px]
-                            bg-black
-                            shadow-[inset_0_0_0_2px_rgba(255,255,255,.15)]
-                          "
-                        >
-
-                          {/* Dynamic island */}
-
-                          <div
-                            className="
-                              pointer-events-none
-                              absolute
-                              left-1/2
-                              top-2
-                              z-30
-                              h-[24px]
-                              w-[82px]
-                              -translate-x-1/2
-                              rounded-full
-                              bg-slate-950
-                              shadow-[0_2px_8px_rgba(0,0,0,.7)]
-                            "
-                          >
-
-                            <div className="absolute right-3 top-1/2 h-2 w-2 -translate-y-1/2 rounded-full bg-slate-700" />
-
-                          </div>
-
-                          <picture>
-
-                            <source
-                              media="(min-width: 768px)"
-                              srcSet={heroImg}
-                            />
-
-                            <img
-                              src={MobileheroImg}
-                              alt="CAPS-REVIEW mobile interface"
-                              loading="eager"
-                              decoding="async"
-                              fetchPriority="high"
-                              className="block h-auto w-full object-contain"
-                            />
-
-                          </picture>
-
-                          {/* Screen glass */}
-
-                          <div className="pointer-events-none absolute inset-0 bg-gradient-to-br from-white/12 via-transparent to-transparent" />
-
-                        </div>
-
-                        {/* =================================================
-                            HARD HAT
-                            REALISTIC — PERCHED ON THE PHONE'S UPPER-RIGHT EDGE
-                        ================================================= */}
-
-                        <div
-                          className="
-                            pointer-events-none
-                            absolute
-                            -right-[43px]
-                            -top-[47px]
-                            z-[100]
-                            rotate-[8deg]
-                            scale-[1.18]
-                            origin-bottom-left
-                            lg:-right-[48px]
-                            lg:-top-[51px]
-                          "
-                        >
-
-                          {/* Soft contact shadow — makes the hat look physically seated */}
-
-                          <div
-                            className="
-                              absolute
-                              bottom-[3px]
-                              left-[18px]
-                              z-0
-                              h-[10px]
-                              w-[112px]
-                              rounded-[50%]
-                              bg-black/20
-                              blur-[7px]
-                            "
-                          />
-
-                          {/* Hard-hat shell */}
-
-                          <div
-                            className="
-                              relative
-                              z-10
-                              h-[67px]
-                              w-[114px]
-                              overflow-hidden
-                              rounded-t-[54px]
-                              border
-                              border-white/90
-                              bg-gradient-to-br
-                              from-white
-                              via-slate-100
-                              to-slate-400
-                              shadow-[0_9px_16px_rgba(0,0,0,.20),inset_0_2px_4px_rgba(255,255,255,.95)]
-                            "
-                          >
-
-                            {/* Dome highlight */}
-
-                            <div
-                              className="
-                                absolute
-                                left-[12px]
-                                top-[7px]
-                                h-[24px]
-                                w-[62px]
-                                rotate-[-10deg]
-                                rounded-full
-                                bg-white/85
-                                blur-[3px]
-                              "
-                            />
-
-                            {/* Raised center ridge */}
-
-                            <div
-                              className="
-                                absolute
-                                left-1/2
-                                top-[-2px]
-                                h-[70px]
-                                w-[14px]
-                                -translate-x-1/2
-                                rounded-full
-                                bg-gradient-to-b
-                                from-white
-                                via-slate-100
-                                to-slate-300
-                                shadow-[0_0_5px_rgba(255,255,255,.9)]
-                              "
-                            />
-
-                            {/* Left shell contour */}
-
-                            <div
-                              className="
-                                absolute
-                                left-[17px]
-                                top-[18px]
-                                h-[39px]
-                                w-[22px]
-                                rounded-[50%]
-                                border-l-2
-                                border-white/70
-                                opacity-80
-                              "
-                            />
-
-                            {/* Right shell contour */}
-
-                            <div
-                              className="
-                                absolute
-                                right-[15px]
-                                top-[18px]
-                                h-[38px]
-                                w-[20px]
-                                rounded-[50%]
-                                border-r-2
-                                border-slate-400/50
-                              "
-                            />
-
-                            {/* Orange safety detail */}
-
-                            <div
-                              className="
-                                absolute
-                                right-[13px]
-                                top-[23px]
-                                h-[20px]
-                                w-[20px]
-                                rounded-full
-                                border
-                                border-orange-300/80
-                                bg-gradient-to-br
-                                from-orange-200
-                                via-orange-400
-                                to-orange-600/50
-                                shadow-[0_0_9px_rgba(249,115,22,.35),inset_0_1px_2px_rgba(255,255,255,.8)]
-                              "
-                            />
-
-                          </div>
-
-                          {/* Wide brim — this is the part that actually sits across the phone edge */}
-
-                          <div
-                            className="
-                              relative
-                              z-20
-                              -mt-[5px]
-                              ml-[-22px]
-                              h-[18px]
-                              w-[154px]
-                              rounded-[50%]
-                              border
-                              border-white/90
-                              bg-gradient-to-b
-                              from-white
-                              via-slate-200
-                              to-slate-500
-                              shadow-[0_6px_11px_rgba(0,0,0,.20),inset_0_2px_3px_rgba(255,255,255,.95)]
-                            "
-                          >
-
-                            {/* Brim top reflection */}
-
-                            <div
-                              className="
-                                absolute
-                                left-[18px]
-                                right-[18px]
-                                top-[4px]
-                                h-[3px]
-                                rounded-full
-                                bg-white/80
-                                blur-[1px]
-                              "
-                            />
-
-                            {/* Dark lower edge for depth */}
-
-                            <div
-                              className="
-                                absolute
-                                bottom-[2px]
-                                left-[22px]
-                                right-[22px]
-                                h-[3px]
-                                rounded-full
-                                bg-slate-500/35
-                                blur-[1px]
-                              "
-                            />
-
-                          </div>
-
-                        </div>
-
+                    {/* ELECTRICAL - Brown Border */}
+                    <div className="flex min-h-[205px] flex-col items-center justify-center rounded-[24px] border-2 border-amber-800/80 bg-white/90 px-4 py-6 shadow-[0_10px_30px_rgba(0,0,0,.06)] backdrop-blur-xl md:min-h-[220px]">
+                      <div className="mb-5 flex h-14 w-14 items-center justify-center text-amber-800 md:h-16 md:w-16">
+                        <svg viewBox="0 0 48 48" className="h-full w-full" fill="none">
+                          <rect x="14" y="14" width="20" height="20" rx="2" stroke="currentColor" strokeWidth="3" />
+                          <rect x="20" y="20" width="8" height="8" rx="1" stroke="currentColor" strokeWidth="3" />
+                          <path d="M18 8V14M24 8V14M30 8V14M18 34V40M24 34V40M30 34V40M8 18H14M8 24H14M8 30H14M34 18H40M34 24H40M34 30H40" stroke="currentColor" strokeWidth="3" strokeLinecap="round" />
+                        </svg>
                       </div>
-
+                      <h3 className="outfit-700 text-center text-[14px] font-bold leading-5 text-slate-900 md:text-[16px]">ELECTRICAL<br />ENGINEERING</h3>
+                      <p className="outfit-400 mt-3 text-center text-[12px] leading-5 text-slate-700 md:text-[13px]">Powering systems.<br />Powering progress.</p>
                     </div>
 
+                    {/* ELECTRONICS - Brown Border */}
+                    <div className="flex min-h-[205px] flex-col items-center justify-center rounded-[24px] border-2 border-amber-800/80 bg-white/90 px-4 py-6 shadow-[0_10px_30px_rgba(0,0,0,.06)] backdrop-blur-xl md:min-h-[220px]">
+                      <div className="mb-5 flex h-14 w-14 items-center justify-center text-amber-800 md:h-16 md:w-16">
+                        <svg viewBox="0 0 48 48" className="h-full w-full" fill="none">
+                          <rect x="13" y="13" width="22" height="22" rx="3" stroke="currentColor" strokeWidth="3" />
+                          <rect x="19" y="19" width="10" height="10" rx="1" stroke="currentColor" strokeWidth="3" />
+                          <path d="M18 7V13M24 7V13M30 7V13M18 35V41M24 35V41M30 35V41M7 18H13M7 24H13M7 30H13M35 18H41M35 24H41M35 30H41" stroke="currentColor" strokeWidth="3" strokeLinecap="round" />
+                        </svg>
+                      </div>
+                      <h3 className="outfit-700 text-center text-[14px] font-bold leading-5 text-slate-900 md:text-[16px]">ELECTRONICS<br />ENGINEERING</h3>
+                      <p className="outfit-400 mt-3 text-center text-[12px] leading-5 text-slate-700 md:text-[13px]">Smart solutions.<br />Connected world.</p>
+                    </div>
+
+                  </div>
+
+                  {/* Bottom engineering illustration band */}
+                  <div className="pointer-events-none absolute -bottom-[115px] left-1/2 z-10 h-[230px] w-[1150px] -translate-x-1/2 opacity-95">
+                    {/* Building */}
+                    <svg className="absolute bottom-0 left-[-20px] h-[220px] w-[260px]" viewBox="0 0 260 250" fill="none">
+                      <defs>
+                        <linearGradient id="refBuilding" x1="0" y1="0" x2="1" y2="1">
+                          <stop offset="0%" stopColor="#fcd34d" />
+                          <stop offset="50%" stopColor="#f59e0b" />
+                          <stop offset="100%" stopColor="#d97706" />
+                        </linearGradient>
+                      </defs>
+                      <path d="M35 75L145 48V240H35Z" fill="url(#refBuilding)" />
+                      <path d="M145 48L215 76V240H145Z" fill="#f59e0b" />
+                      <path d="M35 75L112 38L215 76L145 48Z" fill="#fbbf24" />
+                      <g fill="#fde68a" opacity=".8">
+                        <rect x="52" y="92" width="25" height="34" rx="2" /><rect x="87" y="84" width="25" height="34" rx="2" /><rect x="122" y="76" width="18" height="34" rx="2" />
+                        <rect x="52" y="140" width="25" height="34" rx="2" /><rect x="87" y="132" width="25" height="34" rx="2" /><rect x="122" y="124" width="18" height="34" rx="2" />
+                      </g>
+                    </svg>
+
+                    {/* Circuit board */}
+                    <div className="absolute bottom-[-30px] left-1/2 h-[190px] w-[390px] -translate-x-1/2 rotate-[-7deg] rounded-[24px] bg-gradient-to-br from-orange-500 to-orange-600 shadow-[0_20px_45px_rgba(0,0,0,.18)]">
+                      <div className="absolute left-10 top-12 h-3 w-3 rounded-full bg-orange-200" />
+                      <div className="absolute left-14 top-[55px] h-[2px] w-28 bg-orange-200/80" />
+                      <div className="absolute right-10 top-12 h-3 w-3 rounded-full bg-orange-200" />
+                      <div className="absolute right-14 top-[55px] h-[2px] w-28 bg-orange-200/80" />
+                      <div className="absolute left-1/2 top-[52px] h-28 w-36 -translate-x-1/2 rounded-xl bg-slate-950 shadow-[inset_0_0_0_6px_rgba(255,255,255,.08)]" />
+                      <div className="absolute left-[35px] top-[88px] h-[2px] w-20 bg-orange-200/80" />
+                      <div className="absolute right-[35px] top-[88px] h-[2px] w-20 bg-orange-200/80" />
+                    </div>
+
+                    {/* Transformer */}
+                    <svg className="absolute bottom-[-8px] right-[70px] h-[190px] w-[220px]" viewBox="0 0 220 190" fill="none">
+                      <defs>
+                        <linearGradient id="refTransformer" x1="0" y1="0" x2="1" y2="1">
+                          <stop offset="0%" stopColor="#fde68a" /><stop offset="55%" stopColor="#facc15" /><stop offset="100%" stopColor="#ca8a04" />
+                        </linearGradient>
+                      </defs>
+                      <path d="M35 40L175 55V180H35Z" fill="url(#refTransformer)" />
+                      <path d="M175 55L205 70V180H175Z" fill="#ca8a04" />
+                      <g fill="#fef3c7"><rect x="50" y="20" width="12" height="28" rx="3" /><rect x="95" y="15" width="12" height="32" rx="3" /><rect x="140" y="20" width="12" height="28" rx="3" /></g>
+                      <g stroke="#a16207" strokeWidth="3"><path d="M65 50V180M105 48V180M145 50V180" /></g>
+                      <circle cx="105" cy="100" r="26" fill="#fef08a" opacity=".7" />
+                    </svg>
+
+                    {/* Transmission tower */}
+                    <svg className="absolute bottom-[-5px] right-[-40px] h-[310px] w-[180px]" viewBox="0 0 190 370" fill="none">
+                      <path d="M90 10L145 350H45Z" fill="#f59e0b" fillOpacity=".08" stroke="#f59e0b" strokeWidth="5" />
+                      <g stroke="#f59e0b" strokeWidth="2"><path d="M90 10L45 350M90 10L145 350" /><path d="M78 70H102M70 125H111M61 180H120M52 240H130M45 300H139" /><path d="M78 70L111 125M102 70L70 125M70 125L120 180M111 125L61 180M61 180L130 240M120 180L52 240M52 240L139 300M130 240L45 300" /></g>
+                      <g stroke="#f59e0b" strokeWidth="6" strokeLinecap="round"><path d="M20 75H165M5 130H180M0 185H190" /></g>
+                      <g fill="#fef3c7"><circle cx="25" cy="75" r="5" /><circle cx="155" cy="75" r="5" /><circle cx="10" cy="130" r="5" /><circle cx="170" cy="130" r="5" /></g>
+                    </svg>
                   </div>
 
                 </div>
-
-                {/* =====================================================
-                    ENGINEERING DISCIPLINE STRIP
-                ====================================================== */}
-
-                <div
-                  className="
-                    relative z-[80]
-                    mx-2 mt-10
-                    flex flex-col gap-6
-                    rounded-[30px]
-                    border border-orange-200/50
-                    bg-white/80
-                    px-6 py-6
-                    shadow-[0_14px_45px_rgba(0,0,0,.08)]
-                    backdrop-blur-2xl
-                    sm:mx-6
-                    md:absolute
-                    md:bottom-5
-                    md:left-1/2
-                    md:mt-0
-                    md:w-[92%]
-                    md:-translate-x-1/2
-                    md:flex-row
-                    md:items-center
-                    md:justify-between
-                    md:px-9
-                  "
-                >
-
-                  {/* =====================================================
-    ENGINEERING DISCIPLINE STRIP
-====================================================== */}
-
-
-  {/* CIVIL */}
-
-  <div className="flex flex-1 items-center gap-4">
-
-    <div className="flex h-14 w-14 shrink-0 items-center justify-center rounded-full border border-orange-300/30 bg-orange-100 md:h-16 md:w-16">
-
-      <svg viewBox="0 0 48 48" className="h-8 w-8 md:h-9 md:w-9" fill="none">
-        <path d="M9 35H39" stroke="#f59e0b" strokeWidth="2.5" strokeLinecap="round" />
-        <path d="M12 35C12 22 17 14 24 14C31 14 36 22 36 35" stroke="#f59e0b" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" />
-        <path d="M24 14V9" stroke="#f59e0b" strokeWidth="2.5" strokeLinecap="round" />
-        <path d="M20 35V27M28 35V27" stroke="#f59e0b" strokeWidth="2" strokeLinecap="round" />
-      </svg>
-
-    </div>
-
-    <div>
-      <h3 className="outfit-700 text-[13px] text-gray-900 md:text-[14px]">
-        CIVIL ENGINEERING
-      </h3>
-      <p className="mt-1 text-[11px] leading-5 text-gray-600 md:text-[12px]">
-        Design. Build. Innovate.
-        <br />
-        Shape the future infrastructure.
-      </p>
-    </div>
-
-  </div>
-
-  <div className="hidden h-16 w-px bg-orange-200/50 lg:mx-4 lg:block" />
-
-  {/* ELECTRICAL */}
-
-  <div className="flex flex-1 items-center gap-4">
-
-    <div className="flex h-14 w-14 shrink-0 items-center justify-center rounded-full border border-orange-300/30 bg-orange-100 md:h-16 md:w-16">
-
-      <svg viewBox="0 0 48 48" className="h-8 w-8 md:h-9 md:w-9" fill="none">
-        <path d="M27 5L13 27H23L20 43L36 20H26L27 5Z" stroke="#f59e0b" strokeWidth="2.5" strokeLinejoin="round" />
-      </svg>
-
-    </div>
-
-    <div>
-      <h3 className="outfit-700 text-[13px] text-gray-900 md:text-[14px]">
-        ELECTRICAL ENGINEERING
-      </h3>
-      <p className="mt-1 text-[11px] leading-5 text-gray-600 md:text-[12px]">
-        Power. Systems. Solutions.
-        <br />
-        Energize the world.
-      </p>
-    </div>
-
-  </div>
-
-  <div className="hidden h-16 w-px bg-orange-200/50 lg:mx-4 lg:block" />
-
-  {/* ELECTRONICS */}
-
-  <div className="flex flex-1 items-center gap-4">
-
-    <div className="flex h-14 w-14 shrink-0 items-center justify-center rounded-full border border-orange-300/30 bg-orange-100 md:h-16 md:w-16">
-
-      <svg viewBox="0 0 48 48" className="h-8 w-8 md:h-9 md:w-9" fill="none">
-        <rect x="13" y="13" width="22" height="22" rx="3" stroke="#f59e0b" strokeWidth="2.5" />
-        <rect x="19" y="19" width="10" height="10" rx="1" stroke="#f59e0b" strokeWidth="2" />
-        <path d="M18 7V13M24 7V13M30 7V13M18 35V41M24 35V41M30 35V41M7 18H13M7 24H13M7 30H13M35 18H41M35 24H41M35 30H41" stroke="#f59e0b" strokeWidth="2" strokeLinecap="round" />
-      </svg>
-
-    </div>
-
-    <div>
-      <h3 className="outfit-700 text-[13px] text-gray-900 md:text-[14px]">
-        ELECTRONICS ENGINEERING
-      </h3>
-      <p className="mt-1 text-[11px] leading-5 text-gray-600 md:text-[12px]">
-        Circuits. Devices. Intelligence.
-        <br />
-        Create smart innovations.
-      </p>
-    </div>
-
-  </div>
-
-  <div className="hidden h-16 w-px bg-orange-200/50 lg:mx-4 lg:block" />
-
-  {/* COMPUTER ENGINEERING */}
-
-  <div className="flex flex-1 items-center gap-4">
-
-    <div className="flex h-14 w-14 shrink-0 items-center justify-center rounded-full border border-orange-300/30 bg-orange-100 md:h-16 md:w-16">
-
-      <svg viewBox="0 0 48 48" className="h-8 w-8 md:h-9 md:w-9" fill="none">
-        <rect x="6" y="9" width="36" height="24" rx="2" stroke="#f59e0b" strokeWidth="2.5" />
-        <path d="M17 39H31" stroke="#f59e0b" strokeWidth="2.5" strokeLinecap="round" />
-        <path d="M24 33V39" stroke="#f59e0b" strokeWidth="2.5" strokeLinecap="round" />
-        <path d="M14 17H22V25H14Z" stroke="#f59e0b" strokeWidth="2" strokeLinejoin="round" />
-        <path d="M27 17H34M27 22H34M27 27H34" stroke="#f59e0b" strokeWidth="2" strokeLinecap="round" />
-      </svg>
-
-    </div>
-
-    <div>
-      <h3 className="outfit-700 text-[13px] text-gray-900 md:text-[14px]">
-        COMPUTER ENGINEERING
-      </h3>
-      <p className="mt-1 text-[11px] leading-5 text-gray-600 md:text-[12px]">
-        Code. Compute. Connect.
-        <br />
-        Engineer the digital future.
-      </p>
-    </div>
-
-  </div>
-
-</div>
 
               </header>
 

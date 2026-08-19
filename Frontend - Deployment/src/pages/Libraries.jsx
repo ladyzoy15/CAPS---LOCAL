@@ -12,9 +12,6 @@ import SharedWithMeIconH from "/src/assets/symbols/sharehover.svg";
 import AllActivitiesIcon from "/src/assets/symbols/all.svg";
 import AllActivitiesIconH from "/src/assets/symbols/allhover.svg";
 
-import CollectionsIcon from "/src/assets/symbols/collection.svg";
-import CollectionsIconH from "/src/assets/symbols/collectionhover.svg";
-
 import ArchiveIcon from "/src/assets/symbols/archive.svg";
 import SessionIcon from "/src/assets/symbols/sessions.svg";
 import ArchiveIconH from "/src/assets/symbols/archivehover.svg";
@@ -1077,54 +1074,7 @@ function Libraries() {
               <span>Shared with me</span>
             </span>
           </button>*/}
-
-          <button
-            type="button"
-            onClick={() => navigate("/archived-quiz")}
-            className={`flex w-full cursor-pointer items-center justify-between rounded-md px-3 py-2 text-left text-[14px] transition-colors ${
-              activeView === "archive"
-                ? "bg-gray-100 font-medium text-amber-900"
-                : "text-gray-600 hover:bg-gray-100"
-            }`}
-          >
-            <span className="flex items-center gap-2">
-              <img
-                src={activeView === "archive" ? ArchiveIconH : ArchiveIcon}
-                alt="archive"
-                className="h-4 w-4"
-              />
-              <span>Archive</span>
-            </span>
-          </button>
         </nav>
-
-        <div className="my-4 h-px bg-gray-200" />
-
-        <div className="outfit-500 space-y-1 text-sm">
-          <button
-            type="button"
-            onClick={() => alert("Coming soon")}
-            className={`flex w-full cursor-pointer items-center justify-between rounded-md px-3 py-2 text-left text-[14px] transition-colors ${
-              activeView === "collections"
-                ? "bg-gray-100 font-medium text-gray-900"
-                : "text-gray-600 hover:bg-gray-100"
-            }`}
-          >
-            <span className="flex items-center gap-2">
-              <img
-                src={
-                  activeView === "collections"
-                    ? CollectionsIconH
-                    : CollectionsIcon
-                }
-                alt="Collections"
-                className="h-4 w-4"
-              />
-              <span>Collections</span>
-            </span>
-            <span className="text-xs text-gray-500">0</span>
-          </button>
-        </div>
       </aside>
 
       {/* Main Libraries content */}
