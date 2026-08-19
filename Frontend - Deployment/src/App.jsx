@@ -93,7 +93,7 @@ function App() {
           <Route path=":classID/quizzes" element={<StudentClasses />} />
         </Route>
 
-        {/* Class */}
+        {/* Archived Class */}
         <Route
           path="/archived-class"
           element={<ProtectedRoute element={<Layout />} />}
@@ -211,6 +211,7 @@ function App() {
           <Route path="dashboard" element={<ProgramChairDashboard />} />
         </Route>
 
+        {/* Associate Dean Routes */}
         <Route
           path="/asso-dean/subjects"
           element={<ProtectedRoute element={<Layout />} />}
@@ -228,6 +229,7 @@ function App() {
           <Route path="dashboard" element={<AssoDeanDashboard />} />
         </Route>
 
+        {/* Dean Routes */}
         <Route
           path="/dean/subjects"
           element={<ProtectedRoute element={<Layout />} />}
@@ -241,11 +243,11 @@ function App() {
           path="/dean-dashboard"
           element={<ProtectedRoute element={<Layout />} />}
         >
-          <Route index element={<AdminDashboard />} />
-          <Route path="dashboard" element={<AdminDashboard />} />
+          <Route index element={<FacultyDashboard />} />
+          <Route path="dashboard" element={<FacultyDashboard />} />
         </Route>
 
-        {/* Subject Overview Route (dynamic subjectID) */}
+        {/* Subject Overview Route */}
         <Route
           path="/subject-overview/:subjectID"
           element={<ProtectedRoute element={<Layout />} />}
@@ -289,7 +291,10 @@ function App() {
         </Route>
 
         {/* Users Route */}
-        <Route path="/users" element={<ProtectedRoute element={<Layout />} />}>
+        <Route
+          path="/users"
+          element={<ProtectedRoute element={<Layout />} />}
+        >
           <Route index element={<Users />} />
           <Route path="users" element={<Users />} />
         </Route>

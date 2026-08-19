@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import Sidebar from "./sideBar";
 import Header from "./header";
 import { Outlet, useLocation } from "react-router-dom";
@@ -17,7 +17,9 @@ const Layout = () => {
 
   const [isExpanded, setIsExpanded] = useState(false);
   const [isSubjectExpanded, setIsSubjectExpanded] = useState(false);
-  const [isMobile, setIsMobile] = useState(window.innerWidth < 1025);
+  const [isMobile, setIsMobile] = useState(
+    () => window.innerWidth < 1025
+  );
 
   const location = useLocation();
 
@@ -32,7 +34,12 @@ const Layout = () => {
     const html = document.documentElement;
 
     const checkDarkMode = () => {
-      setIsDarkMode(html.classList.contains("dark"));
+      const dark = html.classList.contains("dark");
+
+      setIsDarkMode((prev) => {
+        if (prev === dark) return prev;
+        return dark;
+      });
     };
 
     checkDarkMode();
@@ -58,7 +65,12 @@ const Layout = () => {
         user &&
         (user.roleID !== undefined || user.roleId !== undefined)
       ) {
-        setRoleId(user.roleID ?? user.roleId);
+        const role = user.roleID ?? user.roleId;
+
+        setRoleId((prev) => {
+          if (prev === role) return prev;
+          return role;
+        });
       }
     } catch (error) {
       console.error("Unable to load user:", error);
@@ -70,7 +82,12 @@ const Layout = () => {
   // =========================================================
   useEffect(() => {
     const handleResize = () => {
-      setIsMobile(window.innerWidth < 1025);
+      const mobile = window.innerWidth < 1025;
+
+      setIsMobile((prev) => {
+        if (prev === mobile) return prev;
+        return mobile;
+      });
     };
 
     window.addEventListener("resize", handleResize);
@@ -163,6 +180,18 @@ const Layout = () => {
     : "#1f2937";
 
   // =========================================================
+  // STABLE OUTLET CONTEXT
+  // Prevent unnecessary child re-renders
+  // =========================================================
+  const outletContext = useMemo(
+    () => ({
+      selectedSubject,
+      setSelectedSubject,
+    }),
+    [selectedSubject]
+  );
+
+  // =========================================================
   // RENDER
   // =========================================================
   return (
@@ -183,7 +212,7 @@ const Layout = () => {
       >
         {/* =====================================================
             SIDEBAR
-            ===================================================== */}
+        ===================================================== */}
         {!isTutorialPage &&
           !isPrintQualifyingExam &&
           !isPrintPersonalQuiz &&
@@ -202,7 +231,7 @@ const Layout = () => {
 
         {/* =====================================================
             MAIN CONTENT
-            ===================================================== */}
+        ===================================================== */}
         <div
           className={`flex min-h-screen flex-1 flex-col ${
             isTutorialPage ||
@@ -248,12 +277,7 @@ const Layout = () => {
                 "background-color 0.3s ease, color 0.3s ease",
             }}
           >
-            <Outlet
-              context={{
-                selectedSubject,
-                setSelectedSubject,
-              }}
-            />
+            <Outlet context={outletContext} />
           </main>
         </div>
       </div>
