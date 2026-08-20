@@ -238,7 +238,7 @@ function LandingPage() {
           </div>
 
           <span className="outfit-500 text-[20px] tracking-wide text-gray-900 md:text-[24px]">
-            CAPS-REVIEW
+            JDK-REVIEW
           </span>
 
         </div>

@@ -1567,7 +1567,7 @@ if (parsedRoleId === 1) {
                       />
 
 
-                      <div className="mt-0 px-3">
+                      <div className="mt-1 px-3">
 
                         <Link
                           to={
@@ -1773,7 +1773,7 @@ if (parsedRoleId === 1) {
 
                 {!isUsersPage && (
                   <span className="outfit-500 flex items-baseline gap-1 text-[15px] whitespace-nowrap text-amber-700 dark:text-gray-400">
-                    CAPS - REVIEW
+                    JDK-REVIEW
                     <span className="text-xs font-medium">
                       <AppVersion />
                     </span>

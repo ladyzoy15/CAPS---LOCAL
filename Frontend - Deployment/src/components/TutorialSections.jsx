@@ -120,7 +120,7 @@ export const IntroductionSection = () => (
   <div>
     <SectionHeader
       tag="Overview"
-      title="Welcome to CAPS"
+      title="Welcome to JDK"
       subtitle="A comprehensive web-based platform designed to help students prepare for exams through practice tests, while giving faculty and administrators the tools they need to manage questions, subjects, and results."
     />
     <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
