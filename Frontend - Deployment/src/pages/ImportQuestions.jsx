@@ -22,14 +22,23 @@ const DEFAULT_PURPOSE_ID = "2"; // Practice
 
 // =========================================================
 // FILE PARSING HELPERS
+//
+// Every parser below now resolves to an array of:
+//   { text: string, images: string[] }   // images = data URLs
+// instead of plain strings, so that figures/diagrams found in
+// the source file can travel alongside the question they belong
+// to and get uploaded together.
 // =========================================================
 
-const cleanLines = (lines) =>
-  lines
-    .map((l) => (l || "").replace(/\s+/g, " ").trim())
-    .filter((l) => l.length > 3)
+const cleanItems = (items) =>
+  items
+    .map((it) => ({
+      text: (it.text || "").replace(/\s+/g, " ").trim(),
+      images: it.images || [],
+    }))
+    .filter((it) => it.text.length > 3)
     .filter(
-      (l) => !/^(page \d+|sheet\d*|©|table of contents)$/i.test(l)
+      (it) => !/^(page \d+|sheet\d*|©|table of contents)$/i.test(it.text)
     );
 
 const parseSpreadsheet = (file) =>
@@ -57,7 +66,12 @@ const parseSpreadsheet = (file) =>
           }
         }
 
-        resolve(rows.map((r) => String(r[qColIdx] ?? "").trim()).filter(Boolean));
+        resolve(
+          rows
+            .map((r) => String(r[qColIdx] ?? "").trim())
+            .filter(Boolean)
+            .map((text) => ({ text, images: [] }))
+        );
       } catch (err) {
         reject(err);
       }
@@ -67,22 +81,56 @@ const parseSpreadsheet = (file) =>
     reader.readAsBinaryString(file);
   });
 
+// DOCX: mammoth converts to HTML and lets us intercept every embedded
+// image as a base64 data URL. We then walk the resulting HTML and
+// attach any image found inside (or immediately before) a paragraph
+// to that paragraph's text — i.e. the question closest to the figure.
 const parseDocx = (file) =>
   new Promise((resolve, reject) => {
     const reader = new FileReader();
 
     reader.onload = async (e) => {
       try {
-        const result = await mammoth.extractRawText({
-          arrayBuffer: e.target.result,
+        const result = await mammoth.convertToHtml(
+          { arrayBuffer: e.target.result },
+          {
+            convertImage: mammoth.images.imgElement((image) =>
+              image.read("base64").then((b64) => ({
+                src: `data:${image.contentType};base64,${b64}`,
+              }))
+            ),
+          }
+        );
+
+        const doc = new DOMParser().parseFromString(result.value, "text/html");
+        const items = [];
+        let pendingImages = [];
+
+        Array.from(doc.body.children).forEach((el) => {
+          const imgEls = el.querySelectorAll ? el.querySelectorAll("img") : [];
+          const imgSrcs = Array.from(imgEls)
+            .map((img) => img.getAttribute("src"))
+            .filter(Boolean);
+
+          const text = (el.textContent || "").trim();
+
+          if (text) {
+            items.push({ text, images: [...pendingImages, ...imgSrcs] });
+            pendingImages = [];
+          } else if (imgSrcs.length) {
+            // Image sits on its own line/paragraph with no text — hold
+            // onto it and attach it to the next question that has text.
+            pendingImages.push(...imgSrcs);
+          }
         });
 
-        resolve(
-          result.value
-            .split("\n")
-            .map((l) => l.trim())
-            .filter(Boolean)
-        );
+        // Trailing images with nothing after them: attach to the last
+        // question found instead of dropping them.
+        if (pendingImages.length && items.length) {
+          items[items.length - 1].images.push(...pendingImages);
+        }
+
+        resolve(items);
       } catch (err) {
         reject(err);
       }
@@ -92,12 +140,90 @@ const parseDocx = (file) =>
     reader.readAsArrayBuffer(file);
   });
 
+// --- PDF image extraction helpers -------------------------------------
+
+const OPS = pdfjsLib.OPS;
+
+// Converts a pdf.js decoded image object (RGB/RGBA/grayscale raw pixel
+// data) into a PNG data URL via an offscreen canvas.
+const imageDataToDataUrl = (imgData) => {
+  if (!imgData || !imgData.data || !imgData.width || !imgData.height) {
+    return null;
+  }
+
+  const { width, height, data } = imgData;
+  const canvas = document.createElement("canvas");
+  canvas.width = width;
+  canvas.height = height;
+  const ctx = canvas.getContext("2d");
+
+  let rgba;
+  if (data.length === width * height * 4) {
+    rgba = new Uint8ClampedArray(data);
+  } else if (data.length === width * height * 3) {
+    rgba = new Uint8ClampedArray(width * height * 4);
+    for (let i = 0, j = 0; i < data.length; i += 3, j += 4) {
+      rgba[j] = data[i];
+      rgba[j + 1] = data[i + 1];
+      rgba[j + 2] = data[i + 2];
+      rgba[j + 3] = 255;
+    }
+  } else if (data.length === width * height) {
+    rgba = new Uint8ClampedArray(width * height * 4);
+    for (let i = 0, j = 0; i < data.length; i += 1, j += 4) {
+      rgba[j] = rgba[j + 1] = rgba[j + 2] = data[i];
+      rgba[j + 3] = 255;
+    }
+  } else {
+    return null;
+  }
+
+  try {
+    ctx.putImageData(new ImageData(rgba, width, height), 0, 0);
+    return canvas.toDataURL("image/png");
+  } catch {
+    return null;
+  }
+};
+
+// Scans a page's operator list for image paint operations and resolves
+// each referenced image object to a data URL.
+const extractPageImages = async (page) => {
+  const opList = await page.getOperatorList();
+  const names = new Set();
+
+  opList.fnArray.forEach((fn, idx) => {
+    if (fn === OPS.paintImageXObject || fn === OPS.paintJpegXObject) {
+      const name = opList.argsArray[idx][0];
+      if (name) names.add(name);
+    }
+  });
+
+  const images = [];
+  for (const name of names) {
+    try {
+      const imgData = await new Promise((resolve) => page.objs.get(name, resolve));
+      const dataUrl = imageDataToDataUrl(imgData);
+      if (dataUrl) images.push(dataUrl);
+    } catch {
+      // Skip images pdf.js can't decode (e.g. unsupported filters)
+      // rather than failing the whole import.
+    }
+  }
+
+  return images;
+};
+
 // Proper line reconstruction using Y position + hasEOL, and throws a clear
-// error when the PDF has no text layer (scanned/image PDF).
+// error when the PDF has no text layer (scanned/image PDF). Figures found
+// on a page are attached to the LAST text line on that same page — the
+// common layout where a diagram sits right below the question it belongs
+// to. If your source PDFs put the figure ABOVE the question instead,
+// attach to the first line of the page rather than the last.
 const parsePdf = async (file) => {
   const buffer = await file.arrayBuffer();
   const pdf = await pdfjsLib.getDocument({ data: buffer }).promise;
-  const allLines = [];
+  const items = [];
   let totalChars = 0;
 
   for (let pageNum = 1; pageNum <= pdf.numPages; pageNum++) {
@@ -106,13 +232,22 @@ const parsePdf = async (file) => {
 
     let currentLine = "";
     let lastY = null;
+    const pageLineIndices = [];
+
+    const pushLine = () => {
+      if (currentLine.trim()) {
+        items.push({ text: currentLine.trim(), images: [] });
+        pageLineIndices.push(items.length - 1);
+      }
+      currentLine = "";
+    };
 
     content.items.forEach((item) => {
       totalChars += item.str.length;
       const y = item.transform[5];
 
       if (lastY !== null && Math.abs(y - lastY) > 2) {
-        if (currentLine.trim()) allLines.push(currentLine.trim());
+        pushLine();
         currentLine = item.str;
       } else {
         currentLine += (currentLine ? " " : "") + item.str;
@@ -120,13 +255,20 @@ const parsePdf = async (file) => {
 
       lastY = y;
 
-      if (item.hasEOL) {
-        if (currentLine.trim()) allLines.push(currentLine.trim());
-        currentLine = "";
-      }
+      if (item.hasEOL) pushLine();
     });
 
-    if (currentLine.trim()) allLines.push(currentLine.trim());
+    pushLine();
+
+    try {
+      const pageImages = await extractPageImages(page);
+      if (pageImages.length && pageLineIndices.length) {
+        const lastIdx = pageLineIndices[pageLineIndices.length - 1];
+        items[lastIdx].images.push(...pageImages);
+      }
+    } catch {
+      // If image extraction fails for this page, keep the text-only result.
+    }
   }
 
   if (totalChars === 0) {
@@ -137,19 +279,25 @@ const parsePdf = async (file) => {
     throw err;
   }
 
-  return allLines;
+  return items;
 };
 
 const parseText = (file) =>
   new Promise((resolve, reject) => {
     const reader = new FileReader();
-    reader.onload = (e) => resolve(e.target.result.split("\n"));
+    reader.onload = (e) =>
+      resolve(
+        e.target.result.split("\n").map((text) => ({ text, images: [] }))
+      );
     reader.onerror = reject;
     reader.readAsText(file);
   });
 
 // OCR for photos / scanned images (jpg, png, webp, etc.) using Tesseract.js,
-// entirely in the browser — no server round-trip needed.
+// entirely in the browser — no server round-trip needed. Since a photo of
+// a question usually contains its own figure baked into the same image,
+// we attach the ORIGINAL photo to the first detected question line rather
+// than trying to crop the figure out.
 const parseImage = async (file, onProgress) => {
   const {
     data: { text },
@@ -169,12 +317,41 @@ const parseImage = async (file, onProgress) => {
     throw err;
   }
 
-  return text.split("\n");
+  const dataUrl = await new Promise((resolve, reject) => {
+    const reader = new FileReader();
+    reader.onload = (e) => resolve(e.target.result);
+    reader.onerror = reject;
+    reader.readAsDataURL(file);
+  });
+
+  const lines = text.split("\n");
+  let attached = false;
+
+  return lines.map((line) => {
+    const trimmed = line.trim();
+    if (trimmed && !attached) {
+      attached = true;
+      return { text: trimmed, images: [dataUrl] };
+    }
+    return { text: trimmed, images: [] };
+  });
 };
 
 const SUPPORTED_FORMATS = ["XLSX", "CSV", "DOCX", "PDF", "TXT", "IMAGE"];
 
 const IMAGE_EXTENSIONS = ["jpg", "jpeg", "png", "webp", "bmp"];
+
+// Converts a base64 data URL into a Blob so it can be sent as a real file
+// in a multipart/form-data request.
+const dataUrlToBlob = (dataUrl) => {
+  const [header, base64] = dataUrl.split(",");
+  const mimeMatch = header.match(/data:(.*?);base64/);
+  const mime = mimeMatch ? mimeMatch[1] : "image/png";
+  const binary = atob(base64);
+  const bytes = new Uint8Array(binary.length);
+  for (let i = 0; i < binary.length; i++) bytes[i] = binary.charCodeAt(i);
+  return new Blob([bytes], { type: mime });
+};
 
 // =========================================================
 // COMPONENT
@@ -240,8 +417,9 @@ const ImportQuestions = () => {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
-  // Parses the file, then imports every detected line straight away —
-  // no checkbox review step.
+  // Parses the file, then imports every detected question straight away —
+  // no checkbox review step. Each question may carry along 0+ figure
+  // images extracted from the source file.
   const handleFile = async (file) => {
     if (!selectedSubjectId) {
       setStatus({
@@ -258,19 +436,19 @@ const ImportQuestions = () => {
     setStatus({ message: `Reading ${file.name}...`, isError: false });
 
     try {
-      let parsedLines = [];
+      let parsedItems = [];
 
       if (["xlsx", "xls", "csv"].includes(ext)) {
-        parsedLines = await parseSpreadsheet(file);
+        parsedItems = await parseSpreadsheet(file);
       } else if (ext === "docx") {
-        parsedLines = await parseDocx(file);
+        parsedItems = await parseDocx(file);
       } else if (ext === "pdf") {
-        parsedLines = await parsePdf(file);
+        parsedItems = await parsePdf(file);
       } else if (ext === "txt") {
-        parsedLines = await parseText(file);
+        parsedItems = await parseText(file);
       } else if (IMAGE_EXTENSIONS.includes(ext)) {
         setStatus({ message: `Reading text from ${file.name}...`, isError: false });
-        parsedLines = await parseImage(file, (pct) => {
+        parsedItems = await parseImage(file, (pct) => {
           setOcrProgress(pct);
           setStatus({
             message: `Reading text from image... ${pct}%`,
@@ -286,7 +464,7 @@ const ImportQuestions = () => {
         return;
       }
 
-      const cleaned = cleanLines(parsedLines);
+      const cleaned = cleanItems(parsedItems);
 
       if (cleaned.length === 0) {
         setStatus({
@@ -327,34 +505,44 @@ const ImportQuestions = () => {
     e.target.value = "";
   };
 
-  // Saves every detected line straight to the Subject question bank
+  // Saves every detected question straight to the Subject question bank
   // (mirrors the "Subject-based" path used by AddQuestionForm), then jumps
-  // into that subject's page to show the result.
-  const handleImport = async (linesToImport) => {
-    const selected = linesToImport.filter((l) => l.trim());
+  // into that subject's page to show the result. Any figure attached to a
+  // question is uploaded alongside it as a file field.
+  const handleImport = async (itemsToImport) => {
+    const selected = itemsToImport.filter((it) => it.text.trim());
 
     if (selected.length === 0) return;
 
     setIsImporting(true);
     setStatus({
-      message: `Importing ${selected.length} question${selected.length === 1 ? "" : "s"}...`,
+      message: "Processing...",
       isError: false,
     });
     const token = sessionStorage.getItem("token");
 
-    let successCount = 0;
-    let failCount = 0;
+    const BATCH_SIZE = 8;
 
-    for (const line of selected) {
+    const importOne = async (item) => {
       try {
         const fd = new FormData();
         fd.append("subjectID", selectedSubjectId);
         fd.append("coverage_id", DEFAULT_COVERAGE_ID);
-        fd.append("questionText", line);
+        fd.append("questionText", item.text);
         fd.append("score", 1);
         fd.append("difficulty_id", 1); // Easy by default; editable later
         fd.append("status_id", 1); // Pending
         fd.append("purpose_id", DEFAULT_PURPOSE_ID);
+
+        // NOTE: field name "image" is a guess — match it to whatever
+        // your /questions/add multer/upload middleware expects. If the
+        // backend accepts several figures per question, loop over
+        // item.images and append each with its own field/array name
+        // instead of just the first one.
+        if (item.images && item.images.length) {
+          const blob = dataUrlToBlob(item.images[0]);
+          fd.append("image", blob, "figure.png");
+        }
 
         const res = await fetch(`${apiUrl}/questions/add`, {
           method: "POST",
@@ -362,45 +550,47 @@ const ImportQuestions = () => {
           body: fd,
         });
 
-        if (res.ok) {
-          successCount += 1;
-        } else {
-          failCount += 1;
-        }
+        return res.ok;
       } catch (err) {
-        console.error("Error importing line:", line, err);
-        failCount += 1;
+        console.error("Error importing question:", item.text, err);
+        return false;
       }
-    }
+    };
 
-    setIsImporting(false);
+    // Fire the uploads in the background and navigate away immediately —
+    // the user doesn't wait for 100+ requests to finish. The toast reports
+    // the final success/fail counts once everything settles in the
+    // background, whichever page the user is on by then.
+    (async () => {
+      let successCount = 0;
+      let failCount = 0;
 
-    if (successCount > 0) {
+      for (let i = 0; i < selected.length; i += BATCH_SIZE) {
+        const batch = selected.slice(i, i + BATCH_SIZE);
+        const results = await Promise.all(batch.map(importOne));
+        results.forEach((ok) => (ok ? successCount++ : failCount++));
+      }
+
       showToast(
         `${successCount} question${successCount === 1 ? "" : "s"} imported${
           failCount ? `, ${failCount} failed` : ""
         }`,
         failCount ? "error" : "success",
       );
+    })();
 
-      const subject = subjects.find(
-        (s) => String(s.subjectID) === String(selectedSubjectId),
-      );
+    const subject = subjects.find(
+      (s) => String(s.subjectID) === String(selectedSubjectId),
+    );
 
-      const user = JSON.parse(sessionStorage.getItem("user") || "{}");
-      const roleID = user?.roleID ?? user?.roleId;
-      let path = "/dean/subjects?subject_id=" + selectedSubjectId;
-      if (roleID === 2) path = "/faculty/subjects?subject_id=" + selectedSubjectId;
-      else if (roleID === 3)
-        path = "/program-chair/subjects?subject_id=" + selectedSubjectId;
+    const user = JSON.parse(sessionStorage.getItem("user") || "{}");
+    const roleID = user?.roleID ?? user?.roleId;
+    let path = "/dean/subjects?subject_id=" + selectedSubjectId;
+    if (roleID === 2) path = "/faculty/subjects?subject_id=" + selectedSubjectId;
+    else if (roleID === 3)
+      path = "/program-chair/subjects?subject_id=" + selectedSubjectId;
 
-      navigate(path, { state: { subject } });
-    } else {
-      setStatus({
-        message: "Could not import any questions. Please try again.",
-        isError: true,
-      });
-    }
+    navigate(path, { state: { subject } });
   };
 
   return (
@@ -477,22 +667,28 @@ const ImportQuestions = () => {
                     : "Drag a file here, or click to browse"}
               </div>
 
-              <div className="outfit-400 mt-1 text-[12px] text-gray-500 dark:text-gray-400">
-                One question per line works best for text-based files. Photos
-                are read automatically with OCR. Detected questions are
-                imported right away — no review step.
-              </div>
+              {!isParsing && !isImporting && (
+                <>
+                  <div className="outfit-400 mt-1 text-[12px] text-gray-500 dark:text-gray-400">
+                    One question per line works best for text-based files.
+                    Photos are read automatically with OCR. Figures/diagrams
+                    found in PDF or Word files are attached to the question
+                    automatically. Detected questions are imported right away
+                    — no review step.
+                  </div>
 
-              <div className="mt-4 flex flex-wrap justify-center gap-1.5">
-                {SUPPORTED_FORMATS.map((fmt) => (
-                  <span
-                    key={fmt}
-                    className="rounded-full bg-white px-2.5 py-0.5 text-[10px] font-semibold tracking-wide text-amber-700 shadow-sm dark:bg-gray-900 dark:text-gray-300"
-                  >
-                    {fmt}
-                  </span>
-                ))}
-              </div>
+                  <div className="mt-4 flex flex-wrap justify-center gap-1.5">
+                    {SUPPORTED_FORMATS.map((fmt) => (
+                      <span
+                        key={fmt}
+                        className="rounded-full bg-white px-2.5 py-0.5 text-[10px] font-semibold tracking-wide text-amber-700 shadow-sm dark:bg-gray-900 dark:text-gray-300"
+                      >
+                        {fmt}
+                      </span>
+                    ))}
+                  </div>
+                </>
+              )}
             </div>
 
             <input
