@@ -11,13 +11,13 @@ require_once base_path('Modules/Users/Database/Seeders/RolesTableSeeder.php');
 require_once base_path('Modules/Users/Database/Seeders/CampusesTableSeeder.php');
 require_once base_path('Modules/Users/Database/Seeders/UsersTableSeeder.php');
 require_once base_path('Modules/Users/Database/Seeders/ProgramSeeder.php');
-//require_once base_path('Modules/Subjects/Database/Seeders/SubjectsTableSeeder.php');
+require_once base_path('Modules/Subjects/Database/Seeders/SubjectsTableSeeder.php');
 require_once base_path('Modules/Subjects/Database/Seeders/YearLevelsTableSeeder.php');
 require_once base_path('Modules/Questions/Database/Seeders/CoverageSeeder.php');
 require_once base_path('Modules/Questions/Database/Seeders/DifficultySeeder.php');
 require_once base_path('Modules/Questions/Database/Seeders/PurposeSeeder.php');
 require_once base_path('Modules/Questions/Database/Seeders/StatusSeeder.php');
-//require_once base_path('Modules/Questions/Database/Seeders/QuestionsTableSeeder.php');
+require_once base_path('Modules/Questions/Database/Seeders/QuestionsTableSeeder.php');
 require_once base_path('Modules/Users/Database/Seeders/StudentsTableSeeder.php');
 require_once base_path('Modules/Users/Database/Seeders/SexesTableSeeder.php');
 //require_once base_path('Modules/Users/Database/Seeders/CurriculumSeeder.php');
@@ -40,11 +40,11 @@ class DatabaseSeeder extends Seeder
             \Modules\Users\Database\Seeders\SexesTableSeeder::class,
             \Modules\Users\Database\Seeders\UsersTableSeeder::class,
             \Modules\Subjects\Database\Seeders\YearLevelsTableSeeder::class,
-            //\Modules\Subjects\Database\Seeders\SubjectsTableSeeder::class,
+            \Modules\Subjects\Database\Seeders\SubjectsTableSeeder::class,
             \Modules\Questions\Database\Seeders\CoverageSeeder::class,
             \Modules\Questions\Database\Seeders\DifficultySeeder::class,
             \Modules\Questions\Database\Seeders\PurposeSeeder::class,
-            //\Modules\Questions\Database\Seeders\QuestionsTableSeeder::class,
+            \Modules\Questions\Database\Seeders\QuestionsTableSeeder::class,
             \Modules\Users\Database\Seeders\StudentsTableSeeder::class,
             //\Modules\Users\Database\Seeders\CurriculumSeeder::class,
             //\Modules\Users\Database\Seeders\RemarksSeeder::class,

@@ -32,6 +32,7 @@ import PracticeExamInfo from "./pages/PracticeExamInfo";
 import PrintQualifyingExam from "./pages/PrintQualifyingExam";
 import PrintPersonalQuiz from "./pages/PrintPersonalQuiz";
 import SubjectOverview from "./pages/SubjectOverview";
+import ImportQuestions from "./pages/ImportQuestions";
 
 import Libraries from "./pages/Libraries";
 import Sessions from "./pages/Sessions";
@@ -43,7 +44,6 @@ import ArchivedClass from "./pages/ArchivedClass";
 import ArchivedQuiz from "./pages/ArchivedQuiz";
 
 import SubjectList from "./pages/SubjectList";
-
 import SubjectsArchive from "./pages/SubjectsArchive";
 
 import LandingPage from "./pages/LandingPage";
@@ -58,6 +58,11 @@ function App() {
   return (
     <Router>
       <Routes>
+
+        {/* =========================
+            PUBLIC ROUTES
+        ========================= */}
+
         <Route path="/" element={<LandingPage />} />
 
         <Route path="/register" element={<Register />} />
@@ -67,10 +72,15 @@ function App() {
         <Route path="/forgot-user-code" element={<ForgotUserCodeForm />} />
         <Route path="/team-caps" element={<Credits />} />
 
-        {/* Public Landing Page */}
         <Route path="/landing" element={<LandingPage />} />
 
-        {/* Libraries - Personal quizzes */}
+        <Route path="/help" element={<TutorialLayout />} />
+
+
+        {/* =========================
+            LIBRARIES
+        ========================= */}
+
         <Route
           path="/libraries"
           element={<ProtectedRoute element={<Layout />} />}
@@ -78,7 +88,11 @@ function App() {
           <Route index element={<Libraries />} />
         </Route>
 
-        {/* Sessions */}
+
+        {/* =========================
+            SESSIONS
+        ========================= */}
+
         <Route
           path="/sessions"
           element={<ProtectedRoute element={<Layout />} />}
@@ -86,14 +100,25 @@ function App() {
           <Route index element={<Sessions />} />
         </Route>
 
-        {/* Class */}
-        <Route path="/class" element={<ProtectedRoute element={<Layout />} />}>
+
+        {/* =========================
+            CLASS
+        ========================= */}
+
+        <Route
+          path="/class"
+          element={<ProtectedRoute element={<Layout />} />}
+        >
           <Route index element={<Class />} />
           <Route path=":classID/students" element={<ClassContent />} />
           <Route path=":classID/quizzes" element={<StudentClasses />} />
         </Route>
 
-        {/* Archived Class */}
+
+        {/* =========================
+            ARCHIVED CLASS
+        ========================= */}
+
         <Route
           path="/archived-class"
           element={<ProtectedRoute element={<Layout />} />}
@@ -101,7 +126,11 @@ function App() {
           <Route index element={<ArchivedClass />} />
         </Route>
 
-        {/* Archived quizzes */}
+
+        {/* =========================
+            ARCHIVED QUIZZES
+        ========================= */}
+
         <Route
           path="/archived-quiz"
           element={<ProtectedRoute element={<Layout />} />}
@@ -109,7 +138,11 @@ function App() {
           <Route index element={<ArchivedQuiz />} />
         </Route>
 
-        {/* Reports */}
+
+        {/* =========================
+            REPORTS
+        ========================= */}
+
         <Route
           path="/reports"
           element={<ProtectedRoute element={<Layout />} />}
@@ -117,10 +150,11 @@ function App() {
           <Route index element={<Reports />} />
         </Route>
 
-        {/* Public Documentation Page */}
-        <Route path="/help" element={<TutorialLayout />} />
 
-        {/* Protected Routes */}
+        {/* =========================
+            PRACTICE EXAM
+        ========================= */}
+
         <Route
           path="/practice-exam-result"
           element={<ProtectedRoute element={<Layout />} />}
@@ -129,21 +163,6 @@ function App() {
           <Route path="content" element={<PracticeExamResults />} />
         </Route>
 
-        <Route
-          path="/print-qualification-exam"
-          element={<ProtectedRoute element={<Layout />} />}
-        >
-          <Route index element={<PrintQualifyingExam />} />
-          <Route path="content" element={<PrintQualifyingExam />} />
-        </Route>
-
-        <Route
-          path="/print-personal-quiz"
-          element={<ProtectedRoute element={<Layout />} />}
-        >
-          <Route index element={<PrintPersonalQuiz />} />
-          <Route path="content" element={<PrintPersonalQuiz />} />
-        </Route>
 
         <Route
           path="/practice-exam"
@@ -153,12 +172,14 @@ function App() {
           <Route path="content" element={<PracticeExam />} />
         </Route>
 
+
         <Route
           path="/practice-exam/preview/:subjectID"
           element={<ProtectedRoute element={<Layout />} />}
         >
           <Route index element={<PracticeExamPreview />} />
         </Route>
+
 
         <Route
           path="/exam-preview"
@@ -168,7 +189,48 @@ function App() {
           <Route path="content" element={<PracticeExamInfo />} />
         </Route>
 
-        {/* Student Dashboard Route */}
+
+        {/* =========================
+            QUALIFYING EXAM
+        ========================= */}
+
+        <Route
+          path="/print-qualification-exam"
+          element={<ProtectedRoute element={<Layout />} />}
+        >
+          <Route index element={<PrintQualifyingExam />} />
+          <Route path="content" element={<PrintQualifyingExam />} />
+        </Route>
+
+
+        {/* =========================
+            IMPORT QUESTIONS
+        ========================= */}
+
+        <Route
+          path="/import-questions"
+          element={<ProtectedRoute element={<Layout />} />}
+        >
+          <Route index element={<ImportQuestions />} />
+        </Route>
+
+
+        {/* =========================
+            PERSONAL QUIZ
+        ========================= */}
+
+        <Route
+          path="/print-personal-quiz"
+          element={<ProtectedRoute element={<Layout />} />}
+        >
+          <Route index element={<PrintPersonalQuiz />} />
+        </Route>
+
+
+        {/* =========================
+            STUDENT DASHBOARD
+        ========================= */}
+
         <Route
           path="/student-dashboard"
           element={<ProtectedRoute element={<Layout />} />}
@@ -177,7 +239,11 @@ function App() {
           <Route path="dashboard" element={<StudentDashboard />} />
         </Route>
 
-        {/* Faculty Routes */}
+
+        {/* =========================
+            FACULTY
+        ========================= */}
+
         <Route
           path="/faculty/subjects"
           element={<ProtectedRoute element={<Layout />} />}
@@ -185,6 +251,7 @@ function App() {
           <Route index element={<SubjectList />} />
           <Route path="content" element={<FacultyContent />} />
         </Route>
+
 
         <Route
           path="/faculty-dashboard"
@@ -194,7 +261,11 @@ function App() {
           <Route path="dashboard" element={<FacultyDashboard />} />
         </Route>
 
-        {/* Program Chair Routes */}
+
+        {/* =========================
+            PROGRAM CHAIR
+        ========================= */}
+
         <Route
           path="/program-chair/subjects"
           element={<ProtectedRoute element={<Layout />} />}
@@ -202,6 +273,7 @@ function App() {
           <Route index element={<SubjectList />} />
           <Route path="content" element={<ProgramChairContent />} />
         </Route>
+
 
         <Route
           path="/program-chair-dashboard"
@@ -211,7 +283,11 @@ function App() {
           <Route path="dashboard" element={<ProgramChairDashboard />} />
         </Route>
 
-        {/* Associate Dean Routes */}
+
+        {/* =========================
+            ASSOCIATE DEAN
+        ========================= */}
+
         <Route
           path="/asso-dean/subjects"
           element={<ProtectedRoute element={<Layout />} />}
@@ -221,6 +297,7 @@ function App() {
           <Route path="content" element={<AdminContent />} />
         </Route>
 
+
         <Route
           path="/asso-dean-dashboard"
           element={<ProtectedRoute element={<Layout />} />}
@@ -229,7 +306,11 @@ function App() {
           <Route path="dashboard" element={<AssoDeanDashboard />} />
         </Route>
 
-        {/* Dean Routes */}
+
+        {/* =========================
+            DEAN
+        ========================= */}
+
         <Route
           path="/dean/subjects"
           element={<ProtectedRoute element={<Layout />} />}
@@ -239,6 +320,7 @@ function App() {
           <Route path="content" element={<AdminContent />} />
         </Route>
 
+
         <Route
           path="/dean-dashboard"
           element={<ProtectedRoute element={<Layout />} />}
@@ -247,13 +329,22 @@ function App() {
           <Route path="dashboard" element={<FacultyDashboard />} />
         </Route>
 
-        {/* Subject Overview Route */}
+
+        {/* =========================
+            SUBJECT OVERVIEW
+        ========================= */}
+
         <Route
           path="/subject-overview/:subjectID"
           element={<ProtectedRoute element={<Layout />} />}
         >
           <Route index element={<SubjectOverview />} />
         </Route>
+
+
+        {/* =========================
+            QUIZ
+        ========================= */}
 
         <Route
           path="/quiz-overview"
@@ -262,12 +353,14 @@ function App() {
           <Route index element={<QuizOverview />} />
         </Route>
 
+
         <Route
           path="/quiz-content"
           element={<ProtectedRoute element={<Layout />} />}
         >
           <Route index element={<QuizContent />} />
         </Route>
+
 
         <Route
           path="/quiz-info/:classPersonalQuizID"
@@ -276,12 +369,14 @@ function App() {
           <Route index element={<QuizInfo />} />
         </Route>
 
+
         <Route
           path="/quiz/:classPersonalQuizID"
           element={<ProtectedRoute element={<Layout />} />}
         >
           <Route index element={<StudentQuiz />} />
         </Route>
+
 
         <Route
           path="/quiz-result/:classPersonalQuizID"
@@ -290,7 +385,11 @@ function App() {
           <Route index element={<StudentQuizResults />} />
         </Route>
 
-        {/* Users Route */}
+
+        {/* =========================
+            USERS
+        ========================= */}
+
         <Route
           path="/users"
           element={<ProtectedRoute element={<Layout />} />}
@@ -298,6 +397,7 @@ function App() {
           <Route index element={<Users />} />
           <Route path="users" element={<Users />} />
         </Route>
+
       </Routes>
     </Router>
   );

@@ -126,9 +126,10 @@ const SubjectCard = ({
     };
   }, [activeIndex]);
 
+  // Practice Exam tab removed per request — subject-content view now opens
+  // directly on "Review Question" (formerly "Qualifying Exam", index 1).
   const tabs = [
-    { label: "Practice Exam", index: 0 },
-    { label: "Qualifying Exam", index: 1 },
+    { label: "Review Question", index: 1 },
     { label: "Pending", index: 4 },
   ];
 
@@ -576,26 +577,10 @@ const SubjectCard = ({
               </div>
             </div>
 
-            {/* Button row for Tablet and Mobile (Configure, Preview, Worksheet, Menu) */}
+            {/* Button row for Tablet and Mobile (Worksheet, Search) */}
             <div className="outfit-500 mt-7 flex w-full flex-row items-center justify-start gap-2 font-semibold md:hidden">
               <button
-                onClick={() =>
-                  alert("Exam preview will be available in a future update.")
-                }
-                className="border-color mb-6 flex cursor-pointer items-center gap-1 rounded-xl border bg-white px-4 py-2 text-gray-700 transition hover:bg-gray-100"
-              >
-                <i className="bx bx-eye text-lg"></i>
-                <span className="text-[14px]">Preview</span>
-              </button>
-              <button
-                onClick={handleAssignClick}
                 className="border-color mb-6 flex items-center justify-center gap-1 rounded-xl border bg-white px-4 py-2 text-[14px] text-gray-700 transition hover:bg-gray-100"
-              >
-                <i className="bx bx-cog text-lg"></i>
-                <span>Settings</span>
-              </button>
-              <button
-                className="border-color mb-6 hidden items-center justify-center gap-1 rounded-xl border bg-white px-4 py-2 text-[14px] text-gray-700 transition hover:bg-gray-100 min-[500px]:flex"
                 onClick={() => {
                   setWorksheetSubject({
                     subjectID,
@@ -636,14 +621,6 @@ const SubjectCard = ({
                   className={`bx ${showMobileSearch ? "bx-x" : "bx-search"} text-2xl`}
                 ></i>
               </button>
-
-              <button
-                ref={actionButtonRef}
-                onClick={() => setShowDropdown((prev) => !prev)}
-                className="border-color mb-6 flex cursor-pointer items-center justify-center rounded-xl border px-2 py-[7px] text-gray-700 transition-all duration-100 hover:bg-gray-100 md:hidden"
-              >
-                <i className="bx bx-dots-vertical-rounded text-2xl"></i>
-              </button>
             </div>
           </div>
 
@@ -674,7 +651,7 @@ const SubjectCard = ({
             {/* Tablet indicator line */}
             <span
               className={`absolute bottom-0 h-1 bg-orange-500 ${
-                activeIndex === 0 ? "rounded-bl-md" : ""
+                activeIndex === 1 ? "rounded-bl-md" : ""
               } ${activeIndex === 4 ? "rounded-br-md" : ""} ${
                 isResizing ? "" : "transition-all duration-300"
               }`}
@@ -753,97 +730,37 @@ const SubjectCard = ({
 
             {/* Desktop Button Row */}
             <div className="outfit mb-0 flex w-full flex-row items-center justify-end gap-2 pb-1 font-semibold">
-              {/* Right: Actions dropdown beside Configure, then Preview */}
-              <div className="flex flex-row items-center gap-2">
-                <div className="relative">
-                  <button
-                    ref={actionButtonRef}
-                    onClick={() => setShowActionDropdownDesk((prev) => !prev)}
-                    className="border-color flex cursor-pointer items-center justify-center rounded-xl border bg-white px-2 py-2 text-gray-700 transition hover:bg-gray-100"
-                  >
-                    <i className="bx bx-dots-vertical-rounded text-2xl"></i>
-                  </button>
-                  {showActionDropdownDesk && (
-                    <div
-                      ref={actionDropdownRef}
-                      className="border-color animate-fadein absolute right-0 z-50 mt-2 w-40 origin-top-right rounded-md border bg-white p-1 text-gray-700 shadow-lg"
-                    >
-                      <button
-                        onClick={() => {
-                          setWorksheetSubject({
-                            subjectID,
-                            subjectName,
-                            subjectCode,
-                            programName,
-                            yearLevel,
-                          });
-                          setIsWorksheetModalOpen(true);
-                          setShowActionDropdownDesk(false);
-                        }}
-                        className="mb-1 flex w-full cursor-pointer items-center gap-2 rounded-md px-4 py-2 text-left text-sm hover:bg-gray-100"
-                      >
-                        <svg
-                          xmlns="http://www.w3.org/2000/svg"
-                          width="16"
-                          height="16"
-                          viewBox="0 0 24 24"
-                          fill="none"
-                          stroke="currentColor"
-                          strokeWidth="2.25"
-                          strokeLinecap="round"
-                          strokeLinejoin="round"
-                          className="lucide lucide-download-icon lucide-download"
-                        >
-                          <path d="M12 15V3" />
-                          <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" />
-                          <path d="m7 10 5 5 5-5" />
-                        </svg>
-                        Worksheet
-                      </button>
-                      <button
-                        onClick={handleEdit}
-                        className="mb-1 flex w-full cursor-pointer items-center gap-2 rounded-md px-4 py-2 text-left text-sm hover:bg-gray-100"
-                      >
-                        <i className="bx bx-edit-alt text-base"></i>
-                        Edit
-                      </button>
-                      <button
-                        onClick={() => {
-                          setSubjectToDelete({
-                            subjectID,
-                            subjectName,
-                            subjectCode,
-                          });
-                          setShowActionDropdownDesk(false);
-                          setShowDeleteModal(true);
-                        }}
-                        className="mb-1 flex w-full cursor-pointer items-center gap-2 rounded-md px-4 py-2 text-left text-sm text-red-500 hover:bg-gray-100"
-                      >
-                        <i className="bx bx-trash text-base"></i>
-                        Remove
-                      </button>
-                    </div>
-                  )}
-                </div>
-                <button
-                  onClick={handleAssignClick}
-                  className="outfit-500 flex cursor-pointer items-center gap-2 rounded-xl border border-b-4 border-orange-300 bg-orange-100 px-4 py-2 text-orange-600 transition-all duration-100 hover:bg-orange-200 hover:text-orange-500 active:translate-y-[2px] active:border-b-2"
+              <button
+                onClick={() => {
+                  setWorksheetSubject({
+                    subjectID,
+                    subjectName,
+                    subjectCode,
+                    programName,
+                    yearLevel,
+                  });
+                  setIsWorksheetModalOpen(true);
+                }}
+                className="border-color flex cursor-pointer items-center gap-2 rounded-xl border bg-white px-4 py-2 text-gray-700 transition hover:bg-gray-100"
+              >
+                <svg
+                  xmlns="http://www.w3.org/2000/svg"
+                  width="16"
+                  height="16"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  strokeWidth="2.25"
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  className="lucide lucide-download-icon lucide-download"
                 >
-                  <i className="bx bxs-cog text-xl"></i>
-                  <span className="text-[14px]">Settings</span>
-                </button>
-                <button
-                  onClick={() =>
-                    alert("Exam preview will be available in a future update.")
-                  }
-                  className="outfit-500 flex cursor-pointer items-center gap-2 rounded-xl border border-b-4 border-orange-600 bg-orange-500 px-4 py-2 text-white transition-all duration-100 hover:bg-orange-600 active:translate-y-[2px] active:border-b-2"
-                >
-                  <i className="bx bx-eye-big text-xl"></i>
-                  <span className="outfit text-[14px] font-semibold">
-                    Preview
-                  </span>
-                </button>
-              </div>
+                  <path d="M12 15V3" />
+                  <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" />
+                  <path d="m7 10 5 5 5-5" />
+                </svg>
+                <span className="text-[14px]">Worksheet</span>
+              </button>
             </div>
 
             {/* Desktop Tabs Bar (bottom-left of SubjectCard, flush with bottom border) */}
@@ -879,81 +796,6 @@ const SubjectCard = ({
             </div>
           </div>
         </>
-      )}
-
-      {showDropdown && (
-        <div
-          ref={dropdownRef}
-          className="outfit lightbox-bg fixed inset-0 z-100 flex items-end justify-center md:hidden"
-          onClick={() => setShowDropdown(false)}
-        >
-          <div
-            className="animate-fade-in-up w-full rounded-t-2xl bg-white shadow-lg"
-            onClick={(e) => e.stopPropagation()}
-          >
-            <div className="px-4 py-3">
-              <h2 className="text-[16px] font-semibold sm:text-[14px]">
-                Select an option
-              </h2>
-            </div>
-            <div className="bg-color h-[0.5px] w-full" />
-            <div className="flex flex-col py-2 text-[16px] sm:text-[14px]">
-              <button
-                onClick={() => {
-                  setWorksheetSubject({
-                    subjectID,
-                    subjectName,
-                    subjectCode,
-                    programName,
-                    yearLevel,
-                  });
-                  setIsWorksheetModalOpen(true);
-                }}
-                className="flex w-full cursor-pointer items-center gap-3 px-6 py-3 text-left text-gray-700 hover:bg-gray-100 sm:hidden"
-              >
-                <svg
-                  xmlns="http://www.w3.org/2000/svg"
-                  width="16"
-                  height="16"
-                  viewBox="0 0 24 24"
-                  fill="none"
-                  stroke="currentColor"
-                  strokeWidth="2.25"
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  className="lucide lucide-download-icon lucide-download"
-                >
-                  <path d="M12 15V3" />
-                  <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" />
-                  <path d="m7 10 5 5 5-5" />
-                </svg>
-                Worksheet
-              </button>
-              <button
-                onClick={handleEdit}
-                className="flex w-full cursor-pointer items-center gap-3 px-6 py-3 text-left text-gray-700 hover:bg-gray-100"
-              >
-                <i className="bx bx-edit-alt text-xl"></i>
-                Edit
-              </button>
-              <button
-                onClick={() => {
-                  setSubjectToDelete({
-                    subjectID,
-                    subjectName,
-                    subjectCode,
-                  });
-                  setShowDropdown(false);
-                  setShowDeleteModal(true);
-                }}
-                className="flex w-full cursor-pointer items-center gap-3 px-6 py-3 text-left text-red-500 hover:bg-gray-100"
-              >
-                <i className="bx bx-trash text-xl"></i>
-                Remove
-              </button>
-            </div>
-          </div>
-        </div>
       )}
 
       {isFormOpen && (
