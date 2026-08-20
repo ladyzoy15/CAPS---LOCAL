@@ -1610,17 +1610,47 @@ const Sidebar = ({
                         }`}
                       >
 
-                        <i
-                          className={`bx bx-import flex-shrink-0 ${
+                        {/* IMPORT ICON */}
+                        <span
+                          className={`flex flex-shrink-0 items-center justify-center ${
                             isUsersPage
-                              ? "text-[20px]"
-                              : "text-[18px]"
-                          } ${
-                            isDarkMode
-                              ? "text-gray-100 drop-shadow-[0_0_2px_rgba(255,255,255,0.35)]"
-                              : "text-amber-700"
+                              ? "size-[20px]"
+                              : "size-[18px]"
                           }`}
-                        />
+                          aria-hidden="true"
+                        >
+                          <svg
+                            viewBox="0 0 24 24"
+                            fill="none"
+                            xmlns="http://www.w3.org/2000/svg"
+                            className="h-full w-full"
+                            style={{
+                              color: isDarkMode
+                                ? "#f3f4f6"
+                                : "#000000",
+                            }}
+                          >
+                            <path
+                              d="M12 3V15"
+                              stroke="currentColor"
+                              strokeWidth="2"
+                              strokeLinecap="round"
+                            />
+                            <path
+                              d="M7 10L12 15L17 10"
+                              stroke="currentColor"
+                              strokeWidth="2"
+                              strokeLinecap="round"
+                              strokeLinejoin="round"
+                            />
+                            <path
+                              d="M5 19H19"
+                              stroke="currentColor"
+                              strokeWidth="2"
+                              strokeLinecap="round"
+                            />
+                          </svg>
+                        </span>
 
                         {!isUsersPage && (
                           <span
