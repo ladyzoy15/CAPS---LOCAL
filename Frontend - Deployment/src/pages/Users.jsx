@@ -25,9 +25,6 @@ import FacultyPfp from "/src/assets/symbols/faculty.png";
 import ProgramChairPfp from "/src/assets/symbols/progchair.png";
 import DeanPfp from "/src/assets/symbols/dean.png";
 
-const getSearchTerms = (query) =>
-  (query || "").trim().toLowerCase().split(/\s+/).filter(Boolean);
-
 const getStoredUser = () => {
   try {
     const raw = sessionStorage.getItem("user");
@@ -35,24 +32,6 @@ const getStoredUser = () => {
   } catch {
     return null;
   }
-};
-
-const userMatchesSearch = (user, query) => {
-  const terms = getSearchTerms(query);
-  if (terms.length === 0) return true;
-
-  const haystack = [
-    user.firstName,
-    user.lastName,
-    `${user.firstName || ""} ${user.lastName || ""}`,
-    user.email,
-    user.userCode,
-  ]
-    .filter(Boolean)
-    .join(" ")
-    .toLowerCase();
-
-  return terms.every((term) => haystack.includes(term));
 };
 
 const CustomSelect = ({
@@ -156,6 +135,8 @@ const UserList = () => {
   const [itemsPerPage] = useState(50); // Number of items per page
   const [searchLoading, setSearchLoading] = useState(false);
   const [tabLoading, setTabLoading] = useState(false);
+  // Prevent an older request from overwriting newer results.
+  const usersRequestIdRef = useRef(0);
 
   // State for user selection and filtering
   const [selectedUsers, setSelectedUsers] = useState([]);
@@ -417,13 +398,6 @@ const UserList = () => {
       });
     }
 
-    // Smart search: client-side search across all fields
-    if (debouncedSearchQuery.trim().length > 0) {
-      filteredUsers = filteredUsers.filter((user) =>
-        userMatchesSearch(user, debouncedSearchQuery),
-      );
-    }
-
     return filteredUsers;
   };
 
@@ -436,10 +410,10 @@ const UserList = () => {
     );
   };
 
-  const hasSearchQuery = () => debouncedSearchQuery.trim().length > 0;
-
-  const usesClientSidePagination = () =>
-    hasArrayFiltersActive() || hasSearchQuery();
+  // Search is handled by the backend.
+  // Only multi-select filters require client-side pagination because
+  // the current API receives those filters as a full result set.
+  const usesClientSidePagination = () => hasArrayFiltersActive();
 
   const getDisplayedUsers = () => {
     const filteredUsers = getFilteredUsers();
@@ -496,14 +470,15 @@ const UserList = () => {
   useEffect(() => {
     const timer = setTimeout(() => {
       setDebouncedSearchQuery(searchQuery);
-      setSearchLoading(true);
-    }, 300); // 300ms delay
+      // Search refreshes in the background; keep the current table visible.
+    }, 400); // 400ms delay
 
     return () => clearTimeout(timer);
   }, [searchQuery]);
 
   // Update fetchUsers to include filters
   const fetchUsers = async (page = 1) => {
+    const requestId = ++usersRequestIdRef.current;
     const token = sessionStorage.getItem("token");
 
     if (!token) {
@@ -534,15 +509,14 @@ const UserList = () => {
         (Array.isArray(programFilter) && programFilter.length > 0) ||
         (Array.isArray(stateFilter) && stateFilter.length > 0);
 
-      const hasSearch = debouncedSearchQuery.trim().length > 0;
-      const clientSideFetch = hasArrayFilters || hasSearch;
-      const apiSearch = "";
+      const search = debouncedSearchQuery.trim();
 
+      // Keep multi-select filters client-side, but ALWAYS send search
+      // to the backend so a search does not download thousands of users.
       const queryParams = new URLSearchParams({
-        page: clientSideFetch ? 1 : page,
-        limit: clientSideFetch ? 10000 : itemsPerPage,
-        search: apiSearch,
-        // When array filters are active, skip backend filters and do client-side filtering
+        page: hasArrayFilters ? 1 : page,
+        limit: hasArrayFilters ? 10000 : itemsPerPage,
+        search: search,
         status: hasArrayFilters ? "all" : statusFilter,
         campus: hasArrayFilters
           ? ""
@@ -566,7 +540,7 @@ const UserList = () => {
             ? ""
             : stateFilter,
         remarks: hasArrayFilters ? "" : remarksFilter,
-        userType: userType, // Keep userType for view filtering (students/faculty/all)
+        userType: userType,
       });
 
       const response = await fetch(
@@ -595,6 +569,10 @@ const UserList = () => {
       }
 
       const data = await response.json();
+
+      // Ignore stale responses if the user has already changed the filter/search.
+      if (requestId !== usersRequestIdRef.current) return;
+
       setUsers(data.users || []);
       const total = data.total || 0;
       setTotalPages(Math.ceil(total / itemsPerPage));
@@ -610,7 +588,7 @@ const UserList = () => {
     }
   };
 
-  // Update useEffect to refetch when filters change
+  // Refetch when search, filters, or the active user view changes
   useEffect(() => {
     fetchUsers(1); // Reset to first page when filters change
   }, [
@@ -973,7 +951,6 @@ const UserList = () => {
       return;
     }
 
-    setLoading(true);
     fetchUsers(newPage);
   };
 
@@ -1561,7 +1538,7 @@ const UserList = () => {
         {/* Users List */}
         <div className="flex flex-1 flex-col">
           {/* User Count */}
-          {!loading && !error && !tabLoading && (
+          {!error && (
             <div className="outfit-400 mb-2 flex items-center justify-between">
               {(() => {
                 const filteredUsers = getFilteredUsers();
@@ -2377,7 +2354,7 @@ const UserList = () => {
               );
             })()}
 
-          {loading || searchLoading || tabLoading ? (
+          {loading && users.length === 0 ? (
             <div className="outfit-400 flex h-64 items-center justify-center">
               <div className="text-center">
                 <div className="loader mx-auto mb-2"></div>
@@ -2689,7 +2666,7 @@ const UserList = () => {
           </div>
 
           {/* Pagination */}
-          {!loading && !searchLoading && !tabLoading && !error && (
+          {!error && (
             <div
               className={`flex justify-center pt-4 ${selectedUsers.length > 0 ? "pb-28" : "pb-28 lg:pb-6"}`}
             >

@@ -5,7 +5,6 @@ import PracticeExamConfig from "./SubjectSettingsDean";
 import { useNavigate } from "react-router-dom";
 import RegisterDropDownSmall from "./registerDropDownSmall";
 import ConfirmModal from "./confirmModal";
-import PrintExamModal from "./PrintExamModal";
 
 // Component to display subject information and tabs for admin/faculty view
 const SubjectCard = ({
@@ -129,7 +128,7 @@ const SubjectCard = ({
   // Practice Exam tab removed per request — subject-content view now opens
   // directly on "Review Question" (formerly "Qualifying Exam", index 1).
   const tabs = [
-    { label: "Review Question", index: 1 },
+    { label: "Questions", index: 1 },
     { label: "Pending", index: 4 },
   ];
 
@@ -488,8 +487,6 @@ const SubjectCard = ({
   }, [editingSubject]);
 
   const [showPreview, setShowPreview] = useState(false);
-  const [isWorksheetModalOpen, setIsWorksheetModalOpen] = useState(false);
-  const [worksheetSubject, setWorksheetSubject] = useState(null);
   const [showMobileSearch, setShowMobileSearch] = useState(false);
 
   return (
@@ -577,40 +574,8 @@ const SubjectCard = ({
               </div>
             </div>
 
-            {/* Button row for Tablet and Mobile (Worksheet, Search) */}
+            {/* Button row for Tablet and Mobile (Search only) */}
             <div className="outfit-500 mt-7 flex w-full flex-row items-center justify-start gap-2 font-semibold md:hidden">
-              <button
-                className="border-color mb-6 flex items-center justify-center gap-1 rounded-xl border bg-white px-4 py-2 text-[14px] text-gray-700 transition hover:bg-gray-100"
-                onClick={() => {
-                  setWorksheetSubject({
-                    subjectID,
-                    subjectName,
-                    subjectCode,
-                    programName,
-                    yearLevel,
-                  });
-                  setIsWorksheetModalOpen(true);
-                }}
-              >
-                <svg
-                  xmlns="http://www.w3.org/2000/svg"
-                  width="16"
-                  height="16"
-                  viewBox="0 0 24 24"
-                  fill="none"
-                  stroke="currentColor"
-                  strokeWidth="2.25"
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  className="lucide lucide-download-icon lucide-download"
-                >
-                  <path d="M12 15V3" />
-                  <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" />
-                  <path d="m7 10 5 5 5-5" />
-                </svg>
-                <span className="text-[14px]">Worksheet</span>
-              </button>
-
               {/* Mobile search toggle */}
               <button
                 type="button"
@@ -726,41 +691,6 @@ const SubjectCard = ({
                   <p className="outfit-400 text-[14px]">{yearLevel || "-"}</p>
                 </div>
               </div>
-            </div>
-
-            {/* Desktop Button Row */}
-            <div className="outfit mb-0 flex w-full flex-row items-center justify-end gap-2 pb-1 font-semibold">
-              <button
-                onClick={() => {
-                  setWorksheetSubject({
-                    subjectID,
-                    subjectName,
-                    subjectCode,
-                    programName,
-                    yearLevel,
-                  });
-                  setIsWorksheetModalOpen(true);
-                }}
-                className="border-color flex cursor-pointer items-center gap-2 rounded-xl border bg-white px-4 py-2 text-gray-700 transition hover:bg-gray-100"
-              >
-                <svg
-                  xmlns="http://www.w3.org/2000/svg"
-                  width="16"
-                  height="16"
-                  viewBox="0 0 24 24"
-                  fill="none"
-                  stroke="currentColor"
-                  strokeWidth="2.25"
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  className="lucide lucide-download-icon lucide-download"
-                >
-                  <path d="M12 15V3" />
-                  <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" />
-                  <path d="m7 10 5 5 5-5" />
-                </svg>
-                <span className="text-[14px]">Worksheet</span>
-              </button>
             </div>
 
             {/* Desktop Tabs Bar (bottom-left of SubjectCard, flush with bottom border) */}
@@ -1055,13 +985,6 @@ const SubjectCard = ({
         />
       )}
 
-      {isWorksheetModalOpen && (
-        <PrintExamModal
-          isOpen={isWorksheetModalOpen}
-          onClose={() => setIsWorksheetModalOpen(false)}
-          initialSubject={worksheetSubject}
-        />
-      )}
     </div>
   );
 };

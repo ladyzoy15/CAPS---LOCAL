@@ -124,8 +124,6 @@ const AdminContent = () => {
 
   // State for exam questions availability
   const [isExamQuestionsEnabled, setIsExamQuestionsEnabled] = useState({});
-  const [practiceExamSettings, setPracticeExamSettings] = useState({});
-  const [isBannerClosed, setIsBannerClosed] = useState(false);
 
   // Fetch QE enabled status and practice exam settings when subject changes
   useEffect(() => {
@@ -139,12 +137,6 @@ const AdminContent = () => {
             { headers: { Authorization: `Bearer ${token}` } },
           );
 
-          // Fetch practice exam settings
-          const practiceResponse = await fetch(
-            `${apiUrl}/practice-settings/${selectedSubject.subjectID}`,
-            { headers: { Authorization: `Bearer ${token}` } },
-          );
-
           if (qeResponse.ok) {
             const qeData = await qeResponse.json();
             setIsExamQuestionsEnabled((prev) => ({
@@ -154,19 +146,6 @@ const AdminContent = () => {
             }));
           }
 
-          if (practiceResponse.ok) {
-            const practiceData = await practiceResponse.json();
-            console.log(
-              "Fetched practice settings for subject",
-              selectedSubject.subjectID,
-              ":",
-              practiceData.data,
-            );
-            setPracticeExamSettings((prev) => ({
-              ...prev,
-              [selectedSubject.subjectID]: practiceData.data || null,
-            }));
-          }
         } catch (err) {
           console.error("Error fetching subject settings:", err);
         }
@@ -175,40 +154,9 @@ const AdminContent = () => {
     }
   }, [selectedSubject, apiUrl]);
 
-  // Re-fetch settings when subjects list is refreshed (e.g. after saving settings)
-  useEffect(() => {
-    const handleRefresh = () => {
-      if (selectedSubject && selectedSubject.subjectID) {
-        const fetchUpdatedSettings = async () => {
-          const token = sessionStorage.getItem("token");
-          try {
-            const practiceResponse = await fetch(
-              `${apiUrl}/practice-settings/${selectedSubject.subjectID}`,
-              { headers: { Authorization: `Bearer ${token}` } },
-            );
-            if (practiceResponse.ok) {
-              const practiceData = await practiceResponse.json();
-              setPracticeExamSettings((prev) => ({
-                ...prev,
-                [selectedSubject.subjectID]: practiceData.data || null,
-              }));
-            }
-          } catch (err) {
-            console.error("Error re-fetching practice settings:", err);
-          }
-        };
-        fetchUpdatedSettings();
-      }
-    };
-    window.addEventListener("refreshSubjectsList", handleRefresh);
-    return () =>
-      window.removeEventListener("refreshSubjectsList", handleRefresh);
-  }, [selectedSubject, apiUrl]);
-
   // Effect to fetch questions when subject changes
   useEffect(() => {
     if (selectedSubject && selectedSubject.subjectID) {
-      setIsBannerClosed(false);
       fetchQuestions();
       setSubmittedQuestion(null);
       setSearchQuery("");
@@ -603,29 +551,6 @@ const AdminContent = () => {
                 pendingCount={questions.filter((q) => q.status_id === 1).length}
               />
 
-              {/* Practice Exam Disabled Banner */}
-              {!isLoading &&
-                !isBannerClosed &&
-                !practiceExamSettings[selectedSubject?.subjectID]
-                  ?.isEnabled && (
-                  <div className="outfit-400 mx-0 mt-3 flex w-full items-center gap-2 border border-amber-200 bg-amber-50 px-4 py-2 sm:mx-auto sm:max-w-[1200px] sm:rounded-xl">
-                    <i className="bx bx-info-circle text-lg text-amber-600"></i>
-                    <p className="flex-1 text-[13px] text-amber-800">
-                      <span className="font-semibold">
-                        Practice Exam is not enabled.
-                      </span>{" "}
-                      Students won't be able to take practice exams for this
-                      subject.
-                    </p>
-                    <button
-                      onClick={() => setIsBannerClosed(true)}
-                      className="flex h-7 w-7 flex-shrink-0 items-center justify-center rounded-full text-amber-600 transition-colors hover:bg-amber-100 hover:text-amber-800 focus:outline-none"
-                      title="Close"
-                    >
-                      <i className="bx bx-x text-xl"></i>
-                    </button>
-                  </div>
-                )}
             </div>
 
             {/* Add Question Section */}
