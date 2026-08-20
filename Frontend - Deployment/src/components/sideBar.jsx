@@ -442,29 +442,24 @@ const Sidebar = ({
   ];
 
 
-  let menuItems = [];
+let menuItems = [];
 
+if (parsedRoleId === 1) {
+  menuItems = [
+    ...baseMenuItems,
+  ];
+} else {
+  menuItems = [
+    ...baseMenuItems,
+  ];
 
-  if (parsedRoleId === 1) {
+  if (parsedRoleId >= 2) {
     menuItems = [
-      ...baseMenuItems,
-      classItem,
+      ...menuItems,
+      ...adminItems,
     ];
-  } else {
-    menuItems = [
-      ...baseMenuItems,
-    ];
-
-    if (parsedRoleId >= 2) {
-      menuItems = [
-        ...menuItems,
-        librariesItem,
-        classItem,
-        ...adminItems,
-      ];
-    }
   }
-
+}
 
   const printButton = {
     icon: "bx-printer",
@@ -1274,7 +1269,7 @@ const Sidebar = ({
             MAIN MENU
         ===================================================== */}
 
-        <ul className="relative z-10 mt-2 mb-3 space-y-[5px] px-0">
+     <ul className="relative z-10 mt-2 mb-0 space-y-[5px] px-0">
 
           {menuItems.map(
             (item, index) => {
@@ -1533,18 +1528,8 @@ const Sidebar = ({
 
           <div className="relative z-10 flex flex-col space-y-[5px]">
 
-            <div className="px-3">
-
-              <div className="mb-4 h-px w-full bg-amber-700/20 dark:bg-gray-700/70" />
-
-              {!isUsersPage && (
-                <div className="outfit-500 px-2 text-[11px] font-semibold uppercase tracking-[0.12em] text-amber-800/80 dark:text-gray-400">
-                  QUALIFYING EXAM
-                </div>
-              )}
-
-            </div>
-
+        <div className="px-3">
+</div>
 
             <ul>
 
@@ -1582,7 +1567,7 @@ const Sidebar = ({
                       />
 
 
-                      <div className="mt-1 px-3">
+                      <div className="mt-0 px-3">
 
                         <Link
                           to={

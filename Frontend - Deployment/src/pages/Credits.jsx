@@ -6,7 +6,7 @@ const Credits = () => {
     { name: "Lady Joy P. Borja", course: "BSCpE 3", image: "/borja.jpg" },
     { name: "Khrist Mae C. Camoc", course: "BSCpE 3", image: "/camoc.jpg" },
     { name: "Devine S. Salagoste", course: "BSCpE 3", image: "/salagoste.jpg" },
-    { name: "Justin N. Saldon", course: "BSCpE 3", image: "/saldon.jpg" },
+    { name: "Justine N. Saldon", course: "BSCpE 3", image: "/saldon.jpg" },
     { name: "Jensen J. Calleja", course: "BSCpE 3", image: "/calleja.jpg" },
   ];
 

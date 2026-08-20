@@ -1551,71 +1551,7 @@ const UserList = () => {
                   </button>
                 )}
 
-                {/* Campus Filter Button */}
-                <div className="relative" ref={campusDropdownRef}>
-                  <button
-                    onClick={() => {
-                      setShowCampusDropdown(!showCampusDropdown);
-                      setShowPositionDropdown(false);
-                      setShowProgramDropdown(false);
-                      setShowStatusDropdown(false);
-                    }}
-                    className={`outfit-500 mt-2 -mb-4 inline-flex cursor-pointer items-center justify-center gap-1 rounded-xl border px-4 py-2 text-[14px] transition-colors ${
-                      campusFilter.length > 0
-                        ? "border-orange-300 bg-orange-50 text-orange-700 hover:bg-orange-100"
-                        : "border-gray-200 bg-white text-gray-700 hover:bg-gray-50"
-                    }`}
-                  >
-                    <span>Campus</span>
-                    {campusFilter.length > 0 && (
-                      <span className="ml-1 flex h-5 w-5 items-center justify-center rounded-full bg-orange-500 text-xs text-white">
-                        {campusFilter.length}
-                      </span>
-                    )}
-                    <i className="bx bx-chevron-down text-xl"></i>
-                  </button>
-                  {showCampusDropdown && (
-                    <div className="outfit-500 absolute right-0 z-50 mt-3 w-45 rounded-lg border border-gray-200 bg-white shadow-lg">
-                      <div className="max-h-60 overflow-y-auto p-1">
-                        {[
-                          { value: "Main Campus", label: "Dapitan" },
-                          { value: "Dipolog Campus", label: "Dipolog" },
-                          { value: "Siocon Campus", label: "Siocon" },
-                          { value: "Katipunan Campus", label: "Katipunan" },
-                          { value: "Tampilisan Campus", label: "Tampilisan" },
-                        ].map((option) => (
-                          <label
-                            key={option.value}
-                            className="outfit-500 flex cursor-pointer items-center gap-2 rounded-md px-3 py-2 hover:bg-gray-100"
-                          >
-                            <input
-                              type="checkbox"
-                              checked={campusFilter.includes(option.value)}
-                              onChange={(e) => {
-                                if (e.target.checked) {
-                                  setCampusFilter([
-                                    ...campusFilter,
-                                    option.value,
-                                  ]);
-                                } else {
-                                  setCampusFilter(
-                                    campusFilter.filter(
-                                      (c) => c !== option.value,
-                                    ),
-                                  );
-                                }
-                              }}
-                              className="h-3 w-3 cursor-pointer rounded border-gray-200"
-                            />
-                            <span className="text-[14px] text-gray-700">
-                              {option.label}
-                            </span>
-                          </label>
-                        ))}
-                      </div>
-                    </div>
-                  )}
-                </div>
+            
 
                 {/* Position Filter Button */}
                 <div className="relative" ref={positionDropdownRef}>
