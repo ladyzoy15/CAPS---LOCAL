@@ -489,7 +489,7 @@ export default function PrintQualifyingExam() {
             background: #fff !important;
           }
 
-          /* Hide CAPS controls that should not appear on paper */
+          /* Hide REVA controls that should not appear on paper */
           .print-hide,
           .pdf-generation-container {
             display: none !important;

@@ -12,7 +12,7 @@ Helpers
 Playwright
      │
      ▼
-CAPS
+REVA
      │
      ▼
 JSON Storage
@@ -24,7 +24,7 @@ JSON Storage
 
 ## auth.ts
 
-Logs into CAPS.
+Logs into REVA.
 
 ```ts
 await login(

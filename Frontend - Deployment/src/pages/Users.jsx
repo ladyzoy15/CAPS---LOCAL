@@ -1463,7 +1463,7 @@ const UserList = () => {
 
   return (
   <div
-    className={`caps-users-page relative flex min-h-screen ${
+    className={`REVA-users-page relative flex min-h-screen ${
       isDarkMode ? "is-dark" : ""
     }`}
   >
@@ -3157,7 +3157,7 @@ const UserList = () => {
           Scoped only to this page so other pages are untouched.
           ========================================================= */}
       <style>{`
-        .caps-users-page {
+        .REVA-users-page {
           min-height: 100vh;
           background: #fff8ef;
           background-image: none;
@@ -3165,190 +3165,190 @@ const UserList = () => {
           transition: background-color .3s ease, color .3s ease;
         }
 
-        .caps-users-page.is-dark {
+        .REVA-users-page.is-dark {
           background: #0b0f14 !important;
           background-image: none !important;
           color: #f3f4f6 !important;
         }
 
-        .caps-users-page.is-dark .users-background {
+        .REVA-users-page.is-dark .users-background {
           background: #0b0f14 !important;
           background-image: none !important;
         }
 /* Light surfaces -> dark surfaces */
-        .caps-users-page.is-dark .bg-white {
+        .REVA-users-page.is-dark .bg-white {
           background-color: #171d25 !important;
           color: #f3f4f6 !important;
         }
 
-        .caps-users-page.is-dark .bg-gray-50,
-        .caps-users-page.is-dark .bg-gray-50\\/40,
-        .caps-users-page.is-dark .bg-gray-50\\/60 {
+        .REVA-users-page.is-dark .bg-gray-50,
+        .REVA-users-page.is-dark .bg-gray-50\\/40,
+        .REVA-users-page.is-dark .bg-gray-50\\/60 {
           background-color: #11161d !important;
         }
 
-        .caps-users-page.is-dark .bg-gray-100 {
+        .REVA-users-page.is-dark .bg-gray-100 {
           background-color: #1b222c !important;
         }
 
-        .caps-users-page.is-dark .bg-gray-200 {
+        .REVA-users-page.is-dark .bg-gray-200 {
           background-color: #252d38 !important;
         }
 
         /* Text */
-        .caps-users-page.is-dark .text-gray-900,
-        .caps-users-page.is-dark .text-gray-800 {
+        .REVA-users-page.is-dark .text-gray-900,
+        .REVA-users-page.is-dark .text-gray-800 {
           color: #f3f4f6 !important;
         }
 
-        .caps-users-page.is-dark .text-gray-700 {
+        .REVA-users-page.is-dark .text-gray-700 {
           color: #e5e7eb !important;
         }
 
-        .caps-users-page.is-dark .text-gray-600 {
+        .REVA-users-page.is-dark .text-gray-600 {
           color: #d1d5db !important;
         }
 
-        .caps-users-page.is-dark .text-gray-500 {
+        .REVA-users-page.is-dark .text-gray-500 {
           color: #9ca3af !important;
         }
 
-        .caps-users-page.is-dark .text-gray-400 {
+        .REVA-users-page.is-dark .text-gray-400 {
           color: #6b7280 !important;
         }
 
-        .caps-users-page.is-dark .text-amber-900 {
+        .REVA-users-page.is-dark .text-amber-900 {
           color: #fbbf24 !important;
         }
 
         /* Borders */
-        .caps-users-page.is-dark .border-gray-100 {
+        .REVA-users-page.is-dark .border-gray-100 {
           border-color: #252d38 !important;
         }
 
-        .caps-users-page.is-dark .border-gray-200 {
+        .REVA-users-page.is-dark .border-gray-200 {
           border-color: #303946 !important;
         }
 
-        .caps-users-page.is-dark .border-gray-300 {
+        .REVA-users-page.is-dark .border-gray-300 {
           border-color: #374151 !important;
         }
 
-        .caps-users-page.is-dark .divide-gray-200 > :not([hidden]) ~ :not([hidden]) {
+        .REVA-users-page.is-dark .divide-gray-200 > :not([hidden]) ~ :not([hidden]) {
           border-color: #303946 !important;
         }
 
         /* Inputs, textareas, selects and custom select buttons */
-        .caps-users-page.is-dark input,
-        .caps-users-page.is-dark textarea,
-        .caps-users-page.is-dark select {
+        .REVA-users-page.is-dark input,
+        .REVA-users-page.is-dark textarea,
+        .REVA-users-page.is-dark select {
           background-color: #171d25 !important;
           color: #f3f4f6 !important;
           border-color: #374151 !important;
         }
 
-        .caps-users-page.is-dark input::placeholder,
-        .caps-users-page.is-dark textarea::placeholder {
+        .REVA-users-page.is-dark input::placeholder,
+        .REVA-users-page.is-dark textarea::placeholder {
           color: #6b7280 !important;
         }
 
         /* Table */
-        .caps-users-page.is-dark table,
-        .caps-users-page.is-dark thead,
-        .caps-users-page.is-dark tbody {
+        .REVA-users-page.is-dark table,
+        .REVA-users-page.is-dark thead,
+        .REVA-users-page.is-dark tbody {
           background-color: #171d25 !important;
           color: #f3f4f6 !important;
         }
 
-        .caps-users-page.is-dark th {
+        .REVA-users-page.is-dark th {
           background-color: #11161d !important;
           color: #d1d5db !important;
           border-color: #303946 !important;
         }
 
-        .caps-users-page.is-dark td {
+        .REVA-users-page.is-dark td {
           background-color: #171d25 !important;
           color: #e5e7eb !important;
           border-color: #303946 !important;
         }
 
-        .caps-users-page.is-dark tr:hover td {
+        .REVA-users-page.is-dark tr:hover td {
           background-color: #1b222c !important;
         }
 
         /* Hover states */
-        .caps-users-page.is-dark .hover\\:bg-gray-50:hover {
+        .REVA-users-page.is-dark .hover\\:bg-gray-50:hover {
           background-color: #1b222c !important;
         }
 
-        .caps-users-page.is-dark .hover\\:bg-gray-100:hover {
+        .REVA-users-page.is-dark .hover\\:bg-gray-100:hover {
           background-color: #252d38 !important;
         }
 
-        .caps-users-page.is-dark .hover\\:bg-gray-700:hover {
+        .REVA-users-page.is-dark .hover\\:bg-gray-700:hover {
           background-color: #374151 !important;
         }
 
         /* Modal/filter cards */
-        .caps-users-page.is-dark .edit-profile-modal-scrollbar,
-        .caps-users-page.is-dark .lightbox-bg .bg-white {
+        .REVA-users-page.is-dark .edit-profile-modal-scrollbar,
+        .REVA-users-page.is-dark .lightbox-bg .bg-white {
           background-color: #171d25 !important;
           color: #f3f4f6 !important;
         }
 
-        .caps-users-page.is-dark .lightbox-bg .bg-gray-50\\/40 {
+        .REVA-users-page.is-dark .lightbox-bg .bg-gray-50\\/40 {
           background-color: #11161d !important;
         }
 
         /* Status text */
-        .caps-users-page.is-dark .text-green-700 {
+        .REVA-users-page.is-dark .text-green-700 {
           color: #86efac !important;
         }
 
-        .caps-users-page.is-dark .text-yellow-600 {
+        .REVA-users-page.is-dark .text-yellow-600 {
           color: #fde68a !important;
         }
 
-        .caps-users-page.is-dark .text-red-600 {
+        .REVA-users-page.is-dark .text-red-600 {
           color: #fca5a5 !important;
         }
 
         /* Orange selected filter states */
-        .caps-users-page.is-dark .bg-orange-50 {
+        .REVA-users-page.is-dark .bg-orange-50 {
           background-color: #3a2412 !important;
         }
 
-        .caps-users-page.is-dark .text-orange-700,
-        .caps-users-page.is-dark .text-orange-800 {
+        .REVA-users-page.is-dark .text-orange-700,
+        .REVA-users-page.is-dark .text-orange-800 {
           color: #fdba74 !important;
         }
 
-        .caps-users-page.is-dark .border-orange-300 {
+        .REVA-users-page.is-dark .border-orange-300 {
           border-color: #9a5b24 !important;
         }
 
         /* Pagination */
-        .caps-users-page.is-dark .inline-flex.items-center.rounded-full.border {
+        .REVA-users-page.is-dark .inline-flex.items-center.rounded-full.border {
           background-color: #171d25 !important;
           border-color: #303946 !important;
         }
 
         /* Scrollbar */
-        .caps-users-page.is-dark ::-webkit-scrollbar {
+        .REVA-users-page.is-dark ::-webkit-scrollbar {
           width: 8px;
           height: 8px;
         }
 
-        .caps-users-page.is-dark ::-webkit-scrollbar-track {
+        .REVA-users-page.is-dark ::-webkit-scrollbar-track {
           background: #0b0f14;
         }
 
-        .caps-users-page.is-dark ::-webkit-scrollbar-thumb {
+        .REVA-users-page.is-dark ::-webkit-scrollbar-thumb {
           background: #374151;
           border-radius: 10px;
         }
 
-        .caps-users-page.is-dark ::-webkit-scrollbar-thumb:hover {
+        .REVA-users-page.is-dark ::-webkit-scrollbar-thumb:hover {
           background: #4b5563;
         }
       `}</style>

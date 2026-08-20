@@ -4,7 +4,7 @@
     "type": "MERGED_MANIFESTS",
     "kind": "Directory"
   },
-  "applicationId": "com.caps.mobile",
+  "applicationId": "com.REVA.mobile",
   "variantName": "debug",
   "elements": [
     {

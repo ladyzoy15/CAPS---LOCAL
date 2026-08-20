@@ -652,7 +652,7 @@ export default function LoginPage() {
           </div>
           <div className="flex items-center justify-center">
             <span className="mx-2 text-xs text-gray-400">
-              Developed by <span className="text-orange-500">Team Caps</span>
+              Developed by <span className="text-orange-500">Team REVA</span>
             </span>
           </div>
         </form>

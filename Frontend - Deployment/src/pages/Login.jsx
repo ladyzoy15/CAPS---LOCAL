@@ -753,14 +753,14 @@ export default function LoginPage() {
                   <span className="text-xs text-gray-400">
                     Developed by{" "}
                     <span
-                      onClick={() => navigate("/team-caps")}
+                      onClick={() => navigate("/team-REVA")}
                       className="
                         cursor-pointer
                         text-orange-500
                         hover:underline
                       "
                     >
-                      Team Caps
+                      Team REVA
                     </span>
                   </span>
                 </form>
@@ -910,7 +910,7 @@ export default function LoginPage() {
             />
           </div>
 
-          {/* CAPS Title */}
+          {/* REVA Title */}
           <div className="mt-5 mb-1 flex flex-col items-center">
             <h1
               className="
@@ -1368,14 +1368,14 @@ export default function LoginPage() {
           <span className="mx-2 text-xs text-gray-400">
             Developed by{" "}
             <button
-              onClick={() => navigate("/team-caps")}
+              onClick={() => navigate("/team-REVA")}
               className="
                 cursor-pointer
                 text-orange-500
                 hover:underline
               "
             >
-              Team Caps
+              Team REVA
             </button>
           </span>
         </div>

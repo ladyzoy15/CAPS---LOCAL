@@ -1751,7 +1751,7 @@ const Sidebar = ({
 
         <div className="absolute bottom-4 left-0 z-10 w-full">
 
-          {/* CAPS */}
+          {/* REVA */}
 
           <div className="px-3">
 
@@ -1780,7 +1780,7 @@ const Sidebar = ({
 
                 <img
                   src={CollegeLogo}
-                  alt="CAPS"
+                  alt="REVA"
                   className="size-[20px] flex-shrink-0"
                   style={getDarkIconStyle()}
                 />
@@ -1788,7 +1788,7 @@ const Sidebar = ({
 
                 {!isUsersPage && (
                   <span className="outfit-500 flex items-baseline gap-1 text-[15px] whitespace-nowrap text-amber-700 dark:text-gray-400">
-                    CAPS - REVIEW
+                    REVA - REVIEW
                     <span className="text-xs font-medium">
                       <AppVersion />
                     </span>

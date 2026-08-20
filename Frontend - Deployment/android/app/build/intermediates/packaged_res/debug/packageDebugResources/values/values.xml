@@ -1,10 +1,10 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <color name="ic_launcher_background">#FFFFFF</color>
-    <string name="app_name">CAPS</string>
-    <string name="custom_url_scheme">com.caps.mobile</string>
-    <string name="package_name">com.caps.mobile</string>
-    <string name="title_activity_main">CAPS</string>
+    <string name="app_name">REVA</string>
+    <string name="custom_url_scheme">com.REVA.mobile</string>
+    <string name="package_name">com.REVA.mobile</string>
+    <string name="title_activity_main">REVA</string>
     <style name="AppTheme" parent="Theme.AppCompat.Light.DarkActionBar">
         
         <item name="colorPrimary">@color/colorPrimary</item>
