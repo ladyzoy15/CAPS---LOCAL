@@ -437,3 +437,103 @@ function App() {
 
           <Route
             path="dashboard"
+            element={<FacultyDashboard />}
+          />
+        </Route>
+
+
+        {/* =========================
+            SUBJECT OVERVIEW
+        ========================= */}
+
+        <Route
+          path="/subject-overview/:subjectID"
+          element={<ProtectedRoute element={<Layout />} />}
+        >
+          <Route
+            index
+            element={<SubjectOverview />}
+          />
+        </Route>
+
+
+        {/* =========================
+            QUIZ
+        ========================= */}
+
+        <Route
+          path="/quiz-overview"
+          element={<ProtectedRoute element={<Layout />} />}
+        >
+          <Route
+            index
+            element={<QuizOverview />}
+          />
+        </Route>
+
+        <Route
+          path="/quiz-content"
+          element={<ProtectedRoute element={<Layout />} />}
+        >
+          <Route
+            index
+            element={<QuizContent />}
+          />
+        </Route>
+
+        <Route
+          path="/quiz-info/:classPersonalQuizID"
+          element={<ProtectedRoute element={<Layout />} />}
+        >
+          <Route
+            index
+            element={<QuizInfo />}
+          />
+        </Route>
+
+        <Route
+          path="/quiz/:classPersonalQuizID"
+          element={<ProtectedRoute element={<Layout />} />}
+        >
+          <Route
+            index
+            element={<StudentQuiz />}
+          />
+        </Route>
+
+        <Route
+          path="/quiz-result/:classPersonalQuizID"
+          element={<ProtectedRoute element={<Layout />} />}
+        >
+          <Route
+            index
+            element={<StudentQuizResults />}
+          />
+        </Route>
+
+
+        {/* =========================
+            USERS
+        ========================= */}
+
+        <Route
+          path="/users"
+          element={<ProtectedRoute element={<Layout />} />}
+        >
+          <Route
+            index
+            element={<Users />}
+          />
+
+          <Route
+            path="users"
+            element={<Users />}
+          />
+        </Route>
+
+      </Routes>
+    </Router>
+  );
+}
+
+export default App;
