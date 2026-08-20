@@ -589,7 +589,18 @@ function SubjectList() {
   };
 
   const handleSubjectClick = (subject) => {
-    navigate(`/subject-overview/subjectID=${subject.subjectID}`, {
+    setSelectedSubject(subject);
+
+    const contentPath =
+      Number(effectiveRoleId) === 2
+        ? "/faculty/subjects/content"
+        : Number(effectiveRoleId) === 3
+          ? "/program-chair/subjects/content"
+          : Number(effectiveRoleId) === 5
+            ? "/asso-dean/subjects/content"
+            : "/dean/subjects/content";
+
+    navigate(`${contentPath}?subjectID=${subject.subjectID}`, {
       state: { subject },
     });
   };
