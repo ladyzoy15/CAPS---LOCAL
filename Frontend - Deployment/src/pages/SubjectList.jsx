@@ -1630,17 +1630,10 @@ function SubjectList() {
                         <div className="space-y-5">
                           <div>
                             <label className="mb-1.5 block text-[13px] font-semibold text-gray-700">
-<<<<<<< HEAD
-                              Subject Code <span className="text-red-500">*</span>
-                            </label>
-                            <div className="relative">
-                              <i className="bx bx-edit absolute top-1/2 left-3 -translate-y-1/2 text-gray-400"></i>
-=======
                               Course Code <span className="text-red-500">*</span>
                             </label>
                             <div className="relative">
                               <i className="bx bx-barcode absolute top-1/2 left-3 -translate-y-1/2 text-gray-400"></i>
->>>>>>> origin/REVA
                               <input
                                 type="text"
                                 placeholder="e.g. MATH123"
@@ -1649,8 +1642,6 @@ function SubjectList() {
                                 className="w-full rounded-xl border border-gray-200 py-2.5 pr-3 pl-9 text-sm transition focus:border-orange-400 focus:ring-2 focus:ring-orange-100 focus:outline-none"
                               />
                             </div>
-<<<<<<< HEAD
-=======
                           </div>
 
                           <div>
@@ -1667,7 +1658,6 @@ function SubjectList() {
                                 className="w-full rounded-xl border border-gray-200 py-2.5 pr-3 pl-9 text-sm transition focus:border-orange-400 focus:ring-2 focus:ring-orange-100 focus:outline-none"
                               />
                             </div>
->>>>>>> origin/REVA
                             <p className="mt-1 text-[11px] text-gray-400">
                               Enter the Course Description (max 20 characters).
                             </p>

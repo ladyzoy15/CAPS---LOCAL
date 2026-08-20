@@ -1895,11 +1895,8 @@ const Sidebar = ({
 
         <div className="absolute bottom-4 left-0 z-10 w-full">
 
-<<<<<<< HEAD
-=======
           {/* REVA */}
 
->>>>>>> origin/REVA
           <div className="px-3">
 
             <div className="mb-2 h-px w-full bg-amber-700/20 dark:bg-gray-700/70" />
@@ -1935,12 +1932,7 @@ const Sidebar = ({
 
                 {!isUsersPage && (
                   <span className="outfit-500 flex items-baseline gap-1 text-[15px] whitespace-nowrap text-amber-700 dark:text-gray-400">
-<<<<<<< HEAD
-                    CAPS - REVIEW
-
-=======
                     REVA
->>>>>>> origin/REVA
                     <span className="text-xs font-medium">
                       <AppVersion />
                     </span>
