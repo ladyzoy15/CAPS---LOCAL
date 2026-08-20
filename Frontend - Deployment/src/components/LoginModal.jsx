@@ -212,7 +212,7 @@ export default function LoginModal({
             <div className="flex h-14 w-14 items-center justify-center rounded-2xl border border-white/15 bg-white/5 shadow-lg backdrop-blur-xl">
               <img
                 src={collegeLogo}
-                alt="CAPS logo"
+                alt="REVA logo"
                 className="size-9 object-contain"
               />
             </div>

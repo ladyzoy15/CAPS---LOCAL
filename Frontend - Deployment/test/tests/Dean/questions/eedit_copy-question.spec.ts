@@ -2,7 +2,7 @@ import { test, expect } from '@playwright/test';
 
 test('Dean can copy edit a pending question', async ({ page }) => {
   const copiedQuestion = `Copied-${Date.now()}`;
-  await page.goto('https://caps-test.coeofjrmsu.com/');
+  await page.goto('https://REVA-test.coeofjrmsu.com/');
 
   // Login
   await page.getByRole('button', { name: 'LOG IN' }).click();

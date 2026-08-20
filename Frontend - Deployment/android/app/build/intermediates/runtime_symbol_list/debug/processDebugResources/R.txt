@@ -277,7 +277,7 @@ int attr switchMinWidth 0x7f0300f4
 int attr switchPadding 0x7f0300f5
 int attr switchStyle 0x7f0300f6
 int attr switchTextAppearance 0x7f0300f7
-int attr textAllCaps 0x7f0300f8
+int attr textAllREVA 0x7f0300f8
 int attr textAppearanceLargePopupMenu 0x7f0300f9
 int attr textAppearanceListItem 0x7f0300fa
 int attr textAppearanceListItemSecondary 0x7f0300fb
@@ -335,7 +335,7 @@ int attr windowSplashScreenAnimationDuration 0x7f03012e
 int attr windowSplashScreenBackground 0x7f03012f
 int attr windowSplashScreenIconBackgroundColor 0x7f030130
 int bool abc_action_bar_embed_tabs 0x7f040000
-int bool abc_config_actionMenuItemAllCaps 0x7f040001
+int bool abc_config_actionMenuItemAllREVA 0x7f040001
 int color abc_background_cache_hint_selector_material_dark 0x7f050000
 int color abc_background_cache_hint_selector_material_light 0x7f050001
 int color abc_btn_colored_borderless_text_material 0x7f050002
@@ -1445,7 +1445,7 @@ int styleable AppCompatTextView_fontFamily 16
 int styleable AppCompatTextView_fontVariationSettings 17
 int styleable AppCompatTextView_lastBaselineToBottomHeight 18
 int styleable AppCompatTextView_lineHeight 19
-int styleable AppCompatTextView_textAllCaps 20
+int styleable AppCompatTextView_textAllREVA 20
 int styleable AppCompatTextView_textLocale 21
 int[] styleable AppCompatTheme { 0x01010057, 0x010100ae, 0x7f030000, 0x7f030001, 0x7f030002, 0x7f030003, 0x7f030004, 0x7f030005, 0x7f030006, 0x7f030007, 0x7f030008, 0x7f030009, 0x7f03000a, 0x7f03000b, 0x7f03000c, 0x7f03000e, 0x7f03000f, 0x7f030010, 0x7f030011, 0x7f030012, 0x7f030013, 0x7f030014, 0x7f030015, 0x7f030016, 0x7f030017, 0x7f030018, 0x7f030019, 0x7f03001a, 0x7f03001b, 0x7f03001c, 0x7f03001d, 0x7f03001e, 0x7f03001f, 0x7f030020, 0x7f030023, 0x7f030024, 0x7f030025, 0x7f030026, 0x7f030027, 0x7f03002d, 0x7f030039, 0x7f03003a, 0x7f03003b, 0x7f03003c, 0x7f03003d, 0x7f03003e, 0x7f030043, 0x7f030044, 0x7f03004a, 0x7f03004b, 0x7f030051, 0x7f030052, 0x7f030053, 0x7f030054, 0x7f030055, 0x7f030056, 0x7f030057, 0x7f030058, 0x7f030059, 0x7f03005a, 0x7f030063, 0x7f030067, 0x7f030068, 0x7f030069, 0x7f03006c, 0x7f03006e, 0x7f030079, 0x7f03007a, 0x7f03007b, 0x7f03007c, 0x7f03007d, 0x7f030093, 0x7f030099, 0x7f0300a9, 0x7f0300aa, 0x7f0300ab, 0x7f0300ac, 0x7f0300af, 0x7f0300b0, 0x7f0300b1, 0x7f0300b2, 0x7f0300b3, 0x7f0300b4, 0x7f0300b5, 0x7f0300b6, 0x7f0300b7, 0x7f0300c8, 0x7f0300c9, 0x7f0300ca, 0x7f0300cb, 0x7f0300cd, 0x7f0300d5, 0x7f0300d6, 0x7f0300d7, 0x7f0300d8, 0x7f0300db, 0x7f0300dc, 0x7f0300dd, 0x7f0300de, 0x7f0300e6, 0x7f0300e7, 0x7f0300f6, 0x7f0300f9, 0x7f0300fa, 0x7f0300fb, 0x7f0300fc, 0x7f0300fd, 0x7f0300fe, 0x7f0300ff, 0x7f030100, 0x7f030101, 0x7f030102, 0x7f030118, 0x7f030119, 0x7f03011a, 0x7f03011b, 0x7f030121, 0x7f030123, 0x7f030124, 0x7f030125, 0x7f030126, 0x7f030127, 0x7f030128, 0x7f030129, 0x7f03012a, 0x7f03012b, 0x7f03012c }
 int styleable AppCompatTheme_android_windowIsFloating 0
@@ -1794,7 +1794,7 @@ int styleable TextAppearance_android_fontFamily 10
 int styleable TextAppearance_android_textFontWeight 11
 int styleable TextAppearance_fontFamily 12
 int styleable TextAppearance_fontVariationSettings 13
-int styleable TextAppearance_textAllCaps 14
+int styleable TextAppearance_textAllREVA 14
 int styleable TextAppearance_textLocale 15
 int[] styleable Toolbar { 0x010100af, 0x01010140, 0x7f030040, 0x7f03004e, 0x7f03004f, 0x7f03005d, 0x7f03005e, 0x7f03005f, 0x7f030060, 0x7f030061, 0x7f030062, 0x7f0300b8, 0x7f0300b9, 0x7f0300ba, 0x7f0300bc, 0x7f0300be, 0x7f0300bf, 0x7f0300cc, 0x7f0300ef, 0x7f0300f0, 0x7f0300f1, 0x7f03010e, 0x7f03010f, 0x7f030110, 0x7f030111, 0x7f030112, 0x7f030113, 0x7f030114, 0x7f030115, 0x7f030116 }
 int styleable Toolbar_android_gravity 0

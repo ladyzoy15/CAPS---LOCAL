@@ -1,6 +1,6 @@
-# CAPS Playwright Automation Framework
+# REVA Playwright Automation Framework
 
-Automated end-to-end testing framework for the **Computer-Aided Preparation System (CAPS)** using **Playwright + TypeScript**.
+Automated end-to-end testing framework for the **Computer-Aided Preparation System (REVA)** using **Playwright + TypeScript**.
 
 ---
 

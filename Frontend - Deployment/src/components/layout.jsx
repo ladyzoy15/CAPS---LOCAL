@@ -196,7 +196,7 @@ const Layout = () => {
   // =========================================================
   return (
     <div
-      className="caps-layout min-h-screen w-full"
+      className="REVA-layout min-h-screen w-full"
       style={{
         backgroundColor,
         color: textColor,
@@ -262,7 +262,7 @@ const Layout = () => {
 
           {/* MAIN */}
           <main
-            className={`caps-main ${
+            className={`REVA-main ${
               isTutorialPage ||
               isQuizPage ||
               isPracticeExamPage ||

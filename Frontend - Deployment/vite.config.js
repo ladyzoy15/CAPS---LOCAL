@@ -23,13 +23,13 @@ export default defineConfig({
         id: "/",
 
         // APP NAME
-        name: "CAPS-REVIEW",
+        name: "REVA",
 
         // SHORT APP NAME
-        short_name: "CAPS-REVIEW",
+        short_name: "REVA",
 
         description:
-          "CAPS-REVIEW - Comprehensive Assessment and Preparation System for JRMSU students.",
+          "REVA - Review, Evaluation and Validation Assessement for JRMSU students.",
 
         theme_color: "#ffffff",
         background_color: "#ffffff",

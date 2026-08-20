@@ -59,7 +59,7 @@ export default function ForgotPasswordModal({ isOpen, onClose, onSwitchToLogin }
           {/* Logo */}
           <div className="mb-5 flex flex-col items-center">
             <div className="flex h-14 w-14 items-center justify-center">
-              <img src={collegeLogo} alt="CAPS logo" className="size-12 object-contain" />
+              <img src={collegeLogo} alt="REVA logo" className="size-12 object-contain" />
             </div>
           </div>
 

@@ -142,7 +142,7 @@ function LandingPage() {
     }
     window.alert(
       "Chrome hasn’t fired the install prompt yet.\n\n" +
-        "Try: ⋮ menu → Save and share → Install CAPS JRMSU (or Install page).\n\n" +
+        "Try: ⋮ menu → Save and share → Install REVA JRMSU (or Install page).\n\n" +
         "If that’s missing: DevTools → Application → Manifest (fix any errors), " +
         "then hard refresh (Ctrl+Shift+R). Use Chrome or Edge on HTTPS.",
     );
@@ -170,9 +170,9 @@ function LandingPage() {
             {/* Close Button */}
             <div className="mb-8 flex items-center justify-between">
               <div className="flex items-center gap-2">
-                <img src={collegeLogo} alt="CAPS logo" className="h-6 w-6" />
+                <img src={collegeLogo} alt="REVA logo" className="h-6 w-6" />
                 <span className="outfit-500 text-[20px] tracking-wide">
-                  CAPS
+                  REVA
                 </span>
               </div>
               <button
@@ -198,7 +198,7 @@ function LandingPage() {
               </a>
 
               <a
-                href="/team-caps"
+                href="/team-REVA"
                 onClick={() => setIsSidebarOpen(false)}
                 className="text-[14px] font-medium text-gray-700 hover:text-gray-900"
               >
@@ -241,13 +241,13 @@ function LandingPage() {
             <div className="flex items-center gap-2">
               <img
                 src={collegeLogo}
-                alt="CAPS logo"
+                alt="REVA logo"
                 decoding="async"
                 fetchPriority="low"
                 className="h-7 w-7 md:h-8 md:w-8"
               />
               <span className="outfit-500 flex items-center gap-1.5 text-[20px] tracking-wide text-gray-900 md:text-[24px]">
-                CAPS
+                REVA
                 <span className="rounded-md border border-orange-500 px-1.5 py-0.5 text-[9px] font-semibold tracking-widest text-orange-500 md:text-[11px]">
                   REVIEW
                 </span>
@@ -262,7 +262,7 @@ function LandingPage() {
                 Download
               </a>
               <a
-                href="/team-caps"
+                href="/team-REVA"
                 className="transition-colors hover:text-gray-900"
               >
                 Developers
@@ -366,7 +366,7 @@ function LandingPage() {
                   <source media="(min-width: 768px)" srcSet={heroImg} />
                   <img
                     src={MobileheroImg}
-                    alt="CAPS Review platform preview"
+                    alt="REVA Review platform preview"
                     loading="eager"
                     decoding="async"
                     fetchPriority="high"
@@ -589,7 +589,7 @@ function LandingPage() {
             <div className="relative">
               <img
                 src={GetStarted}
-                alt="Get started with CAPS"
+                alt="Get started with REVA"
                 loading="lazy"
                 decoding="async"
                 className="w-full rounded-2xl"
@@ -599,7 +599,7 @@ function LandingPage() {
                 <div className="w-[55%] pr-4 text-left text-white md:pr-8 lg:pr-12 xl:pr-16">
                   <h3 className="outfit-700 text-[12px] leading-tight sm:text-[16px] md:text-[20px] lg:text-[26px] xl:text-[30px]">
                     Ready? Start with{" "}
-                    <span className="text-[rgb(124,75,0)]">CAPS</span>
+                    <span className="text-[rgb(124,75,0)]">REVA</span>
                     <br />
                     and Enjoy an{" "}
                     <span className="text-[rgb(124,75,0)]">
@@ -607,7 +607,7 @@ function LandingPage() {
                     </span>
                   </h3>
                   <p className="outfit-400 mt-1 hidden text-white/90 sm:block sm:text-[11px] md:mt-2 md:text-[13px] lg:mt-3 lg:text-[15px] xl:text-base">
-                    Start your journey with CAPS and experience a smarter,
+                    Start your journey with REVA and experience a smarter,
                     faster, and more organized way to handle exams.
                   </p>
                   <div className="mt-2 flex justify-start md:mt-4">
@@ -643,8 +643,8 @@ function LandingPage() {
             {/* Brand + Description */}
             <div className="flex flex-col items-start gap-3">
               <div className="flex items-center gap-2">
-                <img src={collegeLogo} alt="CAPS logo" className="h-6 w-6" />
-                <span className="outfit-700 text-base text-gray-900">CAPS</span>
+                <img src={collegeLogo} alt="REVA logo" className="h-6 w-6" />
+                <span className="outfit-700 text-base text-gray-900">REVA</span>
                 <span className="text-[12px] text-gray-500">
                   <AppVersion />{" "}
                 </span>
@@ -691,7 +691,7 @@ function LandingPage() {
                 <ul className="space-y-1 text-xs md:text-sm">
                   <li>
                     <a
-                      href="/team-caps"
+                      href="/team-REVA"
                       className="outfit-400 hover:text-gray-800"
                     >
                       Developers
@@ -713,7 +713,7 @@ function LandingPage() {
           <div className="border-t border-gray-100">
             <div className="mx-auto flex w-full max-w-[1450px] flex-col items-center justify-between gap-2 px-6 py-4 text-[11px] text-gray-400 md:flex-row">
               <p className="outfit-400">
-                © 2025 CAPS – Comprehensive Assessment and Preparation System.
+                © 2025 REVA – Comprehensive Assessment and Preparation System.
               </p>
               <p className="outfit-400">
                 Powered by JRMSU College of Engineering

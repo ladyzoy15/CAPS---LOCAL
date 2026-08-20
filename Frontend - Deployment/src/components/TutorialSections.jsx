@@ -120,7 +120,7 @@ export const IntroductionSection = () => (
   <div>
     <SectionHeader
       tag="Overview"
-      title="Welcome to CAPS"
+      title="Welcome to REVA"
       subtitle="A comprehensive web-based platform designed to help students prepare for exams through practice tests, while giving faculty and administrators the tools they need to manage questions, subjects, and results."
     />
     <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
@@ -187,7 +187,7 @@ export const QuickStartSection = () => (
         "To get started, navigate to the login page and securely sign in using your credentials. If you are a new user, simply click the 'Register' button to create your account.",
         <ScreenshotPlaceholder
           label="Quic Start"
-          caption="The landing page of CAPS"
+          caption="The landing page of REVA"
           image={startImg}
         />,
 
@@ -276,7 +276,7 @@ export const LoginSection = () => (
           caption="The login screen where users enter their credentials to access the system."
           image={loginImg}
         />,
-        "Next, type your secure password into the Password field, ensuring that your caps lock is off.",
+        "Next, type your secure password into the Password field, ensuring that your REVA lock is off.",
         "Finally, click the 'Log In' button to authenticate your credentials and access your personalized dashboard.",
         "You can also log in via your Google gmail account",
       ]}

@@ -1,7 +1,7 @@
 import { test, expect } from '@playwright/test';
 
 test('Program chair can approve question', async ({ page }) => {
-  await page.goto('https://caps-test.coeofjrmsu.com/');
+  await page.goto('https://REVA-test.coeofjrmsu.com/');
 
   // Login
   await page.getByRole('button', { name: 'LOG IN' }).click();

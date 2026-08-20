@@ -65,7 +65,7 @@ function App() {
         <Route path="/forgot-password" element={<ForgotPasswordForm />} />
         <Route path="/reset-user-code" element={<ResetUserCodePage />} />
         <Route path="/forgot-user-code" element={<ForgotUserCodeForm />} />
-        <Route path="/team-caps" element={<Credits />} />
+        <Route path="/team-REVA" element={<Credits />} />
 
         {/* Public Landing Page */}
         <Route path="/landing" element={<LandingPage />} />
