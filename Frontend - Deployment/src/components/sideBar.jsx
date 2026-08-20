@@ -1788,7 +1788,7 @@ const Sidebar = ({
 
                 {!isUsersPage && (
                   <span className="outfit-500 flex items-baseline gap-1 text-[15px] whitespace-nowrap text-amber-700 dark:text-gray-400">
-                    REVA - REVIEW
+                    REVA
                     <span className="text-xs font-medium">
                       <AppVersion />
                     </span>
