@@ -28,10 +28,8 @@ import UsersIconH from "/src/assets/symbols/usershove.svg";
 import PrintIcon from "/src/assets/symbols/print.svg";
 import PrintIconH from "/src/assets/symbols/printhover.svg";
 
-
 import SubjectsIcon from "/src/assets/symbols/subjects.svg";
 import SubjectsIconH from "/src/assets/symbols/subjectshover.svg";
-
 
 const getRoleName = (roleId) => {
   switch (Number(roleId)) {
@@ -50,7 +48,6 @@ const getRoleName = (roleId) => {
   }
 };
 
-
 const Sidebar = ({
   role_id,
   setSelectedSubject,
@@ -60,7 +57,6 @@ const Sidebar = ({
   isSubjectExpanded,
   setIsSubjectExpanded,
 }) => {
-
   const [isMobile, setIsMobile] = useState(
     window.innerWidth < 1025
   );
@@ -96,7 +92,6 @@ const Sidebar = ({
     clearUserAvatarColor,
   } = profile;
 
-
   // =========================================================
   // DARK MODE
   // =========================================================
@@ -108,7 +103,6 @@ const Sidebar = ({
     );
   });
 
-
   // =========================================================
   // SIDEBAR COLLAPSE
   // =========================================================
@@ -119,7 +113,6 @@ const Sidebar = ({
     );
   });
 
-
   const sidebarRef = useRef(null);
   const userDropdownRef = useRef(null);
 
@@ -129,7 +122,6 @@ const Sidebar = ({
   const apiUrl = import.meta.env.VITE_API_BASE_URL;
 
   const { toast, showToast } = useToast();
-
 
   // =========================================================
   // DARK MODE SYNC
@@ -154,7 +146,6 @@ const Sidebar = ({
     );
   }, [isDarkMode]);
 
-
   useEffect(() => {
     const handler = () => {
       setIsDarkMode(
@@ -177,16 +168,8 @@ const Sidebar = ({
     };
   }, []);
 
-
   // =========================================================
   // DARK MODE ICON STYLE
-  // =========================================================
-  //
-  // SVG files are loaded through <img>, therefore
-  // Tailwind text colors cannot change their color.
-  //
-  // This filter makes icons brighter and stronger ONLY
-  // when dark mode is enabled.
   // =========================================================
 
   const getDarkIconStyle = (active = false) => {
@@ -212,7 +195,6 @@ const Sidebar = ({
     };
   };
 
-
   // =========================================================
   // SAVE SIDEBAR STATE
   // =========================================================
@@ -224,9 +206,7 @@ const Sidebar = ({
     );
   }, [isCollapsed]);
 
-
   const isUsersPage = isCollapsed;
-
 
   // =========================================================
   // PAGE LOADING
@@ -241,7 +221,6 @@ const Sidebar = ({
 
     return () => clearTimeout(timer);
   }, [location]);
-
 
   // =========================================================
   // RESPONSIVE
@@ -264,7 +243,6 @@ const Sidebar = ({
       );
     };
   }, []);
-
 
   // =========================================================
   // CLOSE DROPDOWN OUTSIDE
@@ -294,7 +272,6 @@ const Sidebar = ({
       );
     };
   }, []);
-
 
   // =========================================================
   // LOGOUT
@@ -329,7 +306,6 @@ const Sidebar = ({
     }
   };
 
-
   // =========================================================
   // DISPLAY NAME
   // =========================================================
@@ -356,7 +332,6 @@ const Sidebar = ({
     return `${firstName} ${lastInitial}.`;
   };
 
-
   useEffect(() => {
     if (
       showProfileModal ||
@@ -369,13 +344,11 @@ const Sidebar = ({
     showChangePassword,
   ]);
 
-
   // =========================================================
   // ROLE
   // =========================================================
 
   const parsedRoleId = Number(role_id);
-
 
   const homePath =
     parsedRoleId === 1
@@ -389,7 +362,6 @@ const Sidebar = ({
             : parsedRoleId === 5
               ? "/asso-dean-dashboard"
               : "/";
-
 
   // =========================================================
   // MENU ITEMS
@@ -411,19 +383,15 @@ const Sidebar = ({
     },
   ];
 
-
   const librariesItem = {
     label: "Quizzes",
     path: "/libraries",
   };
 
-
-
   const classItem = {
     label: "Classes",
     path: "/class",
   };
-
 
   const adminItems = [
     {
@@ -433,7 +401,6 @@ const Sidebar = ({
     },
   ];
 
-
   const classes = [
     {
       icon: "bx-book-bookmark",
@@ -441,14 +408,11 @@ const Sidebar = ({
     },
   ];
 
-
   let menuItems = [];
-
 
   if (parsedRoleId === 1) {
     menuItems = [
       ...baseMenuItems,
-      classItem,
     ];
   } else {
     menuItems = [
@@ -458,13 +422,10 @@ const Sidebar = ({
     if (parsedRoleId >= 2) {
       menuItems = [
         ...menuItems,
-        librariesItem,
-        classItem,
         ...adminItems,
       ];
     }
   }
-
 
   const printButton = {
     icon: "bx-printer",
@@ -476,13 +437,11 @@ const Sidebar = ({
     isButton: true,
   };
 
-
   // =========================================================
   // ACTIVE ROUTE
   // =========================================================
 
   const isActive = (path) => {
-
     if (path === "/class") {
       return (
         location.pathname === "/class" ||
@@ -494,7 +453,6 @@ const Sidebar = ({
       );
     }
 
-
     if (path === "/libraries") {
       return (
         location.pathname ===
@@ -504,12 +462,17 @@ const Sidebar = ({
       );
     }
 
+    if (path === "/import-questions") {
+      return (
+        location.pathname ===
+        "/import-questions"
+      );
+    }
 
     return (
       location.pathname === path
     );
   };
-
 
   // =========================================================
   // MENU CLICK
@@ -522,21 +485,17 @@ const Sidebar = ({
     setActiveMenu(null);
   };
 
-
-
   // =========================================================
   // MOBILE
   // =========================================================
 
   if (isMobile) {
-
     const homeItem =
       menuItems.find(
         (item) =>
           item.label === "Home" ||
           item.label === "Exams"
       );
-
 
     return (
       <>
@@ -561,7 +520,6 @@ const Sidebar = ({
               min-[500px]:px-6
             "
           >
-
             <div
               className={
                 parsedRoleId === 1
@@ -569,28 +527,21 @@ const Sidebar = ({
                   : "flex items-center justify-between gap-8"
               }
             >
-
               {parsedRoleId === 1 ? (
                 <>
                   {/* HOME / EXAMS */}
 
                   {homeItem && (
                     <div className="flex h-16 flex-col items-center justify-center">
-
                       <Link
                         to={homeItem.path}
                         onClick={handleMenuClick}
                         className="flex flex-col items-center"
                       >
-
                         <span className="mb-1 flex items-center justify-center">
-
                           <span className="flex h-10 w-10 items-center justify-center rounded-full bg-orange-500 text-white shadow-lg">
-
                             <i className="bx bx-file-detail text-[20px]" />
-
                           </span>
-
                         </span>
 
                         <span
@@ -602,17 +553,13 @@ const Sidebar = ({
                         >
                           {homeItem.label}
                         </span>
-
                       </Link>
-
                     </div>
                   )}
-
 
                   {/* CLASSES */}
 
                   <div className="flex h-16 flex-col items-center justify-center">
-
                     <Link
                       to="/class"
                       onClick={handleMenuClick}
@@ -622,9 +569,7 @@ const Sidebar = ({
                           : "text-amber-700 dark:text-gray-400 hover:text-amber-900 dark:hover:text-orange-300"
                       }`}
                     >
-
                       <span className="mb-1 flex h-6 w-6 items-center justify-center">
-
                         <img
                           src={
                             isActive("/class")
@@ -637,15 +582,12 @@ const Sidebar = ({
                             isActive("/class")
                           )}
                         />
-
                       </span>
 
                       <span className="outfit-500 text-xs">
                         Classes
                       </span>
-
                     </Link>
-
                   </div>
                 </>
               ) : (
@@ -653,7 +595,6 @@ const Sidebar = ({
                   {/* QUIZZES */}
 
                   <div className="flex h-16 flex-1 flex-col items-center justify-center">
-
                     <Link
                       to="/libraries"
                       onClick={handleMenuClick}
@@ -663,9 +604,7 @@ const Sidebar = ({
                           : "text-amber-700 dark:text-gray-400 hover:text-amber-900 dark:hover:text-orange-300"
                       }`}
                     >
-
                       <span className="mb-1 flex h-6 w-6 items-center justify-center">
-
                         <img
                           src={
                             isActive("/libraries")
@@ -678,22 +617,17 @@ const Sidebar = ({
                             isActive("/libraries")
                           )}
                         />
-
                       </span>
 
                       <span className="outfit-500 text-xs">
                         Quizzes
                       </span>
-
                     </Link>
-
                   </div>
-
 
                   {/* CLASSES */}
 
                   <div className="flex h-16 flex-1 flex-col items-center justify-center">
-
                     <Link
                       to="/class"
                       onClick={handleMenuClick}
@@ -703,9 +637,7 @@ const Sidebar = ({
                           : "text-amber-700 dark:text-gray-400 hover:text-amber-900 dark:hover:text-orange-300"
                       }`}
                     >
-
                       <span className="mb-1 flex h-6 w-6 items-center justify-center">
-
                         <img
                           src={
                             isActive("/class")
@@ -718,33 +650,25 @@ const Sidebar = ({
                             isActive("/class")
                           )}
                         />
-
                       </span>
 
                       <span className="outfit-500 text-xs">
                         Classes
                       </span>
-
                     </Link>
-
                   </div>
-
 
                   {/* DASHBOARD */}
 
                   {homeItem && (
                     <div className="flex h-16 flex-1 flex-col items-center justify-center">
-
                       <Link
                         to={homeItem.path}
                         onClick={handleMenuClick}
                         className="flex flex-col items-center"
                       >
-
                         <span className="mb-1 flex items-center justify-center">
-
                           <span className="flex h-10 w-10 items-center justify-center rounded-full bg-orange-500 shadow-lg">
-
                             <img
                               src={DashboardIconW}
                               alt="Dashboard"
@@ -753,9 +677,7 @@ const Sidebar = ({
                                 true
                               )}
                             />
-
                           </span>
-
                         </span>
 
                         <span
@@ -767,18 +689,14 @@ const Sidebar = ({
                         >
                           {homeItem.label}
                         </span>
-
                       </Link>
-
                     </div>
                   )}
-
 
                   {/* USERS */}
 
                   {parsedRoleId >= 2 && (
                     <div className="flex h-16 flex-1 flex-col items-center justify-center">
-
                       <Link
                         to="/users"
                         onClick={handleMenuClick}
@@ -788,9 +706,7 @@ const Sidebar = ({
                             : "text-amber-700 dark:text-gray-400 hover:text-amber-900 dark:hover:text-orange-300"
                         }`}
                       >
-
                         <span className="mb-1 flex h-6 w-6 items-center justify-center">
-
                           <img
                             src={
                               isActive("/users")
@@ -803,24 +719,19 @@ const Sidebar = ({
                               isActive("/users")
                             )}
                           />
-
                         </span>
 
                         <span className="outfit-500 text-xs">
                           Users
                         </span>
-
                       </Link>
-
                     </div>
                   )}
-
 
                   {/* SUBJECTS */}
 
                   {parsedRoleId >= 2 && (
                     <div className="flex h-16 flex-1 flex-col items-center justify-center">
-
                       <Link
                         to={
                           parsedRoleId === 2
@@ -850,9 +761,7 @@ const Sidebar = ({
                             : "text-amber-700 dark:text-gray-400 hover:text-amber-900 dark:hover:text-orange-300"
                         }`}
                       >
-
                         <span className="mb-1 flex h-6 w-6 items-center justify-center">
-
                           <img
                             src={
                               isActive(
@@ -881,24 +790,19 @@ const Sidebar = ({
                               )
                             )}
                           />
-
                         </span>
 
                         <span className="outfit-500 text-xs">
                           Subjects
                         </span>
-
                       </Link>
-
                     </div>
                   )}
                 </>
               )}
-
             </div>
           </div>
         </div>
-
 
         <PrintExamModal
           isOpen={showPrintModal === true}
@@ -909,7 +813,6 @@ const Sidebar = ({
       </>
     );
   }
-
 
   // =========================================================
   // DESKTOP SIDEBAR
@@ -981,7 +884,6 @@ const Sidebar = ({
           />
         </button>
 
-
         {/* =====================================================
             USER PROFILE
         ===================================================== */}
@@ -1045,7 +947,6 @@ const Sidebar = ({
 
             </div>
 
-
             {!isUsersPage && (
               <div className="flex flex-1 flex-col">
 
@@ -1060,7 +961,6 @@ const Sidebar = ({
               </div>
             )}
 
-
             {!isUsersPage && (
               <i
                 className={`bx flex h-6 w-6 flex-shrink-0 items-center justify-center rounded-md border border-amber-900/10 bg-amber-50/70 text-[23px] leading-none text-amber-700 dark:bg-gray-800/80 dark:text-gray-300 ${
@@ -1073,193 +973,216 @@ const Sidebar = ({
 
           </div>
 
-{/* USER DROPDOWN */}
+          {/* USER DROPDOWN */}
 
-{userDropdownOpen && (
-  <div
-    className="outfit-400 fade-in absolute top-2 left-full z-50 ml-2 w-60 rounded-md border p-1 shadow-lg"
-    style={{
-      backgroundColor: isDarkMode ? "#171d25" : "#ffffff",
-      borderColor: isDarkMode ? "#374151" : "#fde68a",
-      boxShadow: isDarkMode
-        ? "0 10px 30px rgba(0,0,0,0.45)"
-        : "0 10px 25px rgba(0,0,0,0.12)",
-    }}
-  >
+          {userDropdownOpen && (
+            <div
+              className="outfit-400 fade-in absolute top-2 left-full z-50 ml-2 w-60 rounded-md border p-1 shadow-lg"
+              style={{
+                backgroundColor: isDarkMode
+                  ? "#171d25"
+                  : "#ffffff",
 
-    {/* USER INFORMATION */}
-    <div className="flex items-center gap-3 px-2 py-3">
+                borderColor: isDarkMode
+                  ? "#374151"
+                  : "#fde68a",
 
-      <div
-        className={`flex h-8 w-10 items-center justify-center rounded-full ${
-          userInfo
-            ? avatarColor
-            : "bg-amber-500"
-        } text-sm font-bold text-white`}
-      >
-        {userInfo?.fullName
-          ? (() => {
-              const parts = userInfo.fullName
-                .trim()
-                .split(/\s+/);
+                boxShadow: isDarkMode
+                  ? "0 10px 30px rgba(0,0,0,0.45)"
+                  : "0 10px 25px rgba(0,0,0,0.12)",
+              }}
+            >
 
-              const firstInitial =
-                parts[0]?.[0] || "";
+              {/* USER INFORMATION */}
 
-              const lastInitial =
-                parts.length > 1
-                  ? parts[parts.length - 1][0]
-                  : "";
+              <div className="flex items-center gap-3 px-2 py-3">
 
-              return (
-                firstInitial + lastInitial
-              ).toUpperCase();
-            })()
-          : null}
-      </div>
+                <div
+                  className={`flex h-8 w-10 items-center justify-center rounded-full ${
+                    userInfo
+                      ? avatarColor
+                      : "bg-amber-500"
+                  } text-sm font-bold text-white`}
+                >
+                  {userInfo?.fullName
+                    ? (() => {
+                        const parts =
+                          userInfo.fullName
+                            .trim()
+                            .split(/\s+/);
 
-      <div className="flex w-full min-w-0 flex-col">
+                        const firstInitial =
+                          parts[0]?.[0] || "";
 
-        {/* NAME */}
-        <span
-          className="overflow-hidden text-ellipsis whitespace-nowrap font-semibold"
-          style={{
-            color: isDarkMode
-              ? "#ffffff"
-              : "#451a03",
-          }}
-        >
-          {userInfo?.fullName || "Loading..."}
-        </span>
+                        const lastInitial =
+                          parts.length > 1
+                            ? parts[
+                                parts.length - 1
+                              ][0]
+                            : "";
 
-        {/* EMAIL */}
-        <span
-          className="overflow-hidden text-ellipsis whitespace-nowrap text-xs"
-          style={{
-            color: isDarkMode
-              ? "#d1d5db"
-              : "#b45309",
-          }}
-        >
-          {userInfo?.email || "Loading..."}
-        </span>
+                        return (
+                          firstInitial +
+                          lastInitial
+                        ).toUpperCase();
+                      })()
+                    : null}
+                </div>
 
-      </div>
+                <div className="flex w-full min-w-0 flex-col">
 
-    </div>
+                  <span
+                    className="overflow-hidden text-ellipsis whitespace-nowrap font-semibold"
+                    style={{
+                      color: isDarkMode
+                        ? "#ffffff"
+                        : "#451a03",
+                    }}
+                  >
+                    {userInfo?.fullName ||
+                      "Loading..."}
+                  </span>
 
+                  <span
+                    className="overflow-hidden text-ellipsis whitespace-nowrap text-xs"
+                    style={{
+                      color: isDarkMode
+                        ? "#d1d5db"
+                        : "#b45309",
+                    }}
+                  >
+                    {userInfo?.email ||
+                      "Loading..."}
+                  </span>
 
-    {/* DIVIDER */}
-    <div
-      className="mx-1 h-[1px]"
-      style={{
-        backgroundColor: isDarkMode
-          ? "#374151"
-          : "#fef3c7",
-      }}
-    />
+                </div>
 
+              </div>
 
-    {/* PROFILE */}
-    <button
-      onClick={() => {
-        setUserDropdownOpen(false);
-        setShowProfileModal(true);
-      }}
-      className="mt-1 flex w-full cursor-pointer items-center justify-start rounded-sm px-4 py-3 text-left text-[14px] transition duration-200"
-      style={{
-        color: isDarkMode
-          ? "#ffffff"
-          : "#451a03",
-        backgroundColor: "transparent",
-      }}
-      onMouseEnter={(e) => {
-        e.currentTarget.style.backgroundColor =
-          isDarkMode
-            ? "#252d38"
-            : "#fef3c7";
-      }}
-      onMouseLeave={(e) => {
-        e.currentTarget.style.backgroundColor =
-          "transparent";
-      }}
-    >
-      <i className="bx bx-user mr-2 text-[16px]" />
-      Profile
-    </button>
+              {/* DIVIDER */}
 
+              <div
+                className="mx-1 h-[1px]"
+                style={{
+                  backgroundColor: isDarkMode
+                    ? "#374151"
+                    : "#fef3c7",
+                }}
+              />
 
-    {/* DARK / LIGHT MODE */}
-    <button
-      onClick={() =>
-        setIsDarkMode((prev) => !prev)
-      }
-      className="flex w-full cursor-pointer items-center justify-start rounded-sm px-4 py-3 text-left text-[14px] transition duration-200"
-      style={{
-        color: isDarkMode
-          ? "#ffffff"
-          : "#451a03",
-        backgroundColor: "transparent",
-      }}
-      onMouseEnter={(e) => {
-        e.currentTarget.style.backgroundColor =
-          isDarkMode
-            ? "#252d38"
-            : "#fef3c7";
-      }}
-      onMouseLeave={(e) => {
-        e.currentTarget.style.backgroundColor =
-          "transparent";
-      }}
-    >
-      <i
-        className={`bx ${
-          isDarkMode
-            ? "bx-sun"
-            : "bx-moon"
-        } mr-2 text-[16px]`}
-      />
+              {/* PROFILE */}
 
-      {isDarkMode
-        ? "Light Mode"
-        : "Dark Mode"}
-    </button>
+              <button
+                onClick={() => {
+                  setUserDropdownOpen(false);
+                  setShowProfileModal(true);
+                }}
+                className="mt-1 flex w-full cursor-pointer items-center justify-start rounded-sm px-4 py-3 text-left text-[14px] transition duration-200"
+                style={{
+                  color: isDarkMode
+                    ? "#ffffff"
+                    : "#451a03",
 
+                  backgroundColor:
+                    "transparent",
+                }}
+                onMouseEnter={(e) => {
+                  e.currentTarget.style.backgroundColor =
+                    isDarkMode
+                      ? "#252d38"
+                      : "#fef3c7";
+                }}
+                onMouseLeave={(e) => {
+                  e.currentTarget.style.backgroundColor =
+                    "transparent";
+                }}
+              >
+                <i className="bx bx-user mr-2 text-[16px]" />
+                Profile
+              </button>
 
-    {/* LOGOUT */}
-    <button
-      onClick={() =>
-        setShowLogoutModal(true)
-      }
-      className="flex w-full cursor-pointer items-center justify-start rounded-sm px-4 py-3 text-left text-[14px] transition duration-200"
-      style={{
-        color: isDarkMode
-          ? "#ffffff"
-          : "#451a03",
-        backgroundColor: "transparent",
-      }}
-      onMouseEnter={(e) => {
-        e.currentTarget.style.backgroundColor =
-          isDarkMode
-            ? "#252d38"
-            : "#fef3c7";
-      }}
-      onMouseLeave={(e) => {
-        e.currentTarget.style.backgroundColor =
-          "transparent";
-      }}
-    >
-      <i className="bx bx-arrow-out-right-square-half mr-2 text-[16px]" />
+              {/* DARK / LIGHT MODE */}
 
-      {isLoggingOut
-        ? "Logging out..."
-        : "Log out"}
-    </button>
+              <button
+                onClick={() =>
+                  setIsDarkMode(
+                    (prev) => !prev
+                  )
+                }
+                className="flex w-full cursor-pointer items-center justify-start rounded-sm px-4 py-3 text-left text-[14px] transition duration-200"
+                style={{
+                  color: isDarkMode
+                    ? "#ffffff"
+                    : "#451a03",
 
-  </div>
-)}
+                  backgroundColor:
+                    "transparent",
+                }}
+                onMouseEnter={(e) => {
+                  e.currentTarget.style.backgroundColor =
+                    isDarkMode
+                      ? "#252d38"
+                      : "#fef3c7";
+                }}
+                onMouseLeave={(e) => {
+                  e.currentTarget.style.backgroundColor =
+                    "transparent";
+                }}
+              >
+
+                <i
+                  className={`bx ${
+                    isDarkMode
+                      ? "bx-sun"
+                      : "bx-moon"
+                  } mr-2 text-[16px]`}
+                />
+
+                {isDarkMode
+                  ? "Light Mode"
+                  : "Dark Mode"}
+
+              </button>
+
+              {/* LOGOUT */}
+
+              <button
+                onClick={() =>
+                  setShowLogoutModal(true)
+                }
+                className="flex w-full cursor-pointer items-center justify-start rounded-sm px-4 py-3 text-left text-[14px] transition duration-200"
+                style={{
+                  color: isDarkMode
+                    ? "#ffffff"
+                    : "#451a03",
+
+                  backgroundColor:
+                    "transparent",
+                }}
+                onMouseEnter={(e) => {
+                  e.currentTarget.style.backgroundColor =
+                    isDarkMode
+                      ? "#252d38"
+                      : "#fef3c7";
+                }}
+                onMouseLeave={(e) => {
+                  e.currentTarget.style.backgroundColor =
+                    "transparent";
+                }}
+              >
+
+                <i className="bx bx-arrow-out-right-square-half mr-2 text-[16px]" />
+
+                {isLoggingOut
+                  ? "Logging out..."
+                  : "Log out"}
+
+              </button>
+
+            </div>
+          )}
+
           <div className="mt-2 mb-4 h-px w-full bg-amber-700/20 dark:bg-gray-700/70" />
-
 
           {!isUsersPage && (
             <div className="outfit-500 px-2 text-[11px] font-semibold uppercase tracking-[0.12em] text-amber-800/80 dark:text-gray-400">
@@ -1269,12 +1192,11 @@ const Sidebar = ({
 
         </div>
 
-
         {/* =====================================================
             MAIN MENU
         ===================================================== */}
 
-        <ul className="relative z-10 mt-2 mb-3 space-y-[5px] px-0">
+        <ul className="relative z-10 mt-2 mb-0 space-y-[5px] px-0">
 
           {menuItems.map(
             (item, index) => {
@@ -1294,7 +1216,6 @@ const Sidebar = ({
                     item.label
                   : routeActive;
 
-
               return (
                 <li
                   key={index}
@@ -1308,7 +1229,6 @@ const Sidebar = ({
                         : "bg-transparent"
                     }`}
                   />
-
 
                   <div className="px-3">
 
@@ -1488,7 +1408,6 @@ const Sidebar = ({
 
                         )}
 
-
                         {!isUsersPage && (
                           <span
                             className={`outfit-500 text-[15px] whitespace-nowrap ${
@@ -1505,7 +1424,6 @@ const Sidebar = ({
 
                     </Link>
 
-
                     {isUsersPage && (
                       <span className="pointer-events-none absolute top-1/2 left-full ml-2 -translate-y-1/2 rounded-md bg-amber-950 px-2 py-1 text-xs whitespace-nowrap text-white opacity-0 shadow-lg transition-opacity duration-150 group-hover:opacity-100 dark:bg-gray-700">
                         {item.label}
@@ -1519,94 +1437,10 @@ const Sidebar = ({
             }
           )}
 
-
-          {/* =================================================
-              IMPORT QUESTIONS
-              Shown to Faculty and up — same roles that can see
-              the Quizzes/Libraries section.
-          ================================================= */}
-
-          {parsedRoleId >= 2 && (
-            <li className="group relative">
-
-              <span
-                className={`absolute top-1/2 left-0 h-6 w-[5px] -translate-y-1/2 rounded-tr-lg rounded-br-lg ${
-                  isActive("/import-questions")
-                    ? "bg-amber-600"
-                    : "bg-transparent"
-                }`}
-              />
-
-              <div className="px-3">
-
-                <Link
-                  to="/import-questions"
-                  onClick={handleMenuClick}
-                  className={`group flex cursor-pointer items-center rounded-lg transition-colors hover:bg-amber-900/10 dark:hover:bg-orange-500/10 ${
-                    isUsersPage
-                      ? "justify-center py-[10px]"
-                      : "justify-start py-[6px]"
-                  } ${
-                    isActive("/import-questions")
-                      ? "bg-amber-900/10 text-amber-950 shadow-[inset_0_0_0_1px_rgba(120,53,15,0.15)] dark:text-gray-100"
-                      : "text-amber-700 dark:text-gray-400 hover:text-amber-900 dark:hover:text-orange-300"
-                  }`}
-                >
-
-                  <div
-                    className={`flex items-center ${
-                      isUsersPage
-                        ? "justify-center"
-                        : "ml-3 gap-3"
-                    }`}
-                  >
-
-                    <i
-                      className={`bx bx-import flex-shrink-0 ${
-                        isUsersPage
-                          ? "text-[20px]"
-                          : "text-[18px]"
-                      } ${
-                        isDarkMode
-                          ? "text-gray-100 drop-shadow-[0_0_2px_rgba(255,255,255,0.35)]"
-                          : "text-amber-700"
-                      }`}
-                    />
-
-
-                    {!isUsersPage && (
-                      <span
-                        className={`outfit-500 text-[15px] whitespace-nowrap ${
-                          isActive("/import-questions")
-                            ? "font-semibold text-amber-950 dark:text-gray-100"
-                            : "text-amber-700 dark:text-gray-400 hover:text-amber-900 dark:hover:text-orange-300"
-                        }`}
-                      >
-                        Import
-                      </span>
-                    )}
-
-                  </div>
-
-                </Link>
-
-
-                {isUsersPage && (
-                  <span className="pointer-events-none absolute top-1/2 left-full ml-2 -translate-y-1/2 rounded-md bg-amber-950 px-2 py-1 text-xs whitespace-nowrap text-white opacity-0 shadow-lg transition-opacity duration-150 group-hover:opacity-100 dark:bg-gray-700">
-                    Import
-                  </span>
-                )}
-
-              </div>
-
-            </li>
-          )}
-
         </ul>
 
-
         {/* =====================================================
-            SUBJECTS / QUALIFYING EXAM
+            SUBJECTS / IMPORT / EXPORT
         ===================================================== */}
 
         {(parsedRoleId === 2 ||
@@ -1616,20 +1450,11 @@ const Sidebar = ({
 
           <div className="relative z-10 flex flex-col space-y-[5px]">
 
-            <div className="px-3">
-
-              <div className="mb-4 h-px w-full bg-amber-700/20 dark:bg-gray-700/70" />
-
-              {!isUsersPage && (
-                <div className="outfit-500 px-2 text-[11px] font-semibold uppercase tracking-[0.12em] text-amber-800/80 dark:text-gray-400">
-                  QUALIFYING EXAM
-                </div>
-              )}
-
-            </div>
-
-
             <ul>
+
+              {/* =================================================
+                  SUBJECTS
+              ================================================= */}
 
               {classes.map(
                 (item, index) => {
@@ -1643,12 +1468,10 @@ const Sidebar = ({
                           ? "/dean/subjects"
                           : "/asso-dean/subjects";
 
-
                   const subjectActive =
                     isActive(
                       subjectsPath
                     );
-
 
                   return (
                     <li
@@ -1664,8 +1487,7 @@ const Sidebar = ({
                         }`}
                       />
 
-
-                      <div className="mt-1 px-3">
+                      <div className="mt-0 px-3">
 
                         <Link
                           to={
@@ -1714,7 +1536,6 @@ const Sidebar = ({
 
                             </span>
 
-
                             {!isUsersPage && (
                               <span
                                 className={`outfit-500 text-[15px] whitespace-nowrap ${
@@ -1731,7 +1552,6 @@ const Sidebar = ({
 
                         </Link>
 
-
                         {isUsersPage && (
                           <span className="pointer-events-none absolute top-1/2 left-full ml-2 -translate-y-1/2 rounded-md bg-amber-950 px-2 py-1 text-xs whitespace-nowrap text-white opacity-0 shadow-lg transition-opacity duration-150 group-hover:opacity-100 dark:bg-gray-700">
                             {item.label}
@@ -1745,13 +1565,97 @@ const Sidebar = ({
                 }
               )}
 
-
               {/* =================================================
-                  EXPORT
-                  Visible to Faculty and up.
+                  IMPORT QUESTIONS
               ================================================= */}
 
               {parsedRoleId >= 2 && (
+                <li className="group relative">
+
+                  <span
+                    className={`absolute top-1/2 left-0 h-6 w-[5px] -translate-y-1/2 rounded-tr-lg rounded-br-lg ${
+                      isActive(
+                        "/import-questions"
+                      )
+                        ? "bg-amber-600"
+                        : "bg-transparent"
+                    }`}
+                  />
+
+                  <div className="px-3">
+
+                    <Link
+                      to="/import-questions"
+                      onClick={
+                        handleMenuClick
+                      }
+                      className={`group flex cursor-pointer items-center rounded-lg transition-colors hover:bg-amber-900/10 dark:hover:bg-orange-500/10 ${
+                        isUsersPage
+                          ? "justify-center py-[10px]"
+                          : "justify-start py-[6px]"
+                      } ${
+                        isActive(
+                          "/import-questions"
+                        )
+                          ? "bg-amber-900/10 text-amber-950 shadow-[inset_0_0_0_1px_rgba(120,53,15,0.15)] dark:text-gray-100"
+                          : "text-amber-700 dark:text-gray-400 hover:text-amber-900 dark:hover:text-orange-300"
+                      }`}
+                    >
+
+                      <div
+                        className={`flex items-center ${
+                          isUsersPage
+                            ? "justify-center"
+                            : "ml-3 gap-3"
+                        }`}
+                      >
+
+                        <i
+                          className={`bx bx-import flex-shrink-0 ${
+                            isUsersPage
+                              ? "text-[20px]"
+                              : "text-[18px]"
+                          } ${
+                            isDarkMode
+                              ? "text-gray-100 drop-shadow-[0_0_2px_rgba(255,255,255,0.35)]"
+                              : "text-amber-700"
+                          }`}
+                        />
+
+                        {!isUsersPage && (
+                          <span
+                            className={`outfit-500 text-[15px] whitespace-nowrap ${
+                              isActive(
+                                "/import-questions"
+                              )
+                                ? "font-semibold text-amber-950 dark:text-gray-100"
+                                : "text-amber-700 dark:text-gray-400 hover:text-amber-900 dark:hover:text-orange-300"
+                            }`}
+                          >
+                            Import
+                          </span>
+                        )}
+
+                      </div>
+
+                    </Link>
+
+                    {isUsersPage && (
+                      <span className="pointer-events-none absolute top-1/2 left-full ml-2 -translate-y-1/2 rounded-md bg-amber-950 px-2 py-1 text-xs whitespace-nowrap text-white opacity-0 shadow-lg transition-opacity duration-150 group-hover:opacity-100 dark:bg-gray-700">
+                        Import
+                      </span>
+                    )}
+
+                  </div>
+
+                </li>
+              )}
+
+              {/* =================================================
+                  EXPORT
+              ================================================= */}
+
+              {parsedRoleId >= 3 && (
                 <li className="group relative">
 
                   <div className="px-3">
@@ -1759,7 +1663,7 @@ const Sidebar = ({
                     <button
                       onClick={() => {
                         setActiveMenu(
-                          "Print"
+                          "Export"
                         );
 
                         printButton.onClick();
@@ -1792,7 +1696,6 @@ const Sidebar = ({
                           )}
                         />
 
-
                         {!isUsersPage && (
                           <span
                             className={`outfit-500 text-[15px] whitespace-nowrap ${
@@ -1809,7 +1712,6 @@ const Sidebar = ({
 
                     </button>
 
-
                     {isUsersPage && (
                       <span className="pointer-events-none absolute top-1/2 left-full ml-2 -translate-y-1/2 rounded-md bg-amber-950 px-2 py-1 text-xs whitespace-nowrap text-white opacity-0 shadow-lg transition-opacity duration-150 group-hover:opacity-100 dark:bg-gray-700">
                         Export
@@ -1821,21 +1723,16 @@ const Sidebar = ({
                 </li>
               )}
 
-
-
             </ul>
 
           </div>
         )}
-
 
         {/* =====================================================
             FOOTER
         ===================================================== */}
 
         <div className="absolute bottom-4 left-0 z-10 w-full">
-
-          {/* CAPS */}
 
           <div className="px-3">
 
@@ -1869,10 +1766,10 @@ const Sidebar = ({
                   style={getDarkIconStyle()}
                 />
 
-
                 {!isUsersPage && (
                   <span className="outfit-500 flex items-baseline gap-1 text-[15px] whitespace-nowrap text-amber-700 dark:text-gray-400">
                     CAPS - REVIEW
+
                     <span className="text-xs font-medium">
                       <AppVersion />
                     </span>
@@ -1889,7 +1786,6 @@ const Sidebar = ({
 
       </div>
 
-
       {/* =====================================================
           PRINT MODAL
       ===================================================== */}
@@ -1902,7 +1798,6 @@ const Sidebar = ({
           setShowPrintModal(false)
         }
       />
-
 
       {/* =====================================================
           LOGOUT MODAL
@@ -1932,16 +1827,13 @@ const Sidebar = ({
 
             </div>
 
-
             <div className="outfit-700 mb-1 text-[20px]">
               Log out
             </div>
 
-
             <div className="outfit-400 mb-5 text-center text-[14px] text-gray-500 dark:text-gray-400">
               Are you sure you want to log out?
             </div>
-
 
             <button
               className="outfit-400 mb-2 w-full cursor-pointer rounded-lg bg-orange-500 py-2 text-[16px] font-semibold text-white transition hover:bg-orange-700"
@@ -1960,7 +1852,6 @@ const Sidebar = ({
                 "Yes, Log out"
               )}
             </button>
-
 
             <button
               className="border-color outfit-400 w-full cursor-pointer rounded-lg border py-2 text-[16px] font-semibold text-gray-700 transition hover:bg-gray-200 dark:border-gray-600 dark:text-gray-200 dark:hover:bg-gray-800"
@@ -1981,7 +1872,6 @@ const Sidebar = ({
         </div>
       )}
 
-
       {/* =====================================================
           PROFILE MODALS
       ===================================================== */}
@@ -1990,7 +1880,6 @@ const Sidebar = ({
         profile={profile}
         showToast={showToast}
       />
-
 
       {/* =====================================================
           TOAST
@@ -2001,10 +1890,8 @@ const Sidebar = ({
         type={toast.type}
         show={toast.show}
       />
-
     </>
   );
 };
-
 
 export default Sidebar;
