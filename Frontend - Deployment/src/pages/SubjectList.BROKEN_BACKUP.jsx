@@ -1,4 +1,4 @@
-﻿import React, { useEffect, useState, useRef } from "react";
+import React, { useEffect, useState, useRef } from "react";
 import { createPortal } from "react-dom";
 import {
   useNavigate,
@@ -17,6 +17,8 @@ import noInternetImage from "../assets/icons/404notfound.png";
 import emptyImage from "../assets/icons/empty.png";
 import AdminContent from "./AdminContent";
 
+import AllSubjectsIcon from "/src/assets/symbols/all.svg";
+import AllSubjectsIconH from "/src/assets/symbols/allhover.svg";
 import ReportsIcon from "/src/assets/symbols/reports.svg";
 
 import BlueBackground from "/src/assets/backgrounds/blue.png";
@@ -325,7 +327,7 @@ function SubjectList() {
   const { toast, showToast } = useToast();
   const apiUrl = import.meta.env.VITE_API_BASE_URL;
 
-  // Get unique program names for sidebar buttons â€” derived from actual subjects
+  // Get unique program names for sidebar buttons — derived from actual subjects
   // so only programs that have at least one subject are shown.
   const uniquePrograms = Array.from(
     new Set(subjects.map((s) => s.programName).filter(Boolean)),
@@ -836,8 +838,71 @@ function SubjectList() {
         }}
       >
         <div className="flex min-h-screen">
-{/* Main content area */}
-          <div className="scrollbar-hide mt-10 ml-0 flex min-h-screen flex-1 flex-col gap-6 overflow-y-auto pb-0 [-ms-overflow-style:none] [scrollbar-width:none] lg:mt-0 [&::-webkit-scrollbar]:hidden">
+          {/* Left sidebar panel */}
+          <aside className="fixed top-0 left-[63px] hidden h-screen w-56 overflow-hidden border-r border-gray-200 bg-white px-4 py-4 lg:block lg:w-64">
+            <h2 className="outfit-500 mb-4 text-[16px] tracking-wide text-black">
+              Subjects
+            </h2>
+
+            <nav className="outfit-500 space-y-1 text-[14px]">
+              <Link
+                to={basePath}
+                onClick={() => {
+                  setSelectedProgramFilter("All");
+                  window.scrollTo({ top: 0, behavior: "smooth" });
+                }}
+                className={`flex w-full cursor-pointer items-center justify-between rounded-md px-3 py-2 text-left transition-colors ${
+                  (location.pathname === "/dean/subjects" ||
+                    location.pathname === "/program-chair/subjects") &&
+                  location.pathname !== "/dean/subjects/archive" &&
+                  selectedProgramFilter === "All"
+                    ? "bg-gray-100 font-medium text-gray-900"
+                    : "text-gray-600 hover:bg-gray-100"
+                }`}
+              >
+                <span className="flex items-center gap-2">
+                  <img
+                    src={
+                      (location.pathname === "/dean/subjects" ||
+                        location.pathname === "/program-chair/subjects") &&
+                      location.pathname !== "/dean/subjects/archive" &&
+                      selectedProgramFilter === "All"
+                        ? AllSubjectsIconH
+                        : AllSubjectsIcon
+                    }
+                    alt="All Subjects"
+                    loading="lazy"
+                    decoding="async"
+                    className="h-4 w-4"
+                  />
+                  <span>All Subjects</span>
+                </span>
+              </Link>
+              <div className="my-4 h-px bg-gray-200" />
+              <div className="outfit-500 px-2 text-[12px] font-semibold text-gray-500">
+                PROGRAMS{" "}
+              </div>
+              {uniquePrograms.map((programName) => (
+                <button
+                  key={programName}
+                  type="button"
+                  onClick={() => {
+                    setSelectedProgramFilter(programName);
+                  }}
+                  className={`flex w-full cursor-pointer items-center justify-between rounded-md px-3 py-2 text-left transition-colors ${
+                    selectedProgramFilter === programName
+                      ? "bg-gray-100 font-medium text-gray-900"
+                      : "text-gray-600 hover:bg-gray-100"
+                  }`}
+                >
+                  <span>{getDisplayProgramName(programName)}</span>
+                </button>
+              ))}
+            </nav>
+          </aside>
+
+          {/* Main content area */}
+          <div className="scrollbar-hide mt-10 ml-0 flex min-h-screen flex-1 flex-col gap-6 overflow-y-auto pb-0 [-ms-overflow-style:none] [scrollbar-width:none] lg:mt-0 lg:ml-64 [&::-webkit-scrollbar]:hidden">
             <div className="min-w-0 space-y-4 px-4 pt-4 md:px-6 md:pt-6">
               <SearchBar
                 value={searchTerm}
@@ -1118,7 +1183,7 @@ function SubjectList() {
                                       month: "short",
                                       day: "numeric",
                                     })
-                                  : "â€”";
+                                  : "—";
 
                               const createdTime =
                                 subject.created_at || subject.createdAt
@@ -1128,7 +1193,7 @@ function SubjectList() {
                                       hour: "2-digit",
                                       minute: "2-digit",
                                     })
-                                  : "â€”";
+                                  : "—";
 
                               const updatedDate =
                                 subject.updated_at || subject.updatedAt
@@ -1139,7 +1204,7 @@ function SubjectList() {
                                       month: "short",
                                       day: "numeric",
                                     })
-                                  : "â€”";
+                                  : "—";
 
                               const updatedTime =
                                 subject.updated_at || subject.updatedAt
@@ -1149,11 +1214,11 @@ function SubjectList() {
                                       hour: "2-digit",
                                       minute: "2-digit",
                                     })
-                                  : "â€”";
+                                  : "—";
 
                               // Format lastQuestionAdded date (for all roles)
-                              let lastQuestionAddedDate = "â€”";
-                              let lastQuestionAddedTime = "â€”";
+                              let lastQuestionAddedDate = "—";
+                              let lastQuestionAddedTime = "—";
 
                               // Check if lastQuestionAdded exists and is not null/empty
                               if (
@@ -1280,7 +1345,7 @@ function SubjectList() {
                                       <div className="absolute right-3 bottom-3 z-20 flex items-center gap-1 rounded-full bg-black/60 px-2 py-1 text-[11px] font-medium text-white md:hidden">
                                         <i className="bx bx-time-five text-sm"></i>
                                         <span className="max-w-[120px] truncate">
-                                          {lastQuestionAddedDate !== "â€”"
+                                          {lastQuestionAddedDate !== "—"
                                             ? `Modified: ${lastQuestionAddedDate}`
                                             : "No questions yet"}
                                         </span>
@@ -1340,11 +1405,11 @@ function SubjectList() {
 
                                       {/* Date Information */}
                                       <div className="outfit-400 space-y-1 text-[12px] text-gray-600">
-                                        {lastQuestionAddedDate !== "â€”" ? (
+                                        {lastQuestionAddedDate !== "—" ? (
                                           // Show last question added date if available
                                           <div>
                                             Last modified: {lastQuestionAddedDate}{" "}
-                                            {lastQuestionAddedTime !== "â€”" &&
+                                            {lastQuestionAddedTime !== "—" &&
                                               `at ${lastQuestionAddedTime}`}
                                           </div>
                                         ) : (
@@ -1565,12 +1630,55 @@ function SubjectList() {
                         <div className="space-y-5">
                           <div>
                             <label className="mb-1.5 block text-[13px] font-semibold text-gray-700">
-                              Subject Name <span className="text-red-500">*</span>
+<<<<<<< HEAD
+                              Subject Code <span className="text-red-500">*</span>
                             </label>
+                            <div className="relative">
+                              <i className="bx bx-edit absolute top-1/2 left-3 -translate-y-1/2 text-gray-400"></i>
+=======
+                              Course Code <span className="text-red-500">*</span>
+                            </label>
+                            <div className="relative">
+                              <i className="bx bx-barcode absolute top-1/2 left-3 -translate-y-1/2 text-gray-400"></i>
+>>>>>>> origin/REVA
+                              <input
+                                type="text"
+                                placeholder="e.g. MATH123"
+                                value={newSubjectCode}
+                                onChange={(e) => setNewSubjectCode(e.target.value)}
+                                className="w-full rounded-xl border border-gray-200 py-2.5 pr-3 pl-9 text-sm transition focus:border-orange-400 focus:ring-2 focus:ring-orange-100 focus:outline-none"
+                              />
+                            </div>
+<<<<<<< HEAD
+=======
+                          </div>
 
+                          <div>
+                            <label className="mb-1.5 block text-[13px] font-semibold text-gray-700">
+                              Course Description <span className="text-red-500">*</span>
+                            </label>
                             <div className="relative">
                               <i className="bx bx-book-open absolute top-1/2 left-3 -translate-y-1/2 text-gray-400"></i>
+                              <input
+                                type="text"
+                                placeholder="e.g. Calculus 1"
+                                value={newSubjectName}
+                                onChange={(e) => setNewSubjectName(e.target.value)}
+                                className="w-full rounded-xl border border-gray-200 py-2.5 pr-3 pl-9 text-sm transition focus:border-orange-400 focus:ring-2 focus:ring-orange-100 focus:outline-none"
+                              />
+                            </div>
+>>>>>>> origin/REVA
+                            <p className="mt-1 text-[11px] text-gray-400">
+                              Enter the Course Description (max 20 characters).
+                            </p>
+                          </div>
 
+                          <div>
+                            <label className="mb-1.5 block text-[13px] font-semibold text-gray-700">
+                              Subject Name <span className="text-red-500">*</span>
+                            </label>
+                            <div className="relative">
+                              <i className="bx bx-book-open absolute top-1/2 left-3 -translate-y-1/2 text-gray-400"></i>
                               <input
                                 type="text"
                                 placeholder="e.g. Calculus 1"
@@ -1581,34 +1689,11 @@ function SubjectList() {
                             </div>
                           </div>
 
-                          <div>
-                            <label className="mb-1.5 block text-[13px] font-semibold text-gray-700">
-                              Subject Code <span className="text-red-500">*</span>
-                            </label>
-
-                            <div className="relative">
-                              <i className="bx bx-edit absolute top-1/2 left-3 -translate-y-1/2 text-gray-400"></i>
-
-                              <input
-                                type="text"
-                                placeholder="e.g. MATH123"
-                                value={newSubjectCode}
-                                onChange={(e) => setNewSubjectCode(e.target.value)}
-                                className="w-full rounded-xl border border-gray-200 py-2.5 pr-3 pl-9 text-sm transition focus:border-orange-400 focus:ring-2 focus:ring-orange-100 focus:outline-none"
-                              />
-                            </div>
-
-                            <p className="mt-1 text-[11px] text-gray-400">
-                              Enter the subject code (max 20 characters).
-                            </p>
-                          </div>
-
                           <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
                             <div>
                               <label className="mb-1.5 block text-[13px] font-semibold text-gray-700">
                                 Program <span className="text-red-500">*</span>
                               </label>
-
                               <RegisterDropDownSmall
                                 name="Program"
                                 value={selectedProgramID}
@@ -1621,7 +1706,6 @@ function SubjectList() {
                                   label: getDisplayProgramName(program.programName),
                                 }))}
                               />
-
                               <p className="mt-1 text-[11px] text-gray-400">
                                 Select the program for this subject.
                               </p>
@@ -1631,7 +1715,6 @@ function SubjectList() {
                               <label className="mb-1.5 block text-[13px] font-semibold text-gray-700">
                                 Year Level <span className="text-red-500">*</span>
                               </label>
-
                               <RegisterDropDownSmall
                                 name="Year Level"
                                 value={selectedYearLevelID}
@@ -1644,13 +1727,13 @@ function SubjectList() {
                                   label: `${yearLevel}${yearLevel === "1" ? "st" : yearLevel === "2" ? "nd" : yearLevel === "3" ? "rd" : "th"} Year`,
                                 }))}
                               />
-
                               <p className="mt-1 text-[11px] text-gray-400">
                                 Select the year level for this subject.
                               </p>
                             </div>
                           </div>
-                        </div>                      </form>
+                        </div>
+                      </form>
                     </div>
 
                     {/* Footer */}
@@ -2080,6 +2163,3 @@ function SubjectList() {
 }
 
 export default SubjectList;
-
-
-

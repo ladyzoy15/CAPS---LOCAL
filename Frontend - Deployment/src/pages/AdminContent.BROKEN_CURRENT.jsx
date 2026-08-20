@@ -28,7 +28,9 @@ const AdminContent = () => {
 
   // Context and state for subject and question management
   const { selectedSubject, setSelectedSubject } = useOutletContext();
-  const [activeTab, setActiveTab] = useState(0);
+  // Practice Exam tab (index 0) was removed from SubjectCard, so the
+  // dashboard now opens directly on "Review Question" (index 1).
+  const [activeTab, setActiveTab] = useState(1);
   const [questions, setQuestions] = useState([]);
   const [submittedQuestion, setSubmittedQuestion] = useState(null);
   const [editingQuestion, setEditingQuestion] = useState(null);
@@ -603,62 +605,6 @@ const AdminContent = () => {
                 pendingCount={questions.filter((q) => q.status_id === 1).length}
               />
 
-                )}
-            </div>
-
-            {/* Add Question Section */}
-            {(activeTab === 0 || activeTab === 1) && (
-              <div>
-                {/* Show Add Question Button Only If No Active Question and There Are Questions */}
-                {!submittedQuestion && filteredQuestions.length > 0 && (
-                  <div className="fixed right-4 bottom-[110px] z-49 text-center sm:right-[-4px] sm:bottom-[4px] sm:p-4 lg:p-4">
-                    <button
-                      onClick={() => {
-                        setSubmittedQuestion("new");
-                        setIsAddingQuestion(true);
-
-                        setTimeout(() => {
-                          if (formRef.current) {
-                            const yOffset = -500;
-                            const y =
-                              formRef.current.getBoundingClientRect().top +
-                              window.pageYOffset +
-                              yOffset;
-
-                            window.scrollTo({ top: y, behavior: "smooth" });
-                          }
-                        }, 100);
-                      }}
-                      className="cursor-pointer rounded-full bg-orange-500 px-[15px] py-[15px] text-[14px] font-semibold text-white shadow-xl hover:bg-orange-600 lg:rounded-xl lg:px-4 lg:py-2"
-                    >
-                      <div className="flex items-center justify-center gap-2">
-                        <i className="bx bx-plus text-[24px] lg:text-[16px]"></i>
-                        <span className="outfit-400 hidden lg:block">
-                          Add Question
-                        </span>
-                      </div>
-                    </button>
-                  </div>
-                )}
-
-                <div ref={formRef}>
-                  {/* Show Combined Form */}
-                  {submittedQuestion === "new" && (
-                    <div className="transition-all duration-300 ease-out">
-                      <AddQuestionForm
-                        subjectID={selectedSubject.subjectID}
-                        onComplete={handleQuestionAdded}
-                        onCancel={() => setSubmittedQuestion(null)}
-                        activeTab={activeTab}
-                        isExamQuestionsEnabled={
-                          isExamQuestionsEnabled[selectedSubject?.subjectID]
-                        }
-                      />
-                    </div>
-                  )}
-                </div>
-              </div>
-            )}
 
             {/* Questions List */}
             {(activeTab === 0 || activeTab === 1 || activeTab === 4) && (
@@ -1519,7 +1465,7 @@ const AdminContent = () => {
                         <span className="mt-4 text-[15px] text-gray-500">
                           No pending questions found
                         </span>
-                        <span className="text-[13px] text-gray-400 dark:text-gray-500">
+                        <span className="text-[13px] text-gray-400">
                           Questions awaiting approval will appear here
                         </span>
                       </div>
@@ -1533,7 +1479,7 @@ const AdminContent = () => {
                         <span className="mt-4 text-[14px] text-gray-600">
                           No questions added yet
                         </span>
-                        <span className="mb-6 text-[12px] text-gray-400 dark:text-gray-500">
+                        <span className="mb-6 text-[12px] text-gray-400">
                           Start building your question bank
                         </span>
                         <button
@@ -1581,7 +1527,7 @@ const AdminContent = () => {
             <span className="mt-4 text-[15px] text-gray-500">
               Select a Subject
             </span>
-            <span className="w-60 text-[13px] text-gray-400 dark:text-gray-500">
+            <span className="w-60 text-[13px] text-gray-400">
               To select a subject, press the subject icon on the navigation bar
             </span>
           </div>

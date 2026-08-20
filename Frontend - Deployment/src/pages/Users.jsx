@@ -1,4 +1,4 @@
-import React, { useEffect, useState, useRef } from "react";
+﻿import React, { useEffect, useState, useRef } from "react";
 import SortCustomDropdown from "/src/components/sortCustomDropdown";
 import ConfirmModal from "/src/components/confirmModal";
 import LoadingOverlay from "/src/components/loadingOverlay";
@@ -990,7 +990,7 @@ const UserList = () => {
       case 5:
         return "Associate Dean";
       default:
-        return "—";
+        return "â€”";
     }
   };
 
@@ -1580,8 +1580,7 @@ const UserList = () => {
                     <div className="outfit-500 absolute right-0 z-50 mt-3 w-45 rounded-lg border border-gray-200 bg-white shadow-lg">
                       <div className="max-h-60 overflow-y-auto p-1">
                         {[
-                          { value: "Student", label: "Student" },
-                          { value: "Instructor", label: "Instructor" },
+                                                    { value: "Instructor", label: "Instructor" },
                           { value: "Program Chair", label: "Program Chair" },
                           { value: "Associate Dean", label: "Associate Dean" },
                           { value: "Dean", label: "Dean" },
@@ -2306,7 +2305,7 @@ const UserList = () => {
                             ) : (
                               <div className={readOnlyFieldClass}>
                                 <span className="truncate">
-                                  {selectedUser.campus || "—"}
+                                  {selectedUser.campus || "â€”"}
                                 </span>
                               </div>
                             )}
@@ -2337,7 +2336,7 @@ const UserList = () => {
                             ) : (
                               <div className={readOnlyFieldClass}>
                                 <span className="truncate">
-                                  {selectedUser.program || "—"}
+                                  {selectedUser.program || "â€”"}
                                 </span>
                               </div>
                             )}
@@ -2380,7 +2379,7 @@ const UserList = () => {
                                       : "text-red-600"
                                 }`}
                               >
-                                {selectedUser.status || "—"}
+                                {selectedUser.status || "â€”"}
                               </span>
                             </div>
                           </div>
@@ -2752,7 +2751,7 @@ const UserList = () => {
                                 <span>{user.userCode}</span>
                                 {user.email && (
                                   <>
-                                    <span>•</span>
+                                    <span>â€¢</span>
                                     <span className="outfit-400-400 max-w-[200px] truncate">
                                       {user.email}
                                     </span>

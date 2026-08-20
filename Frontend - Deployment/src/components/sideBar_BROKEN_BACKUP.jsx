@@ -67,8 +67,7 @@ const Sidebar = ({
   const [isSubjectFocused, setIsSubjectFocused] =
     useState(false);
 
-  const [isLoading, setIsLoading] =
-    useState(false);
+  const [isLoading, setIsLoading] = useState(false);
 
   const [showPrintModal, setShowPrintModal] =
     useState(false);
@@ -183,7 +182,6 @@ const Sidebar = ({
   // =========================================================
 
   const getDarkIconStyle = (active = false) => {
-
     if (!isDarkMode) {
       return {
         opacity: 1,
@@ -261,12 +259,11 @@ const Sidebar = ({
 
 
   // =========================================================
-  // CLOSE USER DROPDOWN OUTSIDE
+  // CLOSE DROPDOWN OUTSIDE
   // =========================================================
 
   useEffect(() => {
     const handleClickOutside = (event) => {
-
       if (
         userDropdownRef.current &&
         !userDropdownRef.current.contains(
@@ -275,7 +272,6 @@ const Sidebar = ({
       ) {
         setUserDropdownOpen(false);
       }
-
     };
 
     document.addEventListener(
@@ -297,29 +293,22 @@ const Sidebar = ({
   // =========================================================
 
   const handleLogout = async () => {
-
     setIsLoggingOut(true);
 
     const token =
       sessionStorage.getItem("token");
 
     try {
-
       await fetch(`${apiUrl}/logout`, {
         method: "POST",
-
         headers: {
           "Content-Type": "application/json",
           Authorization: `Bearer ${token}`,
         },
       });
-
     } catch (error) {
-
       // Ignore network/backend errors.
-
     } finally {
-
       clearUserAvatarColor();
 
       logoutUser(
@@ -329,7 +318,6 @@ const Sidebar = ({
 
       setIsLoggingOut(false);
       setShowLogoutModal(false);
-
     }
   };
 
@@ -339,7 +327,6 @@ const Sidebar = ({
   // =========================================================
 
   const getDisplayName = () => {
-
     if (!userInfo?.fullName) {
       return "Loading...";
     }
@@ -363,14 +350,12 @@ const Sidebar = ({
 
 
   useEffect(() => {
-
     if (
       showProfileModal ||
       showChangePassword
     ) {
       setUserDropdownOpen(false);
     }
-
   }, [
     showProfileModal,
     showChangePassword,
@@ -451,24 +436,19 @@ const Sidebar = ({
   let menuItems = [];
 
   if (parsedRoleId === 1) {
-
     menuItems = [
       ...baseMenuItems,
     ];
-
   } else {
-
     menuItems = [
       ...baseMenuItems,
     ];
 
     if (parsedRoleId >= 2) {
-
       menuItems = [
         ...menuItems,
         ...adminItems,
       ];
-
     }
   }
 
@@ -480,7 +460,7 @@ const Sidebar = ({
   const importItem = {
     icon: "bx-import",
     label: "Import",
-    path: "/import",
+    path: "/import-questions",
   };
 
 
@@ -506,75 +486,31 @@ const Sidebar = ({
   const isActive = (path) => {
 
     if (path === "/class") {
-
       return (
         location.pathname === "/class" ||
-        location.pathname === "/archived-class" ||
+        location.pathname ===
+          "/archived-class" ||
         location.pathname.startsWith(
           "/class/"
         )
       );
-
     }
 
 
     if (path === "/libraries") {
-
       return (
-        location.pathname === "/libraries" ||
-        location.pathname === "/archived-quiz"
+        location.pathname ===
+          "/libraries" ||
+        location.pathname ===
+          "/archived-quiz"
       );
-
     }
 
 
-    if (path === "/import") {
-
+    if (path === "/import-questions") {
       return (
-        location.pathname === "/import" ||
-        location.pathname.startsWith(
-          "/import/"
-        )
+        location.pathname === "/import-questions"
       );
-
-    }
-
-
-    if (path === "/archive") {
-
-      return (
-        location.pathname ===
-          "/dean/subjects/archive" ||
-        location.pathname ===
-          "/asso-dean/subjects/archive"
-      );
-
-    }
-
-
-    if (path === "/dean/subjects/archive") {
-
-      return (
-        location.pathname ===
-          "/dean/subjects/archive" ||
-        location.pathname.startsWith(
-          "/dean/subjects/archive/"
-        )
-      );
-
-    }
-
-
-    if (path === "/asso-dean/subjects/archive") {
-
-      return (
-        location.pathname ===
-          "/asso-dean/subjects/archive" ||
-        location.pathname.startsWith(
-          "/asso-dean/subjects/archive/"
-        )
-      );
-
     }
 
 
@@ -589,13 +525,9 @@ const Sidebar = ({
   // =========================================================
 
   const handleMenuClick = () => {
-
     setIsSubjectFocused(false);
-
     setIsSubjectExpanded(false);
-
     setSelectedSubject(null);
-
     setActiveMenu(null);
   };
 
@@ -620,7 +552,6 @@ const Sidebar = ({
           id="mobile-bottom-nav"
           className="fixed right-0 bottom-0 left-0 z-50 flex justify-center pb-4"
         >
-
           <div
             className="
               mx-4
@@ -648,7 +579,6 @@ const Sidebar = ({
             >
 
               {parsedRoleId === 1 ? (
-
                 <>
                   {/* HOME / EXAMS */}
 
@@ -673,9 +603,7 @@ const Sidebar = ({
 
                         <span
                           className={`outfit-500 text-xs ${
-                            isActive(
-                              homeItem.path
-                            )
+                            isActive(homeItem.path)
                               ? "text-amber-950 dark:text-gray-100"
                               : "text-amber-700 dark:text-gray-400"
                           }`}
@@ -727,13 +655,9 @@ const Sidebar = ({
                     </Link>
 
                   </div>
-
                 </>
-
               ) : (
-
                 <>
-
                   {/* QUIZZES */}
 
                   <div className="flex h-16 flex-1 flex-col items-center justify-center">
@@ -844,9 +768,7 @@ const Sidebar = ({
 
                         <span
                           className={`outfit-500 text-xs ${
-                            isActive(
-                              homeItem.path
-                            )
+                            isActive(homeItem.path)
                               ? "text-amber-950 dark:text-gray-100"
                               : "text-amber-700 dark:text-gray-400"
                           }`}
@@ -918,13 +840,9 @@ const Sidebar = ({
                                 : "/asso-dean/subjects"
                         }
                         onClick={() => {
-
                           handleMenuClick();
-
                           setIsSubjectFocused(false);
-
                           setIsSubjectExpanded(false);
-
                         }}
                         className={`flex flex-col items-center transition-colors ${
                           isActive(
@@ -984,61 +902,16 @@ const Sidebar = ({
                   )}
 
 
-                  {/* =================================================
-                      ARCHIVE - MOBILE
-                  ================================================= */}
-
-                  {parsedRoleId >= 4 && (
-                    <div className="flex h-16 flex-1 flex-col items-center justify-center">
-
-                      <Link
-                        to={
-                          parsedRoleId === 5
-                            ? "/asso-dean/subjects/archive"
-                            : "/dean/subjects/archive"
-                        }
-                        onClick={handleMenuClick}
-                        className={`flex flex-col items-center transition-colors ${
-                          isActive("/archive")
-                            ? "text-amber-950 dark:text-gray-100"
-                            : "text-amber-700 dark:text-gray-400 hover:text-amber-900 dark:hover:text-orange-300"
-                        }`}
-                      >
-
-                        <span className="mb-1 flex h-6 w-6 items-center justify-center">
-
-                          {/* SAME COLOR AS OTHER ICONS */}
-
-                          <i
-                            className={`bx bx-archive text-[22px] ${
-                              isActive("/archive")
-                                ? "text-amber-950 dark:text-gray-100"
-                                : "text-amber-700 dark:text-gray-400"
-                            }`}
-                          />
-
-                        </span>
-
-                        <span className="outfit-500 text-xs">
-                          Archive
-                        </span>
-
-                      </Link>
-
-                    </div>
-                  )}
-
-
                   {/* IMPORT */}
 
                   {parsedRoleId >= 2 && (
                     <div className="flex h-16 flex-1 flex-col items-center justify-center">
 
                       <Link
-                        to="/import"
+                        to="/import-questions"
                         onClick={handleMenuClick}
                         className={`flex flex-col items-center transition-colors ${
-                          isActive("/import")
+                          isActive("/import-questions")
                             ? "text-amber-950 dark:text-gray-100"
                             : "text-amber-700 dark:text-gray-400 hover:text-amber-900 dark:hover:text-orange-300"
                         }`}
@@ -1046,17 +919,40 @@ const Sidebar = ({
 
                         <span className="mb-1 flex h-6 w-6 items-center justify-center">
 
-                          <i
-                            className={`bx bx-import text-[22px] ${
-                              isActive("/import")
+                          <svg
+                            viewBox="0 0 24 24"
+                            fill="none"
+                            xmlns="http://www.w3.org/2000/svg"
+                            className={`h-[22px] w-[22px] flex-shrink-0 ${
+                              isActive("/import-questions")
                                 ? "text-amber-950 dark:text-gray-100"
                                 : "text-amber-700 dark:text-gray-400"
                             }`}
-                          />
+                          >
+                            <path
+                              d="M12 3V14M12 14L8 10M12 14L16 10"
+                              stroke="currentColor"
+                              strokeWidth="1.8"
+                              strokeLinecap="round"
+                              strokeLinejoin="round"
+                            />
+                            <path
+                              d="M5 14V18.5C5 19.3284 5.67157 20 6.5 20H17.5C18.3284 20 19 19.3284 19 18.5V14"
+                              stroke="currentColor"
+                              strokeWidth="1.8"
+                              strokeLinecap="round"
+                            />
+                          </svg>
 
                         </span>
 
-                        <span className="outfit-500 text-xs">
+                        <span
+                          className={`outfit-500 text-xs ${
+                            isActive("/import-questions")
+                              ? "text-amber-950 dark:text-gray-100"
+                              : "text-amber-700 dark:text-gray-400"
+                          }`}
+                        >
                           Import
                         </span>
 
@@ -1069,21 +965,16 @@ const Sidebar = ({
               )}
 
             </div>
-
           </div>
-
         </div>
 
 
         <PrintExamModal
-          isOpen={
-            showPrintModal === true
-          }
+          isOpen={showPrintModal === true}
           onClose={() =>
             setShowPrintModal(false)
           }
         />
-
       </>
     );
   }
@@ -1118,7 +1009,6 @@ const Sidebar = ({
         }}
       >
 
-
         {/* =====================================================
             COLLAPSE BUTTON
         ===================================================== */}
@@ -1151,7 +1041,6 @@ const Sidebar = ({
             hover:text-amber-100
           "
         >
-
           <i
             className={`bx ${
               isCollapsed
@@ -1159,7 +1048,6 @@ const Sidebar = ({
                 : "bx-chevron-left"
             } text-[16px]`}
           />
-
         </button>
 
 
@@ -1197,14 +1085,14 @@ const Sidebar = ({
 
                 {userInfo?.fullName ? (
                   (() => {
-
                     const parts =
                       userInfo.fullName
                         .trim()
                         .split(" ");
 
                     const firstInitial =
-                      parts[0]?.[0] || "";
+                      parts[0]?.[0] ||
+                      "";
 
                     const lastInitial =
                       parts.length > 1
@@ -1217,7 +1105,6 @@ const Sidebar = ({
                       firstInitial +
                       lastInitial
                     ).toUpperCase();
-
                   })()
                 ) : (
                   <span className="inline-block size-8 animate-pulse rounded-full bg-amber-300" />
@@ -1265,16 +1152,16 @@ const Sidebar = ({
                 backgroundColor: isDarkMode
                   ? "#171d25"
                   : "#ffffff",
-
                 borderColor: isDarkMode
                   ? "#374151"
                   : "#fde68a",
-
                 boxShadow: isDarkMode
                   ? "0 10px 30px rgba(0,0,0,0.45)"
                   : "0 10px 25px rgba(0,0,0,0.12)",
               }}
             >
+
+              {/* USER INFORMATION */}
 
               <div className="flex items-center gap-3 px-2 py-3">
 
@@ -1285,10 +1172,8 @@ const Sidebar = ({
                       : "bg-amber-500"
                   } text-sm font-bold text-white`}
                 >
-
                   {userInfo?.fullName
                     ? (() => {
-
                         const parts =
                           userInfo.fullName
                             .trim()
@@ -1299,19 +1184,15 @@ const Sidebar = ({
 
                         const lastInitial =
                           parts.length > 1
-                            ? parts[
-                                parts.length - 1
-                              ][0]
+                            ? parts[parts.length - 1][0]
                             : "";
 
                         return (
                           firstInitial +
                           lastInitial
                         ).toUpperCase();
-
                       })()
                     : null}
-
                 </div>
 
 
@@ -1325,8 +1206,7 @@ const Sidebar = ({
                         : "#451a03",
                     }}
                   >
-                    {userInfo?.fullName ||
-                      "Loading..."}
+                    {userInfo?.fullName || "Loading..."}
                   </span>
 
                   <span
@@ -1337,8 +1217,7 @@ const Sidebar = ({
                         : "#b45309",
                     }}
                   >
-                    {userInfo?.email ||
-                      "Loading..."}
+                    {userInfo?.email || "Loading..."}
                   </span>
 
                 </div>
@@ -1346,13 +1225,14 @@ const Sidebar = ({
               </div>
 
 
+              {/* DIVIDER */}
+
               <div
                 className="mx-1 h-[1px]"
                 style={{
-                  backgroundColor:
-                    isDarkMode
-                      ? "#374151"
-                      : "#fef3c7",
+                  backgroundColor: isDarkMode
+                    ? "#374151"
+                    : "#fef3c7",
                 }}
               />
 
@@ -1361,41 +1241,29 @@ const Sidebar = ({
 
               <button
                 onClick={() => {
-
                   setUserDropdownOpen(false);
-
                   setShowProfileModal(true);
-
                 }}
                 className="mt-1 flex w-full cursor-pointer items-center justify-start rounded-sm px-4 py-3 text-left text-[14px] transition duration-200"
                 style={{
                   color: isDarkMode
                     ? "#ffffff"
                     : "#451a03",
-
-                  backgroundColor:
-                    "transparent",
+                  backgroundColor: "transparent",
                 }}
                 onMouseEnter={(e) => {
-
                   e.currentTarget.style.backgroundColor =
                     isDarkMode
                       ? "#252d38"
                       : "#fef3c7";
-
                 }}
                 onMouseLeave={(e) => {
-
                   e.currentTarget.style.backgroundColor =
                     "transparent";
-
                 }}
               >
-
                 <i className="bx bx-user mr-2 text-[16px]" />
-
                 Profile
-
               </button>
 
 
@@ -1403,32 +1271,24 @@ const Sidebar = ({
 
               <button
                 onClick={() =>
-                  setIsDarkMode(
-                    (prev) => !prev
-                  )
+                  setIsDarkMode((prev) => !prev)
                 }
                 className="flex w-full cursor-pointer items-center justify-start rounded-sm px-4 py-3 text-left text-[14px] transition duration-200"
                 style={{
                   color: isDarkMode
                     ? "#ffffff"
                     : "#451a03",
-
-                  backgroundColor:
-                    "transparent",
+                  backgroundColor: "transparent",
                 }}
                 onMouseEnter={(e) => {
-
                   e.currentTarget.style.backgroundColor =
                     isDarkMode
                       ? "#252d38"
                       : "#fef3c7";
-
                 }}
                 onMouseLeave={(e) => {
-
                   e.currentTarget.style.backgroundColor =
                     "transparent";
-
                 }}
               >
 
@@ -1458,23 +1318,17 @@ const Sidebar = ({
                   color: isDarkMode
                     ? "#ffffff"
                     : "#451a03",
-
-                  backgroundColor:
-                    "transparent",
+                  backgroundColor: "transparent",
                 }}
                 onMouseEnter={(e) => {
-
                   e.currentTarget.style.backgroundColor =
                     isDarkMode
                       ? "#252d38"
                       : "#fef3c7";
-
                 }}
                 onMouseLeave={(e) => {
-
                   e.currentTarget.style.backgroundColor =
                     "transparent";
-
                 }}
               >
 
@@ -1515,7 +1369,9 @@ const Sidebar = ({
                 item.path &&
                 typeof item.path ===
                   "string"
-                  ? isActive(item.path)
+                  ? isActive(
+                      item.path
+                    )
                   : false;
 
               const isItemActive =
@@ -1539,11 +1395,14 @@ const Sidebar = ({
                     }`}
                   />
 
+
                   <div className="px-3">
 
                     <Link
                       to={item.path}
-                      onClick={handleMenuClick}
+                      onClick={
+                        handleMenuClick
+                      }
                       className={`group flex cursor-pointer items-center rounded-lg transition-colors hover:bg-amber-900/10 dark:hover:bg-orange-500/10 ${
                         isUsersPage
                           ? "justify-center py-[10px]"
@@ -1563,8 +1422,10 @@ const Sidebar = ({
                         }`}
                       >
 
-                        {item.label === "Home" ? (
+                        {/* HOME */}
 
+                        {item.label ===
+                        "Home" ? (
                           <span className="relative flex-shrink-0">
 
                             <img
@@ -1586,7 +1447,8 @@ const Sidebar = ({
 
                           </span>
 
-                        ) : item.label === "Exams" ? (
+                        ) : item.label ===
+                          "Exams" ? (
 
                           <i
                             className={`bx bx-file-detail flex-shrink-0 ${
@@ -1594,13 +1456,14 @@ const Sidebar = ({
                                 ? "text-[20px]"
                                 : "text-[18px]"
                             } ${
-                              isItemActive
-                                ? "text-amber-950 dark:text-gray-100"
-                                : "text-amber-700 dark:text-gray-400"
+                              isDarkMode
+                                ? "text-gray-100 drop-shadow-[0_0_2px_rgba(255,255,255,0.35)]"
+                                : "text-amber-700"
                             }`}
                           />
 
-                        ) : item.label === "Quizzes" ? (
+                        ) : item.label ===
+                          "Quizzes" ? (
 
                           <span className="relative flex-shrink-0">
 
@@ -1623,7 +1486,8 @@ const Sidebar = ({
 
                           </span>
 
-                        ) : item.label === "Users" ? (
+                        ) : item.label ===
+                          "Users" ? (
 
                           <span className="relative flex-shrink-0">
 
@@ -1646,7 +1510,8 @@ const Sidebar = ({
 
                           </span>
 
-                        ) : item.label === "Classes" ? (
+                        ) : item.label ===
+                          "Classes" ? (
 
                           <span className="relative flex-shrink-0">
 
@@ -1669,7 +1534,8 @@ const Sidebar = ({
 
                           </span>
 
-                        ) : item.label === "Subjects" ? (
+                        ) : item.label ===
+                          "Subjects" ? (
 
                           <span className="relative flex-shrink-0">
 
@@ -1700,9 +1566,9 @@ const Sidebar = ({
                                 ? "text-[20px]"
                                 : "text-[18px]"
                             } ${
-                              isItemActive
-                                ? "text-amber-950 dark:text-gray-100"
-                                : "text-amber-700 dark:text-gray-400"
+                              isDarkMode
+                                ? "text-gray-100"
+                                : "text-amber-700"
                             }`}
                           />
 
@@ -1714,7 +1580,7 @@ const Sidebar = ({
                             className={`outfit-500 text-[15px] whitespace-nowrap ${
                               isItemActive
                                 ? "font-semibold text-amber-950 dark:text-gray-100"
-                                : "text-amber-700 dark:text-gray-400"
+                                : "text-amber-700 dark:text-gray-400 hover:text-amber-900 dark:hover:text-orange-300"
                             }`}
                           >
                             {item.label}
@@ -1739,489 +1605,74 @@ const Sidebar = ({
             }
           )}
 
-        </ul>
 
+          {/* =================================================
+              IMPORT QUESTIONS
+              Shown to Faculty and up — same roles that can see
+              the Quizzes/Libraries section.
+          ================================================= */}
 
-        {/* =====================================================
-            SUBJECTS / IMPORT / EXPORT / ARCHIVE
-        ===================================================== */}
+          {parsedRoleId >= 2 && (
+            <li className="group relative">
 
-        {(parsedRoleId === 2 ||
-          parsedRoleId === 3 ||
-          parsedRoleId === 4 ||
-          parsedRoleId === 5) && (
+              <span
+                className={`absolute top-1/2 left-0 h-6 w-[5px] -translate-y-1/2 rounded-tr-lg rounded-br-lg ${
+                  isActive("/import-questions")
+                    ? "bg-amber-600"
+                    : "bg-transparent"
+                }`}
+              />
 
-          <div className="relative z-10 flex flex-col space-y-[5px]">
+              <div className="px-3">
 
-            <div className="px-3">
-            </div>
-
-
-            <ul>
-
-              {/* =================================================
-                  SUBJECTS
-              ================================================= */}
-
-              {classes.map(
-                (item, index) => {
-
-                  const subjectsPath =
-                    parsedRoleId === 2
-                      ? "/faculty/subjects"
-                      : parsedRoleId === 3
-                        ? "/program-chair/subjects"
-                        : parsedRoleId === 4
-                          ? "/dean/subjects"
-                          : "/asso-dean/subjects";
-
-
-                  const subjectActive =
-                    isActive(subjectsPath);
-
-
-                  return (
-                    <li
-                      key={index}
-                      className="group relative"
-                    >
-
-                      <span
-                        className={`absolute top-1/2 left-0 h-6 w-[5px] -translate-y-1/2 rounded-tr-lg rounded-br-lg ${
-                          subjectActive
-                            ? "bg-amber-600"
-                            : "bg-transparent"
-                        }`}
-                      />
-
-
-                      <div className="mt-0 px-3">
-
-                        <Link
-                          to={subjectsPath}
-                          onClick={handleMenuClick}
-                          className={`group flex cursor-pointer items-center rounded-lg transition-colors hover:bg-amber-900/10 dark:hover:bg-orange-500/10 ${
-                            isUsersPage
-                              ? "justify-center py-[10px]"
-                              : "justify-start py-[6px]"
-                          } ${
-                            subjectActive
-                              ? "bg-amber-900/10 text-amber-950 dark:text-gray-100"
-                              : "text-amber-700 dark:text-gray-400"
-                          }`}
-                        >
-
-                          <div
-                            className={`flex items-center ${
-                              isUsersPage
-                                ? "justify-center"
-                                : "ml-3 gap-3"
-                            }`}
-                          >
-
-                            <span className="relative flex-shrink-0">
-
-                              <img
-                                src={
-                                  subjectActive
-                                    ? SubjectsIconH
-                                    : SubjectsIcon
-                                }
-                                alt="Subjects"
-                                className={`${
-                                  isUsersPage
-                                    ? "size-[20px]"
-                                    : "size-[18px]"
-                                } flex-shrink-0`}
-                                style={getDarkIconStyle(
-                                  subjectActive
-                                )}
-                              />
-
-                            </span>
-
-
-                            {!isUsersPage && (
-                              <span
-                                className={`outfit-500 text-[15px] whitespace-nowrap ${
-                                  subjectActive
-                                    ? "font-semibold text-amber-950 dark:text-gray-100"
-                                    : "text-amber-700 dark:text-gray-400"
-                                }`}
-                              >
-                                {item.label}
-                              </span>
-                            )}
-
-                          </div>
-
-                        </Link>
-
-
-                        {isUsersPage && (
-                          <span className="pointer-events-none absolute top-1/2 left-full ml-2 -translate-y-1/2 rounded-md bg-amber-950 px-2 py-1 text-xs whitespace-nowrap text-white opacity-0 shadow-lg transition-opacity duration-150 group-hover:opacity-100 dark:bg-gray-700">
-                            {item.label}
-                          </span>
-                        )}
-
-                      </div>
-
-                    </li>
-                  );
-                }
-              )}
-
-
-              {/* =================================================
-                  IMPORT
-              ================================================= */}
-
-              <li className="group relative">
-
-                <span
-                  className={`absolute top-1/2 left-0 h-6 w-[5px] -translate-y-1/2 rounded-tr-lg rounded-br-lg ${
-                    isActive("/import")
-                      ? "bg-amber-600"
-                      : "bg-transparent"
+                <Link
+                  to="/import-questions"
+                  onClick={handleMenuClick}
+                  className={`group flex cursor-pointer items-center rounded-lg transition-colors hover:bg-amber-900/10 dark:hover:bg-orange-500/10 ${
+                    isUsersPage
+                      ? "justify-center py-[10px]"
+                      : "justify-start py-[6px]"
+                  } ${
+                    isActive("/import-questions")
+                      ? "bg-amber-900/10 text-amber-950 shadow-[inset_0_0_0_1px_rgba(120,53,15,0.15)] dark:text-gray-100"
+                      : "text-amber-700 dark:text-gray-400 hover:text-amber-900 dark:hover:text-orange-300"
                   }`}
-                />
+                >
 
-                <div className="px-3">
-
-                  <Link
-                    to="/import"
-                    onClick={() => {
-
-                      handleMenuClick();
-
-                      setActiveMenu(null);
-
-                    }}
-                    className={`group flex w-full cursor-pointer items-center rounded-lg transition-colors hover:bg-amber-900/10 dark:hover:bg-orange-500/10 ${
+                  <div
+                    className={`flex items-center ${
                       isUsersPage
-                        ? "justify-center py-[10px]"
-                        : "justify-start py-[6px]"
-                    } ${
-                      isActive("/import")
-                        ? "bg-amber-900/10 text-amber-950 shadow-[inset_0_0_0_1px_rgba(120,53,15,0.15)] dark:text-gray-100"
-                        : "text-amber-700 dark:text-gray-400"
+                        ? "justify-center"
+                        : "ml-3 gap-3"
                     }`}
                   >
 
-                    <div
-                      className={`flex items-center ${
-                        isUsersPage
-                          ? "justify-center"
-                          : "ml-3 gap-3"
-                      }`}
-                    >
-
-                      <svg
-                        xmlns="http://www.w3.org/2000/svg"
-                        viewBox="0 0 24 24"
-                        fill="none"
-                        stroke="currentColor"
-                        strokeWidth="2"
-                        strokeLinecap="round"
-                        strokeLinejoin="round"
-                        className={`flex-shrink-0 ${
-                          isUsersPage
-                            ? "size-[20px]"
-                            : "size-[18px]"
-                        } ${
-                          isActive("/import")
-                            ? "text-amber-950 dark:text-gray-100"
-                            : "text-amber-700 dark:text-gray-400"
-                        }`}
-                      >
-
-                        <path d="M12 3v12" />
-
-                        <path d="m7 10 5 5 5-5" />
-
-                        <path d="M5 21h14" />
-
-                      </svg>
-
-
-                      {!isUsersPage && (
-                        <span
-                          className={`outfit-500 text-[15px] whitespace-nowrap ${
-                            isActive("/import")
-                              ? "font-semibold text-amber-950 dark:text-gray-100"
-                              : "text-amber-700 dark:text-gray-400"
-                          }`}
-                        >
-                          Import
-                        </span>
-                      )}
-
-                    </div>
-
-                  </Link>
-
-
-                  {isUsersPage && (
-                    <span className="pointer-events-none absolute top-1/2 left-full ml-2 -translate-y-1/2 rounded-md bg-amber-950 px-2 py-1 text-xs whitespace-nowrap text-white opacity-0 shadow-lg transition-opacity duration-150 group-hover:opacity-100 dark:bg-gray-700">
-                      Import
-                    </span>
-                  )}
-
-                </div>
-
-              </li>
-
-
-              {/* =================================================
-                  EXPORT
-              ================================================= */}
-
-              {parsedRoleId >= 3 && (
-                <li className="group relative">
-
-                  <div className="px-3">
-
-                    <button
-                      onClick={() => {
-
-                        setActiveMenu("Print");
-
-                        printButton.onClick();
-
-                      }}
-                      className={`group mt-[6px] mb-[6px] flex w-full cursor-pointer items-center rounded-lg transition-colors hover:bg-amber-900/10 dark:hover:bg-orange-500/10 ${
-                        isUsersPage
-                          ? "justify-center py-[10px]"
-                          : "justify-start py-[6px]"
-                      }`}
-                    >
-
-                      <div
-                        className={`flex items-center ${
-                          isUsersPage
-                            ? "justify-center"
-                            : "ml-3 gap-3"
-                        }`}
-                      >
-
-                        <img
-                          src={
-                            showPrintModal
-                              ? PrintIconH
-                              : PrintIcon
-                          }
-                          alt="Export"
-                          className="size-[20px] flex-shrink-0"
-                          style={getDarkIconStyle(
-                            showPrintModal
-                          )}
-                        />
-
-
-                        {!isUsersPage && (
-                          <span
-                            className={`outfit-500 text-[15px] whitespace-nowrap ${
-                              showPrintModal
-                                ? "font-semibold text-amber-950 dark:text-gray-100"
-                                : "text-amber-700 dark:text-gray-400"
-                            }`}
-                          >
-                            Export
-                          </span>
-                        )}
-
-                      </div>
-
-                    </button>
-
-
-                    {isUsersPage && (
-                      <span className="pointer-events-none absolute top-1/2 left-full ml-2 -translate-y-1/2 rounded-md bg-amber-950 px-2 py-1 text-xs whitespace-nowrap text-white opacity-0 shadow-lg transition-opacity duration-150 group-hover:opacity-100 dark:bg-gray-700">
-                        Export
-                      </span>
-                    )}
-
-                  </div>
-
-                </li>
-              )}
-
-
-              {/* =================================================
-                  ARCHIVE
-              ================================================= */}
-
-              {parsedRoleId >= 4 && (
-                <li className="group relative">
-
-                  <span
-                    className={`absolute top-1/2 left-0 h-6 w-[5px] -translate-y-1/2 rounded-tr-lg rounded-br-lg ${
-                      isActive("/archive")
-                        ? "bg-amber-600"
-                        : "bg-transparent"
-                    }`}
-                  />
-
-
-                  <div className="px-3">
-
-                    <Link
-                      to={
-                        parsedRoleId === 5
-                          ? "/asso-dean/subjects/archive"
-                          : "/dean/subjects/archive"
-                      }
-                      onClick={() => {
-
-                        handleMenuClick();
-
-                        setActiveMenu(null);
-
-                      }}
-                      className={`group flex w-full cursor-pointer items-center rounded-lg transition-colors hover:bg-amber-900/10 dark:hover:bg-orange-500/10 ${
-                        isUsersPage
-                          ? "justify-center py-[10px]"
-                          : "justify-start py-[6px]"
+                    <svg
+                      viewBox="0 0 24 24"
+                      fill="none"
+                      xmlns="http://www.w3.org/2000/svg"
+                      className={`flex-shrink-0 ${
+                        isUsersPage ? "h-[20px] w-[20px]" : "h-[18px] w-[18px]"
                       } ${
-                        isActive("/archive")
-                          ? "bg-amber-900/10 text-amber-950 shadow-[inset_0_0_0_1px_rgba(120,53,15,0.15)] dark:text-gray-100"
+                        isActive("/import-questions")
+                          ? "text-amber-950 dark:text-gray-100"
                           : "text-amber-700 dark:text-gray-400"
                       }`}
                     >
-
-                      <div
-                        className={`flex items-center ${
-                          isUsersPage
-                            ? "justify-center"
-                            : "ml-3 gap-3"
-                        }`}
-                      >
-
-                        {/* =================================================
-                            ARCHIVE ICON
-                            SAME COLOR AS OTHER SIDEBAR ICONS
-                        ================================================= */}
-
-                        <i
-                          className={`bx bx-archive flex-shrink-0 ${
-                            isUsersPage
-                              ? "text-[20px]"
-                              : "text-[18px]"
-                          } ${
-                            isActive("/archive")
-                              ? "text-amber-950 dark:text-gray-100"
-                              : "text-amber-700 dark:text-gray-400"
-                          }`}
-                          title="Archive"
-                        />
-
-
-                        {!isUsersPage && (
-                          <span
-                            className={`outfit-500 text-[15px] whitespace-nowrap ${
-                              isActive("/archive")
-                                ? "font-semibold text-amber-950 dark:text-gray-100"
-                                : "text-amber-700 dark:text-gray-400"
-                            }`}
-                          >
-                            Archive
-                          </span>
-                        )}
-
-                      </div>
-
-                    </Link>
-
-
-                    {isUsersPage && (
-                      <span className="pointer-events-none absolute top-1/2 left-full ml-2 -translate-y-1/2 rounded-md bg-amber-950 px-2 py-1 text-xs whitespace-nowrap text-white opacity-0 shadow-lg transition-opacity duration-150 group-hover:opacity-100 dark:bg-gray-700">
-                        Archive
-                      </span>
-                    )}
-
-                  </div>
-
-                </li>
-              )}
-
-            </ul>
-
-          </div>
-        )}
-
-
-        {/* =====================================================
-            FOOTER
-        ===================================================== */}
-
-        <div className="absolute bottom-4 left-0 z-10 w-full">
-
-          <div className="px-3">
-
-            <div className="mb-2 h-px w-full bg-amber-700/20 dark:bg-gray-700/70" />
-
-            <button
-              onClick={() =>
-                navigate("/team-rvw")
-              }
-              className={`group flex w-full cursor-pointer items-center rounded-lg px-3 py-[8px] transition-colors hover:bg-amber-900/10 dark:hover:bg-orange-500/10 ${
-                isUsersPage
-                  ? "justify-center"
-                  : "justify-start"
-              }`}
-            >
-
-              <div
-                className={`flex items-center ${
-                  isUsersPage
-                    ? ""
-                    : "gap-[10px]"
-                }`}
-              >
-
-                <img
-                  src={CollegeLogo}
-                  alt="REVA"
-                  className="size-[20px] flex-shrink-0"
-                  style={getDarkIconStyle()}
-                />
-
-
-                {!isUsersPage && (
-                  <span className="outfit-500 flex items-baseline gap-1 text-[15px] whitespace-nowrap text-amber-700 dark:text-gray-400">
-
-                    CAPS - REVIEW
-
-                    <span className="text-xs font-medium">
-                      <AppVersion />
-                    </span>
-
-                  </span>
-                )}
-
-              </div>
-
-            </button>
-
-          </div>
-
-        </div>
-
-      </div>
-
-
-      {/* =====================================================
-          PRINT MODAL
-      ===================================================== */}
-
-      <PrintExamModal
-        isOpen={
-          showPrintModal === true
-        }
-        onClose={() =>
-          setShowPrintModal(false)
-        }
-      />
+                      <path
+                        d="M12 3V14M12 14L8 10M12 14L16 10"
+                        stroke="currentColor"
+                        strokeWidth="1.8"
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                      />
+                      <path
+                        d="M5 14V18.5C5 19.3284 5.67157 20 6.5 20H17.5C18.3284 20 19 19.3284 19 18.5V14"
+                        stroke="currentColor"
+                        strokeWidth="1.8"
+                        strokeLinecap="round"
+                      />
+                    </svg>
 
 
       {/* =====================================================
@@ -2242,14 +1693,12 @@ const Sidebar = ({
                 viewBox="0 0 24 24"
                 stroke="orange"
               >
-
                 <path
                   strokeLinecap="round"
                   strokeLinejoin="round"
                   strokeWidth="2"
                   d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a2 2 0 01-2 2H7a2 2 0 01-2-2V7a2 2 0 012-2h4a2 2 0 012 2v1"
                 />
-
               </svg>
 
             </div>
@@ -2267,33 +1716,33 @@ const Sidebar = ({
 
             <button
               className="outfit-400 mb-2 w-full cursor-pointer rounded-lg bg-orange-500 py-2 text-[16px] font-semibold text-white transition hover:bg-orange-700"
-              onClick={handleLogout}
-              disabled={isLoggingOut}
+              onClick={
+                handleLogout
+              }
+              disabled={
+                isLoggingOut
+              }
             >
-
               {isLoggingOut ? (
-
                 <span className="flex items-center justify-center">
-
                   <span className="loader-white mr-2" />
-
                 </span>
-
               ) : (
-
                 "Yes, Log out"
-
               )}
-
             </button>
 
 
             <button
               className="border-color outfit-400 w-full cursor-pointer rounded-lg border py-2 text-[16px] font-semibold text-gray-700 transition hover:bg-gray-200 dark:border-gray-600 dark:text-gray-200 dark:hover:bg-gray-800"
               onClick={() =>
-                setShowLogoutModal(false)
+                setShowLogoutModal(
+                  false
+                )
               }
-              disabled={isLoggingOut}
+              disabled={
+                isLoggingOut
+              }
             >
               Cancel
             </button>

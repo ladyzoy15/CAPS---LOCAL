@@ -1,744 +1,1238 @@
-import React, { useEffect, useState, useRef } from "react";
-import { createPortal } from "react-dom";
-import {
-  useNavigate,
-  useLocation,
-  useOutletContext,
-  Link,
-} from "react-router-dom";
-import RegisterDropDownSmall from "../components/registerDropDownSmall";
-import Toast from "../components/Toast";
-import useToast from "../hooks/useToast";
-import notFoundImage from "../assets/icons/notfound.png";
-import noInternetImage from "../assets/icons/404notfound.png";
-import emptyImage from "../assets/icons/empty.png";
-import AdminContent from "./AdminContent";
-
-import AllSubjectsIcon from "/src/assets/symbols/all.svg";
-import AllSubjectsIconH from "/src/assets/symbols/allhover.svg";
-
-import ArchiveIcon from "/src/assets/symbols/archive.svg";
-import ArchiveIconH from "/src/assets/symbols/archivehover.svg";
-
-import SubPhoto from "../assets/gottfield.jpg";
-
-// Helper function to transform program names
-const getDisplayProgramName = (programName) => {
-  if (programName === "GE") {
-    return "General Subject";
-  }
-  // Expand common abbreviations
-  const programMap = {
-    CE: "Civil Engineering",
-    ABE: "Agricultural and Biosystems Engineering",
-    EE: "Electrical Engineering",
-    CpE: "Computer Engineering",
-    ECE: "Electronics Engineering",
-  };
-  return programMap[programName] || programName;
-};
+﻿import React, { useEffect, useMemo, useState } from "react";
+import { Archive, RotateCcw, Trash2, Search, ChevronDown } from "lucide-react";
 
 function SubjectsArchive() {
-  const navigate = useNavigate();
-  const location = useLocation();
-  const { selectedSubject, setSelectedSubject } = useOutletContext();
-  const params = new URLSearchParams(location.search);
-  const subjectID = params.get("subject_id") || params.get("subjectID");
-  const subjectFromState = location.state?.subject;
-
-  // If subject_id is in URL or subject is in state, set selectedSubject and render AdminContent
-  useEffect(() => {
-    if (subjectFromState && subjectFromState.subjectID) {
-      setSelectedSubject(subjectFromState);
-    } else if (subjectID && !selectedSubject) {
-      // If we have subjectID but no subject in state, fetch it
-      const fetchSubject = async () => {
-        const token = sessionStorage.getItem("token");
-        const apiUrl = import.meta.env.VITE_API_BASE_URL;
-        try {
-          const response = await fetch(`${apiUrl}/subjects/${subjectID}`, {
-            headers: {
-              Authorization: `Bearer ${token}`,
-            },
-          });
-          if (response.ok) {
-            const data = await response.json();
-            if (data.success && data.subject) {
-              setSelectedSubject(data.subject);
-            }
-          }
-        } catch (error) {
-          console.error("Error fetching subject:", error);
-        }
-      };
-      fetchSubject();
-    }
-  }, [subjectID, subjectFromState, setSelectedSubject, selectedSubject]);
-
-  // If subject_id is in URL or subject is in state, navigate to AdminContent route
-  useEffect(() => {
-    if (subjectFromState && subjectFromState.subjectID) {
-      setSelectedSubject(subjectFromState);
-      navigate(
-        "/dean/subjects/content?subjectID=" + subjectFromState.subjectID,
-        {
-          state: { subject: subjectFromState },
-          replace: true,
-        },
-      );
-      return;
-    }
-
-    if (subjectID) {
-      // If we have subjectID but no subject in state, fetch it first
-      const fetchSubject = async () => {
-        const token = sessionStorage.getItem("token");
-        const apiUrl = import.meta.env.VITE_API_BASE_URL;
-        try {
-          const response = await fetch(`${apiUrl}/subjects/${subjectID}`, {
-            headers: {
-              Authorization: `Bearer ${token}`,
-            },
-          });
-          if (response.ok) {
-            const data = await response.json();
-            if (data.success && data.subject) {
-              setSelectedSubject(data.subject);
-              navigate("/dean/subjects/content?subjectID=" + subjectID, {
-                state: { subject: data.subject },
-                replace: true,
-              });
-            }
-          }
-        } catch (error) {
-          console.error("Error fetching subject:", error);
-        }
-      };
-      fetchSubject();
-    }
-  }, [subjectID, subjectFromState, setSelectedSubject, navigate]);
-
-  const [subjects, setSubjects] = useState([]);
-  const [filteredSubjects, setFilteredSubjects] = useState([]);
-  const [selectedProgramFilter, setSelectedProgramFilter] = useState("All");
-  const [subjectLoading, setSubjectLoading] = useState(false);
-  const [networkError, setNetworkError] = useState(false);
-  const [searchTerm, setSearchTerm] = useState("");
-  const [openKebabMenu, setOpenKebabMenu] = useState(null);
-  const kebabMenuRef = useRef(null);
-
-  // Year level filter state
-  const [selectedYearLevelFilter, setSelectedYearLevelFilter] = useState("All");
-  const [showYearLevelDropdown, setShowYearLevelDropdown] = useState(false);
-  const yearLevelDropdownRef = useRef(null);
-
-  // Multi-selection state
-  const [selectedSubjects, setSelectedSubjects] = useState([]);
-  const kebabButtonRefs = useRef({});
-  const [dropdownButtonRect, setDropdownButtonRect] = useState(null);
-
-  // Close kebab menu when clicking outside
-  useEffect(() => {
-    const handleClickOutside = (event) => {
-      const clickedButton = Object.values(kebabButtonRefs.current).find(
-        (ref) => ref && ref.contains(event.target),
-      );
-
-      if (!clickedButton && openKebabMenu) {
-        // Check if click is outside the portal dropdown
-        const dropdownElement = document.querySelector(
-          ".fixed.z-50.min-w-\\[120px\\]",
-        );
-        if (!dropdownElement || !dropdownElement.contains(event.target)) {
-          setOpenKebabMenu(null);
-          setDropdownButtonRect(null);
-        }
-      }
-    };
-
-    if (openKebabMenu) {
-      document.addEventListener("mousedown", handleClickOutside);
-    }
-
-    return () => {
-      document.removeEventListener("mousedown", handleClickOutside);
-    };
-  }, [openKebabMenu]);
-
-  // Close year level dropdown when clicking outside
-  useEffect(() => {
-    const handleClickOutside = (event) => {
-      if (
-        yearLevelDropdownRef.current &&
-        !yearLevelDropdownRef.current.contains(event.target)
-      ) {
-        setShowYearLevelDropdown(false);
-      }
-    };
-
-    if (showYearLevelDropdown) {
-      document.addEventListener("mousedown", handleClickOutside);
-    }
-
-    return () => {
-      document.removeEventListener("mousedown", handleClickOutside);
-    };
-  }, [showYearLevelDropdown]);
-
-  const { toast, showToast } = useToast();
   const apiUrl = import.meta.env.VITE_API_BASE_URL;
 
-  // Get unique program names for sidebar buttons
-  const uniquePrograms = Array.from(
-    new Set(subjects.map((s) => s.programName).filter(Boolean)),
-  ).sort();
+  // ============================================================
+  // STATE
+  // ============================================================
 
-  // Filter subjects based on selected program, search term, and year level
-  useEffect(() => {
-    let filtered = subjects;
+  const [subjects, setSubjects] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState("");
 
-    // Filter by program
-    if (selectedProgramFilter !== "All") {
-      filtered = filtered.filter(
-        (subject) => subject.programName === selectedProgramFilter,
-      );
-    }
+  const [searchTerm, setSearchTerm] = useState("");
+  const [selectedYearLevel, setSelectedYearLevel] = useState("All");
 
-    // Filter by year level
-    if (selectedYearLevelFilter !== "All") {
-      filtered = filtered.filter(
-        (subject) => subject.yearLevel === selectedYearLevelFilter,
-      );
-    }
+  const [selectedSubjects, setSelectedSubjects] = useState([]);
 
-    // Filter by search term
-    if (searchTerm.trim()) {
-      filtered = filtered.filter(
-        (subject) =>
-          subject.subjectName
-            ?.toLowerCase()
-            .includes(searchTerm.toLowerCase().trim()) ||
-          subject.subjectCode
-            ?.toLowerCase()
-            .includes(searchTerm.toLowerCase().trim()),
-      );
-    }
+  const [isRestoring, setIsRestoring] = useState(false);
+  const [isDeleting, setIsDeleting] = useState(false);
 
-    setFilteredSubjects(filtered);
-  }, [selectedProgramFilter, selectedYearLevelFilter, subjects, searchTerm]);
+  const [showDeleteModal, setShowDeleteModal] = useState(false);
 
-  // Fetch archived subjects
-  useEffect(() => {
-    fetchSubjects();
-  }, []);
+  // ============================================================
+  // TOKEN
+  // ============================================================
 
-  // Listen for refresh events
-  useEffect(() => {
-    const handleRefresh = () => fetchSubjects();
-    window.addEventListener("refreshSubjectsList", handleRefresh);
-    return () =>
-      window.removeEventListener("refreshSubjectsList", handleRefresh);
-  }, []);
+  const getToken = () => {
+    return sessionStorage.getItem("token");
+  };
 
-  const fetchSubjects = async () => {
-    const token = sessionStorage.getItem("token");
-    setSubjectLoading(true);
-    setNetworkError(false);
+  // ============================================================
+  // GENERIC RESPONSE PARSER
+  // ============================================================
+
+  const parseResponse = async (response) => {
+    let data = {};
 
     try {
-      // Fetch archived subjects - adjust endpoint as needed
-      const response = await fetch(`${apiUrl}/subjects?archived=true`, {
+      data = await response.json();
+    } catch {
+      data = {};
+    }
+
+    if (!response.ok) {
+      throw new Error(
+        data?.message ||
+          data?.error ||
+          `Request failed with status ${response.status}.`,
+      );
+    }
+
+    return data;
+  };
+
+  // ============================================================
+  // FETCH ARCHIVED SUBJECTS
+  //
+  // IMPORTANT:
+  // Try the existing archive endpoints first.
+  // This avoids using the missing /subjects/archived route.
+  // ============================================================
+
+  const fetchArchivedSubjects = async () => {
+  setLoading(true);
+  setError("");
+
+  const token = sessionStorage.getItem("token");
+
+  try {
+    const response = await fetch(
+      `${apiUrl}/subjects?archived=true`,
+      {
         method: "GET",
         headers: {
+          Accept: "application/json",
           "Content-Type": "application/json",
           Authorization: `Bearer ${token}`,
         },
-      });
+      },
+    );
 
-      if (!response.ok) {
-        throw new Error(`HTTP error! Status: ${response.status}`);
+    if (!response.ok) {
+      throw new Error(
+        `HTTP ${response.status}: Failed to fetch archived subjects.`,
+      );
+    }
+
+    const data = await response.json();
+
+    console.log(
+      "Archived subjects response:",
+      data,
+    );
+
+    if (!data.success) {
+      throw new Error(
+        data.message ||
+          "Failed to fetch archived subjects.",
+      );
+    }
+
+    if (!Array.isArray(data.subjects)) {
+      throw new Error(
+        "Invalid archived subjects response.",
+      );
+    }
+
+    const archivedSubjects =
+      data.subjects.filter(
+        (subject) =>
+          subject.isArchived === true ||
+          subject.is_archived === true ||
+          subject.archived === true ||
+          subject.archived_at !== null ||
+          subject.archivedAt !== null ||
+          subject.status === "archived",
+      );
+
+    setSubjects(
+      archivedSubjects.length > 0
+        ? archivedSubjects
+        : data.subjects,
+    );
+
+    setSelectedSubjects([]);
+  } catch (err) {
+    console.error(
+      "Failed to load archived subjects:",
+      err,
+    );
+
+    setSubjects([]);
+    setSelectedSubjects([]);
+
+    setError(
+      err?.message ||
+        "Failed to load archived subjects.",
+    );
+  } finally {
+    setLoading(false);
+  }
+};
+  // ============================================================
+  // LOAD
+  // ============================================================
+
+  useEffect(() => {
+    fetchArchivedSubjects();
+  }, []);
+
+  // ============================================================
+  // SUBJECT ID
+  // ============================================================
+
+  const getSubjectID = (subject) => {
+    return (
+      subject?.subjectID ??
+      subject?.subject_id ??
+      subject?.id
+    );
+  };
+
+  // ============================================================
+  // YEAR LEVEL
+  // ============================================================
+
+  const getYearLevel = (subject) => {
+    return (
+      subject?.yearLevel ??
+      subject?.year_level ??
+      subject?.yearLevelName ??
+      subject?.year_level_name ??
+      ""
+    );
+  };
+
+  const formatYearLevel = (subject) => {
+    const value = getYearLevel(subject);
+
+    if (!value) {
+      return "—";
+    }
+
+    const text = String(value);
+
+    if (
+      text
+        .toLowerCase()
+        .includes("year")
+    ) {
+      return text;
+    }
+
+    const number = parseInt(text, 10);
+
+    if (!Number.isNaN(number)) {
+      if (number === 1) {
+        return "1st Year";
       }
 
-      const data = await response.json();
-
-      if (!data.success) {
-        throw new Error(data.message || "Failed to fetch archived subjects");
+      if (number === 2) {
+        return "2nd Year";
       }
 
-      if (!Array.isArray(data.subjects)) {
-        console.error("Unexpected subjects data format:", data);
+      if (number === 3) {
+        return "3rd Year";
+      }
+
+      return `${number}th Year`;
+    }
+
+    return text;
+  };
+
+  // ============================================================
+  // YEAR LEVEL OPTIONS
+  // ============================================================
+
+  const yearLevelOptions = useMemo(() => {
+    const values = subjects
+      .map((subject) =>
+        String(getYearLevel(subject)),
+      )
+      .filter(Boolean);
+
+    return [
+      "All",
+      ...Array.from(
+        new Set(values),
+      ),
+    ];
+  }, [subjects]);
+
+  // ============================================================
+  // FILTERED SUBJECTS
+  // ============================================================
+
+  const filteredSubjects = useMemo(() => {
+    const search =
+      searchTerm
+        .trim()
+        .toLowerCase();
+
+    return subjects.filter(
+      (subject) => {
+        const subjectName =
+          String(
+            subject?.subjectName ||
+              subject?.name ||
+              "",
+          ).toLowerCase();
+
+        const subjectCode =
+          String(
+            subject?.subjectCode ||
+              subject?.code ||
+              "",
+          ).toLowerCase();
+
+        const programName =
+          String(
+            subject?.programName ||
+              subject?.program ||
+              "",
+          ).toLowerCase();
+
+        const yearLevel =
+          String(
+            getYearLevel(subject),
+          );
+
+        const matchesSearch =
+          !search ||
+          subjectName.includes(search) ||
+          subjectCode.includes(search) ||
+          programName.includes(search);
+
+        const matchesYear =
+          selectedYearLevel === "All" ||
+          yearLevel ===
+            String(
+              selectedYearLevel,
+            );
+
+        return (
+          matchesSearch &&
+          matchesYear
+        );
+      },
+    );
+  }, [
+    subjects,
+    searchTerm,
+    selectedYearLevel,
+  ]);
+
+  // ============================================================
+  // FILTERED IDS
+  // ============================================================
+
+  const filteredIDs = useMemo(() => {
+    return filteredSubjects
+      .map(getSubjectID)
+      .filter(
+        (id) =>
+          id !== undefined &&
+          id !== null,
+      )
+      .map((id) => String(id));
+  }, [filteredSubjects]);
+
+  // ============================================================
+  // SELECTED IDS
+  // ============================================================
+
+  const selectedIDs =
+    selectedSubjects.map((id) =>
+      String(id),
+    );
+
+  // ============================================================
+  // SELECT ALL STATE
+  // ============================================================
+
+  const allSelected =
+    filteredIDs.length > 0 &&
+    filteredIDs.every((id) =>
+      selectedIDs.includes(id),
+    );
+
+  const someSelected =
+    filteredIDs.some((id) =>
+      selectedIDs.includes(id),
+    );
+
+  // ============================================================
+  // SELECT ONE
+  // ============================================================
+
+  const handleSelectSubject = (
+    subjectID,
+    checked,
+  ) => {
+    const id = String(subjectID);
+
+    setSelectedSubjects(
+      (previous) => {
+        const current =
+          previous.map((value) =>
+            String(value),
+          );
+
+        if (checked) {
+          if (
+            current.includes(id)
+          ) {
+            return current;
+          }
+
+          return [
+            ...current,
+            id,
+          ];
+        }
+
+        return current.filter(
+          (value) =>
+            value !== id,
+        );
+      },
+    );
+  };
+
+  // ============================================================
+  // SELECT ALL
+  // ============================================================
+
+  const handleSelectAll = (
+    checked,
+  ) => {
+    if (!checked) {
+      setSelectedSubjects(
+        (previous) =>
+          previous.filter(
+            (id) =>
+              !filteredIDs.includes(
+                String(id),
+              ),
+          ),
+      );
+
+      return;
+    }
+
+    setSelectedSubjects(
+      (previous) => {
+        const merged = [
+          ...previous.map(
+            (id) => String(id),
+          ),
+          ...filteredIDs,
+        ];
+
+        return Array.from(
+          new Set(merged),
+        );
+      },
+    );
+  };
+
+  // ============================================================
+  // RESTORE SUBJECTS
+  // ============================================================
+
+  const handleRestore = async () => {
+    if (
+      selectedSubjects.length ===
+        0 ||
+      isRestoring ||
+      isDeleting
+    ) {
+      return;
+    }
+
+    setIsRestoring(true);
+    setError("");
+
+    const token = getToken();
+
+    try {
+      const failedSubjects = [];
+
+      for (const subjectID of selectedSubjects) {
+        const response =
+          await fetch(
+            `${apiUrl}/subjects/${subjectID}/restore`,
+            {
+              method: "PATCH",
+              headers: {
+                Accept:
+                  "application/json",
+                "Content-Type":
+                  "application/json",
+                ...(token
+                  ? {
+                      Authorization: `Bearer ${token}`,
+                    }
+                  : {}),
+              },
+              credentials:
+                "include",
+            },
+          );
+
+        try {
+          await parseResponse(
+            response,
+          );
+        } catch (err) {
+          console.error(
+            `Failed to restore subject ${subjectID}:`,
+            err,
+          );
+
+          failedSubjects.push(
+            subjectID,
+          );
+        }
+      }
+
+      if (
+        failedSubjects.length >
+        0
+      ) {
+        throw new Error(
+          `Failed to restore ${failedSubjects.length} subject(s).`,
+        );
+      }
+
+      const restoredIDs =
+        selectedSubjects.map(
+          (id) => String(id),
+        );
+
+      setSubjects(
+        (previous) =>
+          previous.filter(
+            (subject) =>
+              !restoredIDs.includes(
+                String(
+                  getSubjectID(
+                    subject,
+                  ),
+                ),
+              ),
+          ),
+      );
+
+      setSelectedSubjects([]);
+
+      window.dispatchEvent(
+        new Event(
+          "refreshSubjectsList",
+        ),
+      );
+    } catch (err) {
+      console.error(
+        "Restore error:",
+        err,
+      );
+
+      setError(
+        err?.message ||
+          "Failed to restore selected subjects.",
+      );
+    } finally {
+      setIsRestoring(false);
+    }
+  };
+
+  // ============================================================
+  // PERMANENT DELETE
+  // ============================================================
+
+  const handlePermanentDelete =
+    async () => {
+      if (
+        selectedSubjects.length ===
+          0 ||
+        isRestoring ||
+        isDeleting
+      ) {
         return;
       }
 
-      const sortedSubjects = [...data.subjects].sort((a, b) => {
-        // First sort by program name
-        const programCompare = (a.programName || "").localeCompare(
-          b.programName || "",
+      setIsDeleting(true);
+      setError("");
+
+      const token = getToken();
+
+      try {
+        const failedSubjects = [];
+
+        for (const subjectID of selectedSubjects) {
+          const response =
+            await fetch(
+              `${apiUrl}/subjects/${subjectID}/permanent-delete`,
+              {
+                method: "DELETE",
+                headers: {
+                  Accept:
+                    "application/json",
+                  "Content-Type":
+                    "application/json",
+                  ...(token
+                    ? {
+                        Authorization: `Bearer ${token}`,
+                      }
+                    : {}),
+                },
+                credentials:
+                  "include",
+              },
+            );
+
+          try {
+            await parseResponse(
+              response,
+            );
+          } catch (err) {
+            console.error(
+              `Failed to permanently delete subject ${subjectID}:`,
+              err,
+            );
+
+            failedSubjects.push(
+              subjectID,
+            );
+          }
+        }
+
+        if (
+          failedSubjects.length >
+          0
+        ) {
+          throw new Error(
+            `Failed to permanently delete ${failedSubjects.length} subject(s).`,
+          );
+        }
+
+        const deletedIDs =
+          selectedSubjects.map(
+            (id) => String(id),
+          );
+
+        setSubjects(
+          (previous) =>
+            previous.filter(
+              (subject) =>
+                !deletedIDs.includes(
+                  String(
+                    getSubjectID(
+                      subject,
+                    ),
+                  ),
+                ),
+            ),
         );
-        if (programCompare !== 0) return programCompare;
 
-        // If programs are the same, sort by subject code
-        return a.subjectCode.localeCompare(b.subjectCode);
-      });
+        setSelectedSubjects([]);
 
-      setSubjects(sortedSubjects);
-      setFilteredSubjects(sortedSubjects);
-    } catch (error) {
-      if (error instanceof TypeError) {
-        setNetworkError(true);
+        setShowDeleteModal(
+          false,
+        );
+
+        window.dispatchEvent(
+          new Event(
+            "refreshSubjectsList",
+          ),
+        );
+      } catch (err) {
+        console.error(
+          "Permanent delete error:",
+          err,
+        );
+
+        setError(
+          err?.message ||
+            "Failed to permanently delete selected subjects.",
+        );
+      } finally {
+        setIsDeleting(false);
       }
-    } finally {
-      setSubjectLoading(false);
-    }
+    };
+
+  // ============================================================
+  // SUBJECT IMAGE
+  // ============================================================
+
+  const getSubjectImage = (
+    subject,
+  ) => {
+    return (
+      subject?.image ||
+      subject?.subjectImage ||
+      subject?.image_url ||
+      subject?.subject_image ||
+      null
+    );
   };
 
-  // Handle subject checkbox change
-  const handleSubjectCheckboxChange = (subjectID, isChecked) => {
-    if (isChecked) {
-      setSelectedSubjects((prev) => [...prev, subjectID]);
-    } else {
-      setSelectedSubjects((prev) => prev.filter((id) => id !== subjectID));
-    }
-  };
-
-  // Handle select all checkbox
-  const handleSelectAll = (isChecked) => {
-    if (isChecked) {
-      setSelectedSubjects(filteredSubjects.map((subject) => subject.subjectID));
-    } else {
-      setSelectedSubjects([]);
-    }
-  };
-
-  // Count how many filtered subjects are selected
-  const selectedFilteredCount = filteredSubjects.filter((subject) =>
-    selectedSubjects.includes(subject.subjectID),
-  ).length;
-
-  // Check if all visible subjects are selected
-  const isAllSelected =
-    filteredSubjects.length > 0 &&
-    selectedFilteredCount === filteredSubjects.length;
-
-  // Check if some (but not all) visible subjects are selected
-  const isIndeterminate =
-    filteredSubjects.length > 0 &&
-    selectedFilteredCount > 0 &&
-    selectedFilteredCount < filteredSubjects.length;
-
-  const yearLevelOptions = ["1", "2", "3", "4"];
-
-  // Handle subject click to navigate to question management
-  const handleSubjectClick = (subject) => {
-    setSelectedSubject(subject);
-    navigate(`/dean/subjects/content?subjectID=${subject.subjectID}`, {
-      state: { subject },
-    });
-  };
+  // ============================================================
+  // RENDER
+  // ============================================================
 
   return (
-    <div className="-ml-2 flex h-screen">
-      {/* Left sidebar panel */}
-      <aside className="fixed top-0 left-[220px] hidden h-screen w-56 overflow-hidden border-r border-gray-200 bg-white px-4 py-4 md:block lg:w-64">
-        <h2 className="outfit-500 mb-4 text-[16px] tracking-wide text-black">
-          Subjects
-        </h2>
+    <div className="min-h-screen w-full bg-[#fff8ef] px-4 py-6 dark:bg-[#0b0f14] sm:px-6 lg:px-8">
 
-        <nav className="outfit-500 space-y-1 text-[15px]">
-          <Link
-            to="/dean/subjects"
-            className={`flex w-full cursor-pointer items-center justify-between rounded-md px-3 py-2 text-left transition-colors ${
-              location.pathname === "/dean/subjects" &&
-              location.pathname !== "/dean/subjects/archive"
-                ? "bg-gray-100 font-medium text-gray-900"
-                : "text-gray-600 hover:bg-gray-100"
-            }`}
-          >
-            <span className="flex items-center gap-2">
-              <img
-                src={
-                  location.pathname === "/dean/subjects" &&
-                  location.pathname !== "/dean/subjects/archive"
-                    ? AllSubjectsIconH
-                    : AllSubjectsIcon
-                }
-                alt="All Subjects"
-                className="h-4 w-4"
-              />
-              <span>All Subjects</span>
-            </span>
-          </Link>
-          <div className="my-4 h-px bg-gray-200" />
-          <div className="outfit-500 px-2 text-[12px] font-semibold text-gray-500">
-            FIELDS{" "}
-          </div>
-          {uniquePrograms.map((programName) => (
-            <button
-              key={programName}
-              type="button"
-              onClick={() => setSelectedProgramFilter(programName)}
-              className={`flex w-full cursor-pointer items-center justify-between rounded-md px-3 py-2 text-left transition-colors ${
-                selectedProgramFilter === programName
-                  ? "bg-gray-100 font-medium text-gray-900"
-                  : "text-gray-600 hover:bg-gray-100"
-              }`}
-            >
-              <span>{getDisplayProgramName(programName)}</span>
-            </button>
-          ))}
+      <div className="mx-auto w-full max-w-6xl pb-32">
 
-          <div className="my-4 h-px bg-gray-200" />
+        {/* ======================================================
+            TITLE
+        ====================================================== */}
 
-          <Link
-            to="/dean/subjects/archive"
-            className={`flex w-full cursor-pointer items-center justify-between rounded-md px-3 py-2 text-left transition-colors ${
-              location.pathname === "/dean/subjects/archive"
-                ? "bg-gray-100 font-medium text-gray-900"
-                : "text-gray-600 hover:bg-gray-100"
-            }`}
-          >
-            <span className="flex items-center gap-2">
-              <img
-                src={
-                  location.pathname === "/dean/subjects/archive"
-                    ? ArchiveIconH
-                    : ArchiveIcon
-                }
-                alt="archives"
-                className="h-4 w-4"
-              />
-              <span>Archive</span>
-            </span>
-            <span className="text-xs text-gray-500">{subjects.length}</span>
-          </Link>
-        </nav>
-      </aside>
+        <div className="mb-7">
 
-      {/* Main content area */}
-      <div className="ml-[220px] flex-1 overflow-y-auto md:ml-[276px] lg:ml-[300px]">
-        <div className="mx-auto max-w-7xl px-4 py-6 sm:px-6 lg:px-8">
-          {/* Header */}
-          <div className="mb-6">
-            <h1 className="outfit-500 text-2xl font-semibold text-gray-900">
-              {searchTerm
-                ? `Search results for "${searchTerm}"`
-                : selectedProgramFilter === "All"
-                  ? "Archived Subjects"
-                  : `Archived Subjects - ${getDisplayProgramName(selectedProgramFilter)}`}
-            </h1>
-            {selectedSubjects.length > 0 && (
-              <p className="mt-1 text-sm text-gray-500">
-                Select the subjects you want to delete (
-                {selectedSubjects.length} selected)
-              </p>
-            )}
-          </div>
+          <h1 className="outfit-700 text-2xl font-bold text-gray-900 dark:text-gray-100">
+            Archived Subjects
+          </h1>
 
-          {/* Search and Filters */}
-          <div className="mb-6 flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
-            {/* Search Bar */}
-            <div className="relative flex-1">
-              <input
-                type="text"
-                placeholder="Search subjects..."
-                value={searchTerm}
-                onChange={(e) => setSearchTerm(e.target.value)}
-                className="w-full rounded-xl border border-gray-200 px-4 py-2 pl-10 text-[14px] text-gray-900 transition-all duration-200 hover:border-gray-500 focus:border-[#FE6902] focus:outline-none"
-              />
-              <i className="bx bx-search absolute top-1/2 left-3 -translate-y-1/2 text-gray-400"></i>
-              {searchTerm && (
-                <button
-                  onClick={() => setSearchTerm("")}
-                  className="absolute top-1/2 right-3 -translate-y-1/2 text-gray-400 hover:text-gray-600"
-                >
-                  <i className="bx bx-x text-lg"></i>
-                </button>
-              )}
-            </div>
-
-            {/* Year Level Filter and Actions */}
-            <div className="flex items-center gap-3">
-              {/* Year Level Dropdown */}
-              <div className="relative" ref={yearLevelDropdownRef}>
-                <button
-                  type="button"
-                  onClick={() =>
-                    setShowYearLevelDropdown(!showYearLevelDropdown)
-                  }
-                  className="outfit -mb-4 inline-flex cursor-pointer items-center rounded-xl border border-gray-200 bg-white px-4 py-2 text-[14px] font-medium text-gray-700 transition-colors hover:bg-gray-50"
-                >
-                  <span>
-                    {selectedYearLevelFilter === "All"
-                      ? "All Year Levels"
-                      : `Year ${selectedYearLevelFilter}`}
-                  </span>
-                  <i
-                    className={`bx bx-chevron-down ml-2 text-lg transition-transform ${
-                      showYearLevelDropdown ? "rotate-180" : ""
-                    }`}
-                  ></i>
-                </button>
-                {showYearLevelDropdown && (
-                  <div className="absolute right-0 z-20 mt-2 min-w-[160px] rounded-xl border border-gray-200 bg-white p-1 shadow-lg">
-                    <button
-                      type="button"
-                      onClick={() => {
-                        setSelectedYearLevelFilter("All");
-                        setShowYearLevelDropdown(false);
-                      }}
-                      className={`outfit-500 flex w-full cursor-pointer items-center gap-2 rounded-md px-3 py-2 text-left text-[14px] transition-colors ${
-                        selectedYearLevelFilter === "All"
-                          ? "bg-gray-100 text-black"
-                          : "text-gray-600 hover:bg-gray-200"
-                      }`}
-                    >
-                      All Year Levels
-                    </button>
-                    {yearLevelOptions.map((yearLevel) => (
-                      <button
-                        key={yearLevel}
-                        type="button"
-                        onClick={() => {
-                          setSelectedYearLevelFilter(yearLevel);
-                          setShowYearLevelDropdown(false);
-                        }}
-                        className={`outfit-500 flex w-full cursor-pointer items-center gap-2 rounded-md px-3 py-2 text-left text-sm transition-colors ${
-                          selectedYearLevelFilter === yearLevel
-                            ? "bg-gray-100 text-black"
-                            : "text-gray-600 hover:bg-gray-200"
-                        }`}
-                      >
-                        Year {yearLevel}
-                      </button>
-                    ))}
-                  </div>
-                )}
-              </div>
-            </div>
-          </div>
-
-          {/* Subject Count */}
-          {!subjectLoading && !networkError && (
-            <div className="mb-4 text-sm text-gray-600">
-              {filteredSubjects.length} subject(s)
-            </div>
-          )}
-
-          {/* Loading State */}
-          {subjectLoading && (
-            <div className="flex items-center justify-center py-12">
-              <div className="loader"></div>
-            </div>
-          )}
-
-          {/* Network Error State */}
-          {networkError && (
-            <div className="flex flex-col items-center justify-center py-12">
-              <img
-                src={noInternetImage}
-                alt="Network Error"
-                className="mb-4 h-32 w-32"
-              />
-              <p className="text-lg font-semibold text-gray-900">
-                Network Error
-              </p>
-              <p className="text-sm text-gray-500">
-                Please check your internet connection and try again.
-              </p>
-            </div>
-          )}
-
-          {/* Empty State */}
-          {!subjectLoading &&
-            !networkError &&
-            filteredSubjects.length === 0 && (
-              <div className="flex flex-col items-center justify-center py-12">
-                <img
-                  src={emptyImage}
-                  alt="No subjects"
-                  className="mb-4 h-32 w-32"
-                />
-                <p className="text-lg font-semibold text-gray-900">
-                  No archived subjects found
-                </p>
-                <p className="text-sm text-gray-500">
-                  {searchTerm
-                    ? "Try adjusting your search terms"
-                    : "Archived subjects will appear here"}
-                </p>
-              </div>
-            )}
-
-          {/* Subjects Table */}
-          {!subjectLoading && !networkError && filteredSubjects.length > 0 && (
-            <div className="outfit rounded-xl border border-gray-200 bg-white">
-              <div className="overflow-x-auto overflow-y-visible">
-                <table className="w-full">
-                  <thead className="border-b border-gray-200 bg-white">
-                    <tr>
-                      <th className="w-6 px-2 py-3">
-                        <input
-                          type="checkbox"
-                          checked={isAllSelected && !isIndeterminate}
-                          ref={(input) => {
-                            if (input) {
-                              input.indeterminate = isIndeterminate;
-                            }
-                          }}
-                          onChange={(e) => handleSelectAll(e.target.checked)}
-                          className="h-4 w-4 cursor-pointer rounded border-gray-500 text-orange-500"
-                        />
-                      </th>
-                      <th className="px-6 py-3 text-left text-sm font-semibold text-gray-900">
-                        Subject Information
-                      </th>
-                      <th className="px-6 py-4 text-right text-sm font-semibold text-gray-900">
-                        Actions
-                      </th>
-                    </tr>
-                  </thead>
-                  <tbody className="divide-y divide-gray-200 bg-white">
-                    {filteredSubjects.map((subject) => (
-                      <tr
-                        key={subject.subjectID}
-                        onClick={() => handleSubjectClick(subject)}
-                        className="cursor-pointer transition-colors hover:bg-gray-50"
-                      >
-                        <td
-                          className="w-12 px-4 py-3"
-                          onClick={(e) => e.stopPropagation()}
-                        >
-                          <input
-                            type="checkbox"
-                            checked={selectedSubjects.includes(
-                              subject.subjectID,
-                            )}
-                            onChange={(e) =>
-                              handleSubjectCheckboxChange(
-                                subject.subjectID,
-                                e.target.checked,
-                              )
-                            }
-                            onClick={(e) => e.stopPropagation()}
-                            className="h-4 w-4 cursor-pointer rounded border-gray-500 text-orange-500"
-                          />
-                        </td>
-                        <td className="px-6 py-4">
-                          <div className="flex items-center gap-3">
-                            <div className="flex size-10 items-center justify-center overflow-hidden rounded bg-gray-100">
-                              <img
-                                src={SubPhoto}
-                                alt={subject.subjectName}
-                                className="h-full w-full object-cover"
-                              />
-                            </div>
-                            <div>
-                              <div className="text-sm font-semibold text-gray-900">
-                                {subject.subjectName}
-                              </div>
-                              <div className="mt-0.5 flex items-center gap-2 text-xs text-gray-500">
-                                <span>{subject.subjectCode}</span>
-                                {subject.yearLevel && (
-                                  <>
-                                    <span>•</span>
-                                    <span>{subject.yearLevel}</span>
-                                  </>
-                                )}
-                              </div>
-                            </div>
-                          </div>
-                        </td>
-
-                        <td className="px-6 py-4 text-right whitespace-nowrap">
-                          <div
-                            ref={kebabMenuRef}
-                            className="relative z-50 flex items-center justify-end"
-                          >
-                            <button
-                              ref={(el) => {
-                                kebabButtonRefs.current[subject.subjectID] = el;
-                              }}
-                              onClick={(e) => {
-                                e.stopPropagation();
-                                const button =
-                                  kebabButtonRefs.current[subject.subjectID];
-                                if (button) {
-                                  const rect = button.getBoundingClientRect();
-                                  setDropdownButtonRect({
-                                    top: rect.top + window.scrollY,
-                                    right:
-                                      window.innerWidth -
-                                      rect.right +
-                                      window.scrollX,
-                                    bottom: rect.bottom + window.scrollY,
-                                    subjectID: subject.subjectID,
-                                  });
-                                }
-                                setOpenKebabMenu(
-                                  openKebabMenu === subject.subjectID
-                                    ? null
-                                    : subject.subjectID,
-                                );
-                              }}
-                              className="flex cursor-pointer items-center justify-center rounded-lg border border-gray-300 p-2 text-gray-600 transition-colors hover:bg-gray-100 hover:text-gray-600"
-                            >
-                              <i className="bx bx-dots-vertical-rounded text-xl"></i>
-                            </button>
-                          </div>
-                        </td>
-                      </tr>
-                    ))}
-                  </tbody>
-                </table>
-              </div>
-            </div>
-          )}
         </div>
-      </div>
 
-      {/* Dropdown Portal - Rendered outside table */}
-      {openKebabMenu &&
-        dropdownButtonRect &&
-        createPortal(
-          <div
-            ref={kebabMenuRef}
-            className="outfit-500 fixed z-50 min-w-[120px] rounded-lg border border-gray-200 bg-white p-1 shadow-lg"
-            style={{
-              top: `${
-                window.innerHeight -
-                  (dropdownButtonRect.bottom - window.scrollY) <
-                100
-                  ? dropdownButtonRect.top - 90
-                  : dropdownButtonRect.bottom + 8
-              }px`,
-              right: `${dropdownButtonRect.right}px`,
-            }}
-            onClick={(e) => e.stopPropagation()}
-          >
-            <button
-              className="outfit-500 flex w-full cursor-pointer items-center gap-2 rounded-md px-3 py-2 text-sm text-gray-700 transition-colors hover:bg-gray-100"
-              onClick={(e) => {
-                e.stopPropagation();
-                const subject = filteredSubjects.find(
-                  (s) => s.subjectID === openKebabMenu,
-                );
-                if (subject) {
-                  // Handle restore or other actions for archived subjects
-                  showToast("Restore functionality coming soon", "info");
-                }
-                setOpenKebabMenu(null);
-                setDropdownButtonRect(null);
-              }}
+        {/* ======================================================
+            SEARCH + YEAR LEVEL
+        ====================================================== */}
+
+        <div className="mb-6 flex w-full items-center gap-4">
+
+          <div className="relative min-w-0 flex-1">
+
+            <Search
+              size={18}
+              className="absolute top-1/2 left-3.5 -translate-y-1/2 text-gray-400"
+            />
+
+            <input
+              type="text"
+              value={searchTerm}
+              onChange={(event) =>
+                setSearchTerm(
+                  event.target.value,
+                )
+              }
+              placeholder="Search subjects..."
+              className="outfit-400 h-11 w-full rounded-xl border border-gray-200 bg-white pl-11 pr-4 text-sm text-gray-800 outline-none transition focus:border-orange-400 focus:ring-2 focus:ring-orange-100 dark:border-gray-700 dark:bg-[#11161d] dark:text-gray-100"
+            />
+
+          </div>
+
+          <div className="relative shrink-0">
+
+            <select
+              value={
+                selectedYearLevel
+              }
+              onChange={(event) =>
+                setSelectedYearLevel(
+                  event.target.value,
+                )
+              }
+              className="outfit-400 h-11 min-w-[155px] appearance-none rounded-xl border border-gray-200 bg-white px-4 pr-10 text-sm text-gray-800 outline-none focus:border-orange-400 dark:border-gray-700 dark:bg-[#11161d] dark:text-gray-100"
             >
-              <i className="bx bx-undo text-sm"></i>
-              Restore
+
+              {yearLevelOptions.map(
+                (year) => (
+                  <option
+                    key={year}
+                    value={year}
+                  >
+                    {year === "All"
+                      ? "All Year Levels"
+                      : formatYearLevel(
+                          {
+                            yearLevel:
+                              year,
+                          },
+                        )}
+                  </option>
+                ),
+              )}
+
+            </select>
+
+            <ChevronDown
+              size={17}
+              className="pointer-events-none absolute top-1/2 right-3 -translate-y-1/2 text-gray-500"
+            />
+
+          </div>
+
+        </div>
+
+        {/* ======================================================
+            COUNT
+        ====================================================== */}
+
+        <div className="mb-5 flex items-center justify-between">
+
+          <p className="outfit-400 text-sm text-gray-600 dark:text-gray-400">
+
+            {filteredSubjects.length}{" "}
+            subject(s)
+
+          </p>
+
+          {selectedSubjects.length >
+            0 && (
+            <p className="outfit-500 text-sm font-semibold text-orange-600 dark:text-orange-400">
+
+              {selectedSubjects.length}{" "}
+              selected
+
+            </p>
+          )}
+
+        </div>
+
+        {/* ======================================================
+            ERROR
+        ====================================================== */}
+
+        {error && (
+
+          <div className="mb-5 flex items-center justify-between gap-4 rounded-xl border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-700 dark:border-red-900/50 dark:bg-red-950/20 dark:text-red-300">
+
+            <span>
+              {error}
+            </span>
+
+            <button
+              type="button"
+              onClick={
+                fetchArchivedSubjects
+              }
+              className="shrink-0 font-semibold underline"
+            >
+              Retry
             </button>
-          </div>,
-          document.body,
+
+          </div>
+
         )}
 
-      {/* Toast */}
-      <Toast message={toast.message} type={toast.type} show={toast.show} />
+        {/* ======================================================
+            LOADING
+        ====================================================== */}
+
+        {loading ? (
+
+          <div className="rounded-xl border border-gray-200 bg-white px-6 py-16 text-center dark:border-gray-700 dark:bg-[#11161d]">
+
+            <div className="mx-auto mb-3 h-8 w-8 animate-spin rounded-full border-2 border-orange-200 border-t-orange-500" />
+
+            <p className="text-sm text-gray-400">
+              Loading archived subjects...
+            </p>
+
+          </div>
+
+        ) : filteredSubjects.length ===
+          0 ? (
+
+          /* ====================================================
+             EMPTY
+          ==================================================== */
+
+          <div className="rounded-xl border border-dashed border-gray-300 bg-white px-6 py-16 text-center dark:border-gray-700 dark:bg-[#11161d]">
+
+            <Archive
+              size={40}
+              className="mx-auto mb-3 text-gray-300 dark:text-gray-600"
+            />
+
+            <p className="font-semibold text-gray-600 dark:text-gray-300">
+              No archived subjects.
+            </p>
+
+            <p className="mt-1 text-sm text-gray-400">
+              Subjects that you archive
+              will appear here.
+            </p>
+
+          </div>
+
+        ) : (
+
+          /* ====================================================
+             SUBJECT TABLE
+          ==================================================== */
+
+          <div className="overflow-hidden rounded-xl border border-gray-200 bg-white dark:border-gray-700 dark:bg-[#11161d]">
+
+            <div className="overflow-x-auto">
+
+              <table className="w-full">
+
+                <thead className="border-b border-gray-200 dark:border-gray-700">
+
+                  <tr>
+
+                    {/* SELECT ALL */}
+
+                    <th className="w-16 px-4 py-4 text-center">
+
+                      <input
+                        type="checkbox"
+                        checked={
+                          allSelected
+                        }
+                        ref={(element) => {
+                          if (element) {
+                            element.indeterminate =
+                              someSelected &&
+                              !allSelected;
+                          }
+                        }}
+                        onChange={(
+                          event,
+                        ) =>
+                          handleSelectAll(
+                            event.target
+                              .checked,
+                          )
+                        }
+                        className="h-4 w-4 cursor-pointer rounded border-gray-400 text-orange-500 focus:ring-orange-500"
+                        aria-label="Select all subjects"
+                      />
+
+                    </th>
+
+                    {/* ONLY ONE COLUMN */}
+                    {/* NO ACTIONS COLUMN */}
+
+                    <th className="px-4 py-4 text-left text-sm font-semibold text-gray-900 dark:text-gray-100">
+
+                      Subject Information
+
+                    </th>
+
+                  </tr>
+
+                </thead>
+
+                <tbody className="divide-y divide-gray-200 dark:divide-gray-700">
+
+                  {filteredSubjects.map(
+                    (subject) => {
+                      const subjectID =
+                        getSubjectID(
+                          subject,
+                        );
+
+                      const isSelected =
+                        selectedIDs.includes(
+                          String(
+                            subjectID,
+                          ),
+                        );
+
+                      const image =
+                        getSubjectImage(
+                          subject,
+                        );
+
+                      return (
+
+                        <tr
+                          key={
+                            subjectID
+                          }
+                          className={`transition-colors ${
+                            isSelected
+                              ? "bg-orange-50/60 dark:bg-orange-500/5"
+                              : "hover:bg-gray-50 dark:hover:bg-white/[0.02]"
+                          }`}
+                        >
+
+                          {/* CHECKBOX */}
+
+                          <td className="w-16 px-4 py-4 text-center align-middle">
+
+                            <input
+                              type="checkbox"
+                              checked={
+                                isSelected
+                              }
+                              onChange={(
+                                event,
+                              ) =>
+                                handleSelectSubject(
+                                  subjectID,
+                                  event
+                                    .target
+                                    .checked,
+                                )
+                              }
+                              className="h-4 w-4 cursor-pointer rounded border-gray-400 text-orange-500 focus:ring-orange-500"
+                            />
+
+                          </td>
+
+                          {/* SUBJECT INFO */}
+
+                          <td className="px-4 py-4">
+
+                            <div className="flex items-center gap-3">
+
+                              {/* IMAGE */}
+
+                              <div className="flex h-10 w-10 shrink-0 items-center justify-center overflow-hidden rounded-lg bg-gray-100 dark:bg-gray-800">
+
+                                {image ? (
+
+                                  <img
+                                    src={
+                                      image
+                                    }
+                                    alt=""
+                                    className="h-full w-full object-cover"
+                                  />
+
+                                ) : (
+
+                                  <Archive
+                                    size={20}
+                                    className="text-gray-400"
+                                  />
+
+                                )}
+
+                              </div>
+
+                              {/* TEXT */}
+
+                              <div className="min-w-0">
+
+                                <p className="outfit-600 truncate text-sm font-semibold text-gray-900 dark:text-gray-100">
+
+                                  {subject.subjectName ||
+                                    subject.name ||
+                                    "Unnamed Subject"}
+
+                                </p>
+
+                                <p className="mt-0.5 text-xs text-gray-500 dark:text-gray-400">
+
+                                  {subject.subjectCode ||
+                                    subject.code ||
+                                    "—"}
+
+                                  <span className="mx-2">
+                                    •
+                                  </span>
+
+                                  {formatYearLevel(
+                                    subject,
+                                  )}
+
+                                </p>
+
+                              </div>
+
+                            </div>
+
+                          </td>
+
+                        </tr>
+
+                      );
+                    },
+                  )}
+
+                </tbody>
+
+              </table>
+
+            </div>
+
+          </div>
+
+        )}
+
+      </div>
+
+      {/* ========================================================
+          BOTTOM ACTION BAR
+          ALWAYS VISIBLE
+      ======================================================== */}
+
+      <div className="fixed right-0 bottom-0 left-0 z-40 border-t border-gray-200 bg-white/95 px-4 py-3 shadow-[0_-4px_20px_rgba(0,0,0,0.08)] backdrop-blur-md dark:border-gray-700 dark:bg-[#11161d]/95">
+
+        <div className="mx-auto flex w-full max-w-6xl items-center justify-between gap-4">
+
+          {/* LEFT */}
+
+          <div>
+
+            <p className="outfit-600 text-sm font-semibold text-gray-900 dark:text-gray-100">
+
+              {selectedSubjects.length}{" "}
+              selected
+
+            </p>
+
+            <p className="hidden text-xs text-gray-500 sm:block dark:text-gray-400">
+
+              Select one or more subjects
+              to take action.
+
+            </p>
+
+          </div>
+
+          {/* RIGHT BUTTONS */}
+
+          <div className="flex items-center gap-2">
+
+            {/* RESTORE */}
+
+            <button
+              type="button"
+              onClick={
+                handleRestore
+              }
+              disabled={
+                selectedSubjects.length ===
+                  0 ||
+                isRestoring ||
+                isDeleting
+              }
+              className="flex items-center gap-2 rounded-lg border border-green-500 bg-green-500 px-4 py-2.5 text-sm font-semibold text-white transition hover:bg-green-600 disabled:cursor-not-allowed disabled:border-green-200 disabled:bg-green-100 disabled:text-green-400"
+            >
+
+              <RotateCcw
+                size={17}
+              />
+
+              <span>
+                {isRestoring
+                  ? "Restoring..."
+                  : "Restore"}
+              </span>
+
+            </button>
+
+            {/* PERMANENT DELETE */}
+
+            <button
+              type="button"
+              onClick={() =>
+                setShowDeleteModal(
+                  true,
+                )
+              }
+              disabled={
+                selectedSubjects.length ===
+                  0 ||
+                isRestoring ||
+                isDeleting
+              }
+              className="flex items-center gap-2 rounded-lg border border-red-500 bg-red-500 px-4 py-2.5 text-sm font-semibold text-white transition hover:bg-red-600 disabled:cursor-not-allowed disabled:border-red-200 disabled:bg-red-100 disabled:text-red-400"
+            >
+
+              <Trash2
+                size={17}
+              />
+
+              <span>
+                Permanently Delete
+              </span>
+
+            </button>
+
+          </div>
+
+        </div>
+
+      </div>
+
+      {/* ========================================================
+          DELETE CONFIRMATION MODAL
+      ======================================================== */}
+
+      {showDeleteModal && (
+
+        <div className="fixed inset-0 z-[100] flex items-center justify-center bg-black/40 px-4 backdrop-blur-sm">
+
+          <div className="w-full max-w-md rounded-2xl bg-white p-6 shadow-2xl dark:bg-[#11161d]">
+
+            <div className="mb-4 flex items-center gap-3">
+
+              <div className="flex h-11 w-11 items-center justify-center rounded-full bg-red-100 text-red-600 dark:bg-red-500/10 dark:text-red-400">
+
+                <Trash2
+                  size={22}
+                />
+
+              </div>
+
+              <div>
+
+                <h2 className="text-lg font-semibold text-gray-900 dark:text-gray-100">
+
+                  Permanently Delete?
+
+                </h2>
+
+                <p className="text-sm text-gray-500 dark:text-gray-400">
+
+                  This action cannot be undone.
+
+                </p>
+
+              </div>
+
+            </div>
+
+            <p className="mb-6 text-sm leading-6 text-gray-600 dark:text-gray-300">
+
+              Are you sure you want to
+              permanently delete{" "}
+
+              <strong className="text-gray-900 dark:text-gray-100">
+
+                {selectedSubjects.length}{" "}
+                subject
+                {selectedSubjects.length !==
+                1
+                  ? "s"
+                  : ""}
+
+              </strong>
+
+              ?
+
+            </p>
+
+            <div className="flex justify-end gap-2">
+
+              <button
+                type="button"
+                onClick={() =>
+                  setShowDeleteModal(
+                    false,
+                  )
+                }
+                disabled={
+                  isDeleting
+                }
+                className="rounded-lg bg-gray-100 px-4 py-2.5 text-sm font-semibold text-gray-700 hover:bg-gray-200 disabled:opacity-50 dark:bg-gray-800 dark:text-gray-200 dark:hover:bg-gray-700"
+              >
+                Cancel
+              </button>
+
+              <button
+                type="button"
+                onClick={
+                  handlePermanentDelete
+                }
+                disabled={
+                  isDeleting
+                }
+                className="flex items-center gap-2 rounded-lg bg-red-600 px-4 py-2.5 text-sm font-semibold text-white hover:bg-red-700 disabled:cursor-not-allowed disabled:opacity-50"
+              >
+
+                <Trash2
+                  size={17}
+                />
+
+                {isDeleting
+                  ? "Deleting..."
+                  : "Permanently Delete"}
+
+              </button>
+
+            </div>
+
+          </div>
+
+        </div>
+
+      )}
+
     </div>
   );
 }

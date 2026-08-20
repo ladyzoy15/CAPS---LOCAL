@@ -17,6 +17,8 @@ import noInternetImage from "../assets/icons/404notfound.png";
 import emptyImage from "../assets/icons/empty.png";
 import AdminContent from "./AdminContent";
 
+import AllSubjectsIcon from "/src/assets/symbols/all.svg";
+import AllSubjectsIconH from "/src/assets/symbols/allhover.svg";
 import ReportsIcon from "/src/assets/symbols/reports.svg";
 
 import BlueBackground from "/src/assets/backgrounds/blue.png";
@@ -836,8 +838,71 @@ function SubjectList() {
         }}
       >
         <div className="flex min-h-screen">
-{/* Main content area */}
-          <div className="scrollbar-hide mt-10 ml-0 flex min-h-screen flex-1 flex-col gap-6 overflow-y-auto pb-0 [-ms-overflow-style:none] [scrollbar-width:none] lg:mt-0 [&::-webkit-scrollbar]:hidden">
+          {/* Left sidebar panel */}
+          <aside className="fixed top-0 left-[63px] hidden h-screen w-56 overflow-hidden border-r border-gray-200 bg-white px-4 py-4 lg:block lg:w-64">
+            <h2 className="outfit-500 mb-4 text-[16px] tracking-wide text-black">
+              Subjects
+            </h2>
+
+            <nav className="outfit-500 space-y-1 text-[14px]">
+              <Link
+                to={basePath}
+                onClick={() => {
+                  setSelectedProgramFilter("All");
+                  window.scrollTo({ top: 0, behavior: "smooth" });
+                }}
+                className={`flex w-full cursor-pointer items-center justify-between rounded-md px-3 py-2 text-left transition-colors ${
+                  (location.pathname === "/dean/subjects" ||
+                    location.pathname === "/program-chair/subjects") &&
+                  location.pathname !== "/dean/subjects/archive" &&
+                  selectedProgramFilter === "All"
+                    ? "bg-gray-100 font-medium text-gray-900"
+                    : "text-gray-600 hover:bg-gray-100"
+                }`}
+              >
+                <span className="flex items-center gap-2">
+                  <img
+                    src={
+                      (location.pathname === "/dean/subjects" ||
+                        location.pathname === "/program-chair/subjects") &&
+                      location.pathname !== "/dean/subjects/archive" &&
+                      selectedProgramFilter === "All"
+                        ? AllSubjectsIconH
+                        : AllSubjectsIcon
+                    }
+                    alt="All Subjects"
+                    loading="lazy"
+                    decoding="async"
+                    className="h-4 w-4"
+                  />
+                  <span>All Subjects</span>
+                </span>
+              </Link>
+              <div className="my-4 h-px bg-gray-200" />
+              <div className="outfit-500 px-2 text-[12px] font-semibold text-gray-500">
+                PROGRAMS{" "}
+              </div>
+              {uniquePrograms.map((programName) => (
+                <button
+                  key={programName}
+                  type="button"
+                  onClick={() => {
+                    setSelectedProgramFilter(programName);
+                  }}
+                  className={`flex w-full cursor-pointer items-center justify-between rounded-md px-3 py-2 text-left transition-colors ${
+                    selectedProgramFilter === programName
+                      ? "bg-gray-100 font-medium text-gray-900"
+                      : "text-gray-600 hover:bg-gray-100"
+                  }`}
+                >
+                  <span>{getDisplayProgramName(programName)}</span>
+                </button>
+              ))}
+            </nav>
+          </aside>
+
+          {/* Main content area */}
+          <div className="scrollbar-hide mt-10 ml-0 flex min-h-screen flex-1 flex-col gap-6 overflow-y-auto pb-0 [-ms-overflow-style:none] [scrollbar-width:none] lg:mt-0 lg:ml-64 [&::-webkit-scrollbar]:hidden">
             <div className="min-w-0 space-y-4 px-4 pt-4 md:px-6 md:pt-6">
               <SearchBar
                 value={searchTerm}
@@ -2080,6 +2145,4 @@ function SubjectList() {
 }
 
 export default SubjectList;
-
-
 

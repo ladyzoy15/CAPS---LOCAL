@@ -1,10 +1,10 @@
-﻿import { useNavigate } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 import { useState, useEffect, useRef } from "react";
 import useToast from "../hooks/useToast";
 import Toast from "../components/Toast";
 import ChangelogModal from "../components/ChangelogModal";
 
-/* â”€â”€ Colour palette cycling for the left-panel icon bg â”€â”€â”€â”€â”€â”€â”€ */
+/* ── Colour palette cycling for the left-panel icon bg ─────── */
 const ICON_COLORS = [
   { bg: "#fff7ed", iconColor: "#f97316" }, // orange
   { bg: "#eff6ff", iconColor: "#3b82f6" }, // blue
@@ -14,7 +14,7 @@ const ICON_COLORS = [
   { bg: "#f0fdfa", iconColor: "#14b8a6" }, // teal
 ];
 
-/* â”€â”€ Icon pool â€” varied per card â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */
+/* ── Icon pool — varied per card ────────────────────────────── */
 const SUBJECT_ICONS = [
   "bx bx-book",
   "bx bx-calculator",
@@ -38,7 +38,7 @@ const getCardStyle = (subjectID) => {
   };
 };
 
-/* â”€â”€ Expand program abbreviations to full names â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */
+/* ── Expand program abbreviations to full names ─────────────── */
 const PROGRAM_NAMES = {
   // General
   GE: "General Subject",
@@ -51,7 +51,7 @@ const PROGRAM_NAMES = {
 };
 
 const expandProgram = (name) => {
-  if (!name) return "â€”";
+  if (!name) return "—";
   // If exact match in map, return full name
   if (PROGRAM_NAMES[name]) return PROGRAM_NAMES[name];
   // If the name starts with "BS " or "AB " it's already expanded
@@ -78,7 +78,7 @@ const isAvailablePracticeSubject = (subject) =>
   getExamItemCount(subject) > 0 &&
   getAvailableQuestionCount(subject) > 0;
 
-/* â”€â”€ Subject card â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */
+/* ── Subject card ───────────────────────────────────────────── */
 const SubjectCard = ({ subject, onExplore }) => {
   const examItemCount = getExamItemCount(subject);
 
@@ -91,7 +91,7 @@ const SubjectCard = ({ subject, onExplore }) => {
     },
     {
       label: "YEAR LEVEL",
-      value: subject.yearLevel || "â€”",
+      value: subject.yearLevel || "—",
     },
     {
       label: "PROGRAM",
@@ -104,7 +104,7 @@ const SubjectCard = ({ subject, onExplore }) => {
   return (
     <div className="relative overflow-hidden rounded-xl rounded-b-xl border border-gray-200 bg-white transition hover:shadow-md">
       <div className="flex flex-col sm:flex-row">
-        {/* Left panel â€” checker-grid background */}
+        {/* Left panel — checker-grid background */}
         <div
           className="relative flex w-full shrink-0 flex-row items-center gap-3 border-b border-gray-100 px-4 py-4 sm:w-48 sm:flex-col sm:items-start sm:justify-center sm:gap-0 sm:border-r sm:border-b-0 sm:px-5 sm:py-6"
           style={{
@@ -160,7 +160,7 @@ const SubjectCard = ({ subject, onExplore }) => {
   );
 };
 
-/* â”€â”€ Main component â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */
+/* ── Main component ─────────────────────────────────────────── */
 const StudentDashboard = () => {
   const navigate = useNavigate();
   const { toast, showToast } = useToast();
@@ -201,7 +201,7 @@ const StudentDashboard = () => {
     }
   }, []);
 
-  /* â”€â”€ Load user from session â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */
+  /* ── Load user from session ─────────────────────────── */
   useEffect(() => {
     try {
       const user = JSON.parse(sessionStorage.getItem("user"));
@@ -211,7 +211,7 @@ const StudentDashboard = () => {
     }
   }, []);
 
-  /* â”€â”€ Close level dropdown on outside click â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */
+  /* ── Close level dropdown on outside click ──────────── */
   useEffect(() => {
     const handle = (e) => {
       if (levelRef.current && !levelRef.current.contains(e.target))
@@ -221,7 +221,7 @@ const StudentDashboard = () => {
     return () => document.removeEventListener("mousedown", handle);
   }, []);
 
-  /* â”€â”€ Fetch subjects â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */
+  /* ── Fetch subjects ─────────────────────────────────── */
   useEffect(() => {
     const fetchSubjects = async () => {
       try {
@@ -243,7 +243,7 @@ const StudentDashboard = () => {
     fetchSubjects();
   }, [apiUrl]);
 
-  /* â”€â”€ Check for ongoing exam â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */
+  /* ── Check for ongoing exam ─────────────────────────── */
   useEffect(() => {
     const keys = Object.keys(localStorage).filter((k) => k.startsWith("exam_"));
     if (!keys.length) return;
@@ -299,7 +299,7 @@ const StudentDashboard = () => {
     }
   }, []);
 
-  /* â”€â”€ Continue ongoing exam â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */
+  /* ── Continue ongoing exam ──────────────────────────── */
   const handleContinueExam = () => {
     if (!ongoingExam) return;
     const lastQuestionIndex = parseInt(
@@ -318,7 +318,7 @@ const StudentDashboard = () => {
     });
   };
 
-  /* â”€â”€ Generate exam for a subject â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */
+  /* ── Generate exam for a subject ────────────────────── */
   const handleGenerateExam = async (subject) => {
     setGeneratingFor(subject.subjectID);
 
@@ -373,7 +373,7 @@ const StudentDashboard = () => {
       localStorage.setItem(
         `${examKey}_exam_data`,
         JSON.stringify({
-          // Server-authoritative attempt id â€” bound to this issued question set.
+          // Server-authoritative attempt id — bound to this issued question set.
           attemptId: data.attemptId,
           questions: data.questions,
           totalPoints: data.totalPoints,
@@ -412,7 +412,7 @@ const StudentDashboard = () => {
     }
   };
 
-  /* â”€â”€ Join class via code â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */
+  /* ── Join class via code ────────────────────────────── */
   const handleJoinClass = async (e) => {
     e.preventDefault();
     if (!classCode.trim()) {
@@ -442,7 +442,7 @@ const StudentDashboard = () => {
     }
   };
 
-  /* â”€â”€ Filtered subjects â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */
+  /* ── Filtered subjects ──────────────────────────────── */
   const filtered = subjects.filter((s) => {
     if (!isAvailablePracticeSubject(s)) return false;
     if (!searchQuery.trim()) return true;
@@ -453,15 +453,15 @@ const StudentDashboard = () => {
     );
   });
 
-  /* â”€â”€ Render â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */
+  /* ── Render ─────────────────────────────────────────── */
   return (
     <>
       <Toast message={toast.message} type={toast.type} show={toast.show} />
 
       <div className="outfit-400 relative mt-8 min-h-screen bg-white pb-12 lg:mt-0">
-        {/* HERO â€” no gradient, plain white */}
+        {/* HERO — no gradient, plain white */}
         <div className="relative px-5 pt-10 pb-4 text-center md:px-6 md:pt-14 md:pb-6">
-          {/* Changelog button â€” top right */}
+          {/* Changelog button — top right */}
           <button
             onClick={() => setShowChangelog(true)}
             title="What's new"
@@ -536,7 +536,7 @@ const StudentDashboard = () => {
                 <p className="outfit-400 mt-0.5 text-[12px] text-yellow-700 md:mt-0 md:text-[13px]">
                   {ongoingExam.examData?.subjectName ||
                     `Subject ${ongoingExam.subjectID}`}{" "}
-                  â€” your progress has been saved.
+                  — your progress has been saved.
                 </p>
               </div>
               <button
@@ -657,4 +657,3 @@ const StudentDashboard = () => {
 };
 
 export default StudentDashboard;
-
