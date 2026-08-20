@@ -101,19 +101,17 @@ define(["./workbox-5a5d9309"], function (workbox) {
    * The precacheAndRoute() method efficiently caches
    * and responds to requests for URLs in the manifest.
    */
-  workbox.precacheAndRoute(
-    [
-      {
-        "url": "suppress-warnings.js",
-        "revision": "d41d8cd98f00b204e9800998ecf8427e"
-      },
-      {
-        "url": "index.html",
-        "revision": "0.dcaicvf4qi8"
-      }
-    ],
-    {}
-  );
+  workbox.precacheAndRoute([{
+    "url": "suppress-warnings.js",
+    "revision": "d41d8cd98f00b204e9800998ecf8427e"
+  }, {
+    "url": "index.html",
+    "revision": "0.pk7etiross"
+  }], {});
+  workbox.cleanupOutdatedCaches();
+  workbox.registerRoute(new workbox.NavigationRoute(workbox.createHandlerBoundToURL("index.html"), {
+    allowlist: [/^\/$/]
+  }));
 
   // Remove old/outdated caches.
   workbox.cleanupOutdatedCaches();

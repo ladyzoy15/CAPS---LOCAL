@@ -72,31 +72,11 @@ function App() {
         <Route path="/" element={<LandingPage />} />
 
         <Route path="/register" element={<Register />} />
-
-        <Route
-          path="/reset-password"
-          element={<ResetPasswordPage />}
-        />
-
-        <Route
-          path="/forgot-password"
-          element={<ForgotPasswordForm />}
-        />
-
-        <Route
-          path="/reset-user-code"
-          element={<ResetUserCodePage />}
-        />
-
-        <Route
-          path="/forgot-user-code"
-          element={<ForgotUserCodeForm />}
-        />
-
-        <Route
-          path="/team-rvw"
-          element={<Credits />}
-        />
+        <Route path="/reset-password" element={<ResetPasswordPage />} />
+        <Route path="/forgot-password" element={<ForgotPasswordForm />} />
+        <Route path="/reset-user-code" element={<ResetUserCodePage />} />
+        <Route path="/forgot-user-code" element={<ForgotUserCodeForm />} />
+        <Route path="/team-REVA" element={<Credits />} />
 
         {/* Public Landing Page */}
         <Route

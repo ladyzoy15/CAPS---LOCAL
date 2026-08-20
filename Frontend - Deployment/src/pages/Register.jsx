@@ -1045,11 +1045,11 @@ export default function Register() {
 
                       <span
                         onClick={() =>
-                          navigate("/team-caps")
+                          navigate("/team-REVA")
                         }
                         className="cursor-pointer text-orange-500 hover:underline"
                       >
-                        Team Caps
+                        Team REVA
                       </span>
                     </span>
 
@@ -1791,11 +1791,11 @@ export default function Register() {
 
                   <span
                     onClick={() =>
-                      navigate("/team-caps")
+                      navigate("/team-REVA")
                     }
                     className="cursor-pointer text-orange-500 hover:underline"
                   >
-                    Team Caps
+                    Team REVA
                   </span>
                 </span>
 

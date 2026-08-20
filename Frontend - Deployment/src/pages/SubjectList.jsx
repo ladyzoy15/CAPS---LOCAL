@@ -828,7 +828,7 @@ function SubjectList() {
       />
 
       <div
-        className={`caps-subject-page relative min-h-screen ${
+        className={`REVA-subject-page relative min-h-screen ${
           isDarkMode ? "is-dark" : ""
         }`}
         style={{
@@ -1630,10 +1630,17 @@ function SubjectList() {
                         <div className="space-y-5">
                           <div>
                             <label className="mb-1.5 block text-[13px] font-semibold text-gray-700">
+<<<<<<< HEAD
                               Subject Code <span className="text-red-500">*</span>
                             </label>
                             <div className="relative">
                               <i className="bx bx-edit absolute top-1/2 left-3 -translate-y-1/2 text-gray-400"></i>
+=======
+                              Course Code <span className="text-red-500">*</span>
+                            </label>
+                            <div className="relative">
+                              <i className="bx bx-barcode absolute top-1/2 left-3 -translate-y-1/2 text-gray-400"></i>
+>>>>>>> origin/REVA
                               <input
                                 type="text"
                                 placeholder="e.g. MATH123"
@@ -1642,8 +1649,27 @@ function SubjectList() {
                                 className="w-full rounded-xl border border-gray-200 py-2.5 pr-3 pl-9 text-sm transition focus:border-orange-400 focus:ring-2 focus:ring-orange-100 focus:outline-none"
                               />
                             </div>
+<<<<<<< HEAD
+=======
+                          </div>
+
+                          <div>
+                            <label className="mb-1.5 block text-[13px] font-semibold text-gray-700">
+                              Course Description <span className="text-red-500">*</span>
+                            </label>
+                            <div className="relative">
+                              <i className="bx bx-book-open absolute top-1/2 left-3 -translate-y-1/2 text-gray-400"></i>
+                              <input
+                                type="text"
+                                placeholder="e.g. Calculus 1"
+                                value={newSubjectName}
+                                onChange={(e) => setNewSubjectName(e.target.value)}
+                                className="w-full rounded-xl border border-gray-200 py-2.5 pr-3 pl-9 text-sm transition focus:border-orange-400 focus:ring-2 focus:ring-orange-100 focus:outline-none"
+                              />
+                            </div>
+>>>>>>> origin/REVA
                             <p className="mt-1 text-[11px] text-gray-400">
-                              Enter the subject code (max 20 characters).
+                              Enter the Course Description (max 20 characters).
                             </p>
                           </div>
 
@@ -1992,8 +2018,8 @@ function SubjectList() {
           SUBJECT PAGE DARK MODE OVERRIDES
           ===================================================== */}
       <style>{`
-        html.dark .caps-subject-page,
-        html.dark .caps-subject-page > div {
+        html.dark .REVA-subject-page,
+        html.dark .REVA-subject-page > div {
           background: #0b0f14 !important;
           background-color: #0b0f14 !important;
           background-image: none !important;
@@ -2001,7 +2027,7 @@ function SubjectList() {
         }
 
         /* Sidebar */
-        html.dark .caps-subject-page aside {
+        html.dark .REVA-subject-page aside {
           background: #11161d !important;
           background-color: #11161d !important;
           background-image: none !important;
@@ -2009,126 +2035,126 @@ function SubjectList() {
           color: #f3f4f6 !important;
         }
 
-        html.dark .caps-subject-page aside h2 {
+        html.dark .REVA-subject-page aside h2 {
           color: #f3f4f6 !important;
         }
 
-        html.dark .caps-subject-page aside .text-gray-600 {
+        html.dark .REVA-subject-page aside .text-gray-600 {
           color: #9ca3af !important;
         }
 
-        html.dark .caps-subject-page aside .text-gray-500 {
+        html.dark .REVA-subject-page aside .text-gray-500 {
           color: #9ca3af !important;
         }
 
-        html.dark .caps-subject-page aside .text-gray-900 {
+        html.dark .REVA-subject-page aside .text-gray-900 {
           color: #f3f4f6 !important;
         }
 
-        html.dark .caps-subject-page aside .bg-gray-100 {
+        html.dark .REVA-subject-page aside .bg-gray-100 {
           background-color: #252d38 !important;
         }
 
-        html.dark .caps-subject-page aside .hover\\:bg-gray-100:hover {
+        html.dark .REVA-subject-page aside .hover\\:bg-gray-100:hover {
           background-color: #1b222c !important;
         }
 
-        html.dark .caps-subject-page aside .bg-gray-200 {
+        html.dark .REVA-subject-page aside .bg-gray-200 {
           background-color: #303946 !important;
         }
 
         /* Main separators and headings */
-        html.dark .caps-subject-page .bg-gray-200 {
+        html.dark .REVA-subject-page .bg-gray-200 {
           background-color: #303946 !important;
         }
 
-        html.dark .caps-subject-page .text-black,
-        html.dark .caps-subject-page .text-gray-900 {
+        html.dark .REVA-subject-page .text-black,
+        html.dark .REVA-subject-page .text-gray-900 {
           color: #f3f4f6 !important;
         }
 
-        html.dark .caps-subject-page .text-gray-700 {
+        html.dark .REVA-subject-page .text-gray-700 {
           color: #d1d5db !important;
         }
 
-        html.dark .caps-subject-page .text-gray-600 {
+        html.dark .REVA-subject-page .text-gray-600 {
           color: #9ca3af !important;
         }
 
-        html.dark .caps-subject-page .text-gray-500 {
+        html.dark .REVA-subject-page .text-gray-500 {
           color: #9ca3af !important;
         }
 
         /* Search / filter controls */
-        html.dark .caps-subject-page input,
-        html.dark .caps-subject-page select,
-        html.dark .caps-subject-page textarea {
+        html.dark .REVA-subject-page input,
+        html.dark .REVA-subject-page select,
+        html.dark .REVA-subject-page textarea {
           background-color: #171d25 !important;
           color: #f3f4f6 !important;
           border-color: #374151 !important;
         }
 
-        html.dark .caps-subject-page input::placeholder,
-        html.dark .caps-subject-page textarea::placeholder {
+        html.dark .REVA-subject-page input::placeholder,
+        html.dark .REVA-subject-page textarea::placeholder {
           color: #6b7280 !important;
         }
 
-        html.dark .caps-subject-page .bg-white {
+        html.dark .REVA-subject-page .bg-white {
           background-color: #171d25 !important;
           color: #f3f4f6 !important;
         }
 
-        html.dark .caps-subject-page .border-gray-200 {
+        html.dark .REVA-subject-page .border-gray-200 {
           border-color: #303946 !important;
         }
 
-        html.dark .caps-subject-page .border-gray-300 {
+        html.dark .REVA-subject-page .border-gray-300 {
           border-color: #374151 !important;
         }
 
-        html.dark .caps-subject-page .hover\\:bg-gray-100:hover {
+        html.dark .REVA-subject-page .hover\\:bg-gray-100:hover {
           background-color: #252d38 !important;
         }
 
-        html.dark .caps-subject-page .hover\\:bg-gray-200:hover {
+        html.dark .REVA-subject-page .hover\\:bg-gray-200:hover {
           background-color: #303946 !important;
         }
 
         /* Empty state */
-        html.dark .caps-subject-page .bg-gray-50\\/60 {
+        html.dark .REVA-subject-page .bg-gray-50\\/60 {
           background-color: #11161d !important;
         }
 
         /* Keep colored subject header images intact. */
-        html.dark .caps-subject-page img {
+        html.dark .REVA-subject-page img {
           background-color: transparent;
         }
 
         /* Modals */
-        html.dark .caps-subject-page .bg-white .text-gray-900 {
+        html.dark .REVA-subject-page .bg-white .text-gray-900 {
           color: #f3f4f6 !important;
         }
 
-        html.dark .caps-subject-page .bg-white .text-gray-700 {
+        html.dark .REVA-subject-page .bg-white .text-gray-700 {
           color: #d1d5db !important;
         }
 
         /* Scrollbar */
-        html.dark .caps-subject-page ::-webkit-scrollbar {
+        html.dark .REVA-subject-page ::-webkit-scrollbar {
           width: 8px;
           height: 8px;
         }
 
-        html.dark .caps-subject-page ::-webkit-scrollbar-track {
+        html.dark .REVA-subject-page ::-webkit-scrollbar-track {
           background: #0b0f14;
         }
 
-        html.dark .caps-subject-page ::-webkit-scrollbar-thumb {
+        html.dark .REVA-subject-page ::-webkit-scrollbar-thumb {
           background: #374151;
           border-radius: 10px;
         }
 
-        html.dark .caps-subject-page ::-webkit-scrollbar-thumb:hover {
+        html.dark .REVA-subject-page ::-webkit-scrollbar-thumb:hover {
           background: #4b5563;
         }
       `}</style>

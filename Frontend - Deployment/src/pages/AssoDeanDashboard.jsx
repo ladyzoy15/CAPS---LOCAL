@@ -27,7 +27,7 @@ const AssoDeanDashboard = () => {
           {/* Badge */}
           <span className="inline-flex items-center gap-1.5 rounded-full border border-orange-200 bg-orange-50 px-3 py-1 text-[11px] font-semibold tracking-widest text-orange-500 uppercase">
             <i className="bx bx-rocket text-[13px]" />
-            CAPS v2.0.0 is live
+            REVA v2.0.0 is live
           </span>
 
           {/* Heading */}
@@ -36,7 +36,7 @@ const AssoDeanDashboard = () => {
           </h1>
           <p className="max-w-md text-[15px] leading-relaxed text-gray-500">
             Explore everything new in{" "}
-            <strong className="text-gray-700">CAPS v2.0</strong> — quizzes,
+            <strong className="text-gray-700">REVA v2.0</strong> — quizzes,
             classes, reports, and more are now live.
           </p>
 

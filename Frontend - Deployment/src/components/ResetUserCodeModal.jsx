@@ -162,7 +162,7 @@ export default function ResetUserCodeModal({
             <div className="flex h-14 w-14 items-center justify-center">
               <img
                 src={collegeLogo}
-                alt="CAPS logo"
+                alt="REVA logo"
                 className="size-12 object-contain"
               />
             </div>

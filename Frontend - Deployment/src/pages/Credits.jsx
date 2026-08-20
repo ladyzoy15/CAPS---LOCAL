@@ -330,7 +330,7 @@ const Credits = () => {
                 : "rgba(55,65,81,0.70)",
             }}
           >
-            © {new Date().getFullYear()} JRMSU CAPS • ALL RIGHTS RESERVED
+            © {new Date().getFullYear()} JRMSU REVA • ALL RIGHTS RESERVED
           </p>
         </div>
       </div>

@@ -9,7 +9,7 @@ test('Program chair can add a multiple-choice question', async ({ page }) => {
   const optionB = 'Testing';
   const optionC = 'Lets Test';
 
-  await page.goto('https://caps-test.coeofjrmsu.com/');
+  await page.goto('https://REVA-test.coeofjrmsu.com/');
 
   // Login
   await page.getByRole('button', { name: 'LOG IN' }).click();

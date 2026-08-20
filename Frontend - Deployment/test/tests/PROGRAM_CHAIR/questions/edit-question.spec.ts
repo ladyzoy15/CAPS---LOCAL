@@ -7,7 +7,7 @@ test('Program chair can edit question', async ({ page }) => {
   const updatedOptionB = 'Hello';
   const updatedOptionC = 'Testing';
 
-  await page.goto('https://caps-test.coeofjrmsu.com/');
+  await page.goto('https://REVA-test.coeofjrmsu.com/');
 
   // Login
   await page.getByRole('button', { name: 'LOG IN' }).click();

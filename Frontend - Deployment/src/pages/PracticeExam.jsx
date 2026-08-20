@@ -884,7 +884,7 @@ const PracticeExam = () => {
             className="h-[30px] w-[30px] object-contain"
           />
           <span className="outfit-700 text-[16px] tracking-wider text-black">
-            CAPS
+            REVA
           </span>
         </div>
         <div className="flex items-center gap-3">
