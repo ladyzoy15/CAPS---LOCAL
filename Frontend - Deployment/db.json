@@ -8,8 +8,8 @@
       "email": "admin@gmail.com",
       "campusID": 2,
       "roleID": 4,
-      "password": "Capsproj4!",
-      "password_confirmation": "Capsproj4!",
+      "password": "REVAproj4!",
+      "password_confirmation": "REVAproj4!",
       "status": "unregistered"
     },
     {
@@ -20,8 +20,8 @@
       "email": "admin@gmail.com",
       "campusID": 2,
       "roleID": 4,
-      "password": "Capsproj4!",
-      "password_confirmation": "Capsproj4!",
+      "password": "REVAproj4!",
+      "password_confirmation": "REVAproj4!",
       "status": "unregistered"
     },
     {
@@ -32,8 +32,8 @@
       "email": "admin@gmail.com",
       "campusID": 2,
       "roleID": 4,
-      "password": "Capsproj4!",
-      "password_confirmation": "Capsproj4!",
+      "password": "REVAproj4!",
+      "password_confirmation": "REVAproj4!",
       "status": "registered"
     }
   ],

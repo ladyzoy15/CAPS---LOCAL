@@ -1,5 +1,5 @@
 /* =========================================================
-   CAPS DARK MODE - GLOBAL
+   REVA DARK MODE - GLOBAL
    ========================================================= */
 
 html.dark {
@@ -48,8 +48,8 @@ html.dark aside [class*="bg-gradient"] {
    MAIN PAGE
    ========================================================= */
 
-html.dark .caps-layout,
-html.dark .caps-main {
+html.dark .REVA-layout,
+html.dark .REVA-main {
   background-color: #0b0f14 !important;
   color: #f3f4f6 !important;
 }
@@ -238,20 +238,20 @@ html.dark #root {
 }
 
 /* Main application containers */
-html.dark .caps-layout,
-html.dark .caps-main,
-html.dark .caps-page-shell {
+html.dark .REVA-layout,
+html.dark .REVA-main,
+html.dark .REVA-page-shell {
   background: #0b0f14 !important;
   background-image: none !important;
 }
 
 /* Remove any gradient / glow / reflection */
-html.dark .caps-layout::before,
-html.dark .caps-layout::after,
-html.dark .caps-main::before,
-html.dark .caps-main::after,
-html.dark .caps-page-shell::before,
-html.dark .caps-page-shell::after {
+html.dark .REVA-layout::before,
+html.dark .REVA-layout::after,
+html.dark .REVA-main::before,
+html.dark .REVA-main::after,
+html.dark .REVA-page-shell::before,
+html.dark .REVA-page-shell::after {
   content: none !important;
   display: none !important;
   background: none !important;

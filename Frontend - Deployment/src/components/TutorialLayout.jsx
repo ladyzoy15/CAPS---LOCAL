@@ -152,8 +152,8 @@ const TutorialLayout = () => {
       <header className="outfit-500 fixed top-0 left-0 z-50 flex h-[44px] w-full items-center justify-between border-b border-gray-200 bg-white px-4 sm:px-6">
         {/* Left: Logo + Title */}
         <div className="flex items-center gap-2">
-          <img src={collegeLogo} alt="CAPS Logo" className="size-[28px]" />
-          <span className="text-[14px] font-semibold text-gray-800">CAPS</span>
+          <img src={collegeLogo} alt="REVA Logo" className="size-[28px]" />
+          <span className="text-[14px] font-semibold text-gray-800">REVA</span>
           <span className="text-gray-300">|</span>
           <span className="text-[12px] font-medium text-gray-400">
             Documentation
@@ -181,7 +181,7 @@ const TutorialLayout = () => {
             Feedback
           </a>
           <a
-            href="/team-caps"
+            href="/team-REVA"
             className="transition-colors hover:text-gray-800"
           >
             Developers
@@ -229,7 +229,7 @@ const TutorialLayout = () => {
               Feedback
             </a>
             <a
-              href="/team-caps"
+              href="/team-REVA"
               onClick={() => setMobileHeaderMenuOpen(false)}
               className="py-2.5 transition-colors hover:text-gray-900"
             >
@@ -401,7 +401,7 @@ const TutorialLayout = () => {
               <div className="mt-12 border-t border-gray-200 pt-6 pb-8">
                 <div className="flex flex-col items-center justify-between gap-4 sm:flex-row">
                   <p className="text-xs text-gray-400">
-                    © 2025 CAPS · Documentation
+                    © 2025 REVA · Documentation
                   </p>
                   <div className="flex gap-4">
                     {/* Prev / Next nav */}

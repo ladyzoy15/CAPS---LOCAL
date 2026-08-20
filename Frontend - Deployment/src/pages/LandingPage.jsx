@@ -170,7 +170,7 @@ function LandingPage() {
 
     window.alert(
       "Chrome hasn't fired the install prompt yet.\n\n" +
-        "Try: ⋮ menu → Save and share → Install CAPS-REVIEW JRMSU (or Install page).\n\n" +
+        "Try: ⋮ menu → Save and share → Install REVA JRMSU (or Install page).\n\n" +
         "If that's missing: DevTools → Application → Manifest (fix any errors), " +
         "then hard refresh (Ctrl+Shift+R). Use Chrome or Edge on HTTPS.",
     );
@@ -229,7 +229,7 @@ function LandingPage() {
 
             <img
               src={collegeLogo}
-              alt="CAPS-REVIEW logo"
+              alt="REVA logo"
               decoding="async"
               fetchPriority="low"
               className="h-6 w-6 object-contain"
@@ -238,7 +238,7 @@ function LandingPage() {
           </div>
 
           <span className="outfit-500 text-[20px] tracking-wide text-gray-900 md:text-[24px]">
-            CAPS-REVIEW
+            REVA
           </span>
 
         </div>
@@ -348,11 +348,11 @@ function LandingPage() {
                   <span className="pointer-events-none absolute right-[20%] top-[10%] h-2.5 w-2.5 rounded-full bg-orange-600" />
                   <span className="pointer-events-none absolute left-[18%] top-[12%] h-6 w-6 rounded-full border-2 border-orange-600 bg-white" />
 
-                  {/* CAPS-REVIEW Logo */}
+                  {/* REVA Logo */}
                   <div className="relative z-20 mx-auto flex h-20 w-20 items-center justify-center pt-4 md:h-24 md:w-24">
                     <img
                       src={collegeLogo}
-                      alt="CAPS-REVIEW"
+                      alt="REVA"
                       className="h-16 w-16 object-contain md:h-20 md:w-20"
                     />
                   </div>
@@ -607,13 +607,13 @@ function LandingPage() {
               <h2 className="outfit-500 text-[24px] font-semibold leading-tight text-gray-900 md:text-[25px] lg:text-[33px] xl:text-[45px]">
 
                 <span className="text-gray-800">
-                  Comprehensive Assessment
+                  Review Evaluation
                 </span>
 
                 <br />
 
                 <span className="bg-gradient-to-r from-orange-500 via-orange-400 to-orange-600 bg-clip-text text-transparent">
-                  &amp; Review System
+                  &amp; and Validation Assessment
                 </span>
 
               </h2>
@@ -653,7 +653,7 @@ function LandingPage() {
                   lg:text-lg
                 "
               >
-                [ CAPS-REVIEW FEATURES ]
+                [ REVA FEATURES ]
               </span>
 
             </div>
@@ -664,7 +664,7 @@ function LandingPage() {
 
             <p className="outfit-400 mx-auto mt-8 max-w-2xl text-[14px] text-gray-700 lg:text-[16px] xl:text-lg">
 
-              CAPS-REVIEW gives students a focused space to practice questions,
+              REVA gives students a focused space to practice questions,
               review difficult topics, track progress, and build confidence before exam day.
 
             </p>
@@ -1091,7 +1091,7 @@ function LandingPage() {
 
               <img
                 src={GetStarted}
-                alt="Get started with CAPS-REVIEW"
+                alt="Get started with REVA"
                 loading="lazy"
                 decoding="async"
                 className="w-full rounded-[36px]"
@@ -1124,7 +1124,7 @@ function LandingPage() {
                     Ready? Start Reviewing with{" "}
 
                     <span className="text-orange-600">
-                      CAPS-REVIEW
+                      REVA
                     </span>
 
                     <br />
@@ -1139,7 +1139,7 @@ function LandingPage() {
 
                   <p className="outfit-400 mt-1 hidden text-gray-700 sm:block sm:text-[11px] md:mt-2 md:text-[13px] lg:mt-3 lg:text-[15px] xl:text-base">
 
-                    Use CAPS-REVIEW to practice, review your lessons, and
+                    Use REVA to practice, review your lessons, and
                     prepare for exams in a smarter and more organized way.
 
                   </p>
@@ -1213,7 +1213,7 @@ function LandingPage() {
             <div className="pointer-events-none absolute inset-x-16 top-0 h-px bg-gradient-to-r from-transparent via-orange-300/50 to-transparent" />
 
             <h2 className="outfit-700 text-2xl text-gray-900 md:text-3xl lg:text-4xl xl:text-5xl">
-              More CAPS-REVIEW Features to come!
+              More REVA Features to come!
             </h2>
 
             <p className="outfit-400 mt-4 text-sm text-gray-700 md:text-[14px] lg:text-base">
@@ -1264,14 +1264,14 @@ function LandingPage() {
 
                   <img
                     src={collegeLogo}
-                    alt="CAPS-REVIEW logo"
+                    alt="REVA logo"
                     className="h-5 w-5"
                   />
 
                 </div>
 
                 <span className="outfit-700 text-base text-gray-900">
-                  CAPS-REVIEW
+                  REVA
                 </span>
 
                 <span className="text-[12px] text-gray-500">
@@ -1282,7 +1282,7 @@ function LandingPage() {
 
               <p className="outfit-400 max-w-sm text-xs text-gray-600 md:text-sm">
 
-                CAPS-REVIEW is a smart assessment and exam review platform designed
+                REVA is a smart assessment and exam review platform designed
                 to help students practice, review lessons, and prepare with confidence.
 
               </p>
@@ -1340,7 +1340,7 @@ function LandingPage() {
                   <li>
 
                     <a
-                      href="/team-caps"
+                      href="/team-REVA"
                       className="outfit-400 transition hover:text-gray-900"
                     >
                       Developers
@@ -1382,7 +1382,7 @@ function LandingPage() {
             >
 
               <p className="outfit-400">
-                © 2025 CAPS-REVIEW – Comprehensive Assessment and Preparation System.
+                © 2026 REVA – Review Evaluation and Validation Assessment.
               </p>
 
               <p className="outfit-400">

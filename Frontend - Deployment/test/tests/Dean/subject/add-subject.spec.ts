@@ -5,7 +5,7 @@ test('Dean can create a new subject', async ({ page }) => {
   const subjectName = `Test-${Date.now()}`;
   const subjectCode = `SUB${Date.now()}`;
 
-  await page.goto('https://caps-test.coeofjrmsu.com/');
+  await page.goto('https://REVA-test.coeofjrmsu.com/');
   await page.getByRole('button', { name: 'LOG IN' }).click();
   await page.getByRole('textbox', { name: 'e.g. 23-A-' }).fill(process.env.DEAN_USERNAME!);
   await page.getByRole('textbox', { name: '••••••••••' }).fill(process.env.DEAN_PASSWORD!);

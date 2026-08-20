@@ -2,7 +2,7 @@ import { test, expect } from '@playwright/test';
 
 test('Asso Dean can undo setup practice exam', async ({ page }) => {
   const numberOfQuestions = '2';
-  await page.goto('https://caps-test.coeofjrmsu.com/');
+  await page.goto('https://REVA-test.coeofjrmsu.com/');
 
   // Login
   await page.getByRole('button', { name: 'LOG IN' }).click();

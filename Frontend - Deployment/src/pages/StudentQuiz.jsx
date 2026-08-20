@@ -1075,7 +1075,7 @@ const StudentQuiz = () => {
 
       {/* ── TOP NAVBAR (desktop md+) ── */}
       <header className="hidden h-[53px] w-full items-center justify-between border-b border-gray-200 bg-white px-5 md:flex">
-        {/* Left: logo + CAPS + title */}
+        {/* Left: logo + REVA + title */}
         <div className="flex items-center gap-2">
           <img
             src={collegeLogo}
@@ -1083,7 +1083,7 @@ const StudentQuiz = () => {
             className="h-[30px] w-[30px] object-contain"
           />
           <span className="outfit-700 text-[16px] tracking-wider text-black">
-            CAPS
+            REVA
           </span>
         </div>
 

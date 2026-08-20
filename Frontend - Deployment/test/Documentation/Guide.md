@@ -1,4 +1,4 @@
-# CAPS Playwright Automation Guide
+# REVA Playwright Automation Guide
 
 ---
 
@@ -622,7 +622,7 @@ Check whether:
 Verify:
 
 - `.env` credentials are correct.
-- CAPS website is accessible.
+- REVA website is accessible.
 - The account has permission for the tested module.
 
 ---

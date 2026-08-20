@@ -1,6 +1,6 @@
-# CAPS Automation Framework
+# REVA Automation Framework
 
-Playwright automation framework for the **CAPS (Computer-Aided Preparation System)**.
+Playwright automation framework for the **REVA (Computer-Aided Preparation System)**.
 
 ---
 
@@ -61,7 +61,7 @@ Test Script
  Playwright Actions
       │
       ▼
- CAPS Website
+ REVA Website
       │
       ▼
  JSON Storage
@@ -87,7 +87,7 @@ await login(
 
 auth.ts automatically
 
-- Opens CAPS
+- Opens REVA
 - Clicks Login
 - Enters credentials
 - Signs in
