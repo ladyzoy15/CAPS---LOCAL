@@ -28,7 +28,9 @@ const AdminContent = () => {
 
   // Context and state for subject and question management
   const { selectedSubject, setSelectedSubject } = useOutletContext();
-  const [activeTab, setActiveTab] = useState(0);
+  // Practice Exam tab (index 0) was removed from SubjectCard, so the
+  // dashboard now opens directly on "Review Question" (index 1).
+  const [activeTab, setActiveTab] = useState(1);
   const [questions, setQuestions] = useState([]);
   const [submittedQuestion, setSubmittedQuestion] = useState(null);
   const [editingQuestion, setEditingQuestion] = useState(null);

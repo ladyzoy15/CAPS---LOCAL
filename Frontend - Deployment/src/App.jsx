@@ -1,4 +1,4 @@
-import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
+import { BrowserRouter as Router, Routes, Route, useNavigate, useSearchParams } from "react-router-dom";
 import Register from "./pages/Register";
 import Layout from "./components/layout";
 import ProtectedRoute from "./components/protectRoute";
@@ -53,6 +53,70 @@ import QuizContent from "./pages/QuizContent";
 import QuizInfo from "./pages/QuizInfo";
 import StudentQuiz from "./pages/StudentQuiz";
 import StudentQuizResults from "./pages/StudentQuizResults";
+import ImportQuestionModal from "./components/ImportQuestionModal";
+
+
+function ImportQuestionsPage() {
+  const navigate = useNavigate();
+  const [searchParams] = useSearchParams();
+
+  const personalQuizID =
+    searchParams.get("personalQuizID") ||
+    searchParams.get("personal_quiz_id");
+
+  const subjectID =
+    searchParams.get("subjectID") ||
+    searchParams.get("subject_id");
+
+  const handleImportComplete = () => {
+    navigate(-1);
+  };
+
+  // The sidebar can be opened from many pages. If the required
+  // quiz/subject IDs are not available, show a safe page instead
+  // of rendering a broken/blank screen.
+  if (!personalQuizID || !subjectID) {
+    return (
+      <div className="flex min-h-screen items-center justify-center bg-gray-50 px-6 dark:bg-[#0f141a]">
+        <div className="w-full max-w-lg rounded-2xl border border-gray-200 bg-white p-8 text-center shadow-lg dark:border-gray-700 dark:bg-[#171d25]">
+          <div className="mx-auto mb-4 flex h-14 w-14 items-center justify-center rounded-full bg-orange-100 text-orange-600 dark:bg-orange-500/10 dark:text-orange-400">
+            <i className="bx bx-import text-3xl" />
+          </div>
+
+          <h1 className="outfit-700 text-xl text-gray-900 dark:text-gray-100">
+            Import Questions
+          </h1>
+
+          <p className="outfit-400 mt-2 text-sm leading-6 text-gray-500 dark:text-gray-400">
+            Please open the quiz you want to add questions to,
+            then use Import Questions from that quiz.
+          </p>
+
+          <button
+            type="button"
+            onClick={() => navigate(-1)}
+            className="outfit-500 mt-6 rounded-lg bg-orange-500 px-5 py-2.5 text-sm font-semibold text-white transition hover:bg-orange-600"
+          >
+            Go Back
+          </button>
+        </div>
+      </div>
+    );
+  }
+
+  return (
+    <div className="min-h-screen bg-gray-50 dark:bg-[#0f141a]">
+      <ImportQuestionModal
+        isOpen={true}
+        personalQuizID={personalQuizID}
+        subjectID={subjectID}
+        existingQuestionIds={[]}
+        onClose={() => navigate(-1)}
+        onImport={handleImportComplete}
+      />
+    </div>
+  );
+}
 
 function App() {
   return (
@@ -70,7 +134,7 @@ function App() {
         <Route path="/forgot-password" element={<ForgotPasswordForm />} />
         <Route path="/reset-user-code" element={<ResetUserCodePage />} />
         <Route path="/forgot-user-code" element={<ForgotUserCodeForm />} />
-        <Route path="/team-caps" element={<Credits />} />
+        <Route path="/team-rvw" element={<Credits />} />
 
         <Route path="/landing" element={<LandingPage />} />
 
@@ -385,11 +449,15 @@ function App() {
           <Route index element={<StudentQuizResults />} />
         </Route>
 
+        {/* Import Questions Route */}
+        <Route
+          path="/import-questions"
+          element={<ProtectedRoute element={<Layout />} />}
+        >
+          <Route index element={<ImportQuestionsPage />} />
+        </Route>
 
-        {/* =========================
-            USERS
-        ========================= */}
-
+        {/* Users Route */}
         <Route
           path="/users"
           element={<ProtectedRoute element={<Layout />} />}
