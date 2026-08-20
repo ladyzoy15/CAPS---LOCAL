@@ -1583,6 +1583,89 @@ const Sidebar = ({
             }
           )}
 
+
+          {/* =================================================
+              IMPORT QUESTIONS
+              Shown to Faculty and up — same roles that can see
+              the Quizzes/Libraries section.
+          ================================================= */}
+
+          {parsedRoleId >= 2 && (
+            <li className="group relative">
+
+              <span
+                className={`absolute top-1/2 left-0 h-6 w-[5px] -translate-y-1/2 rounded-tr-lg rounded-br-lg ${
+                  isActive("/import-questions")
+                    ? "bg-amber-600"
+                    : "bg-transparent"
+                }`}
+              />
+
+              <div className="px-3">
+
+                <Link
+                  to="/import-questions"
+                  onClick={handleMenuClick}
+                  className={`group flex cursor-pointer items-center rounded-lg transition-colors hover:bg-amber-900/10 dark:hover:bg-orange-500/10 ${
+                    isUsersPage
+                      ? "justify-center py-[10px]"
+                      : "justify-start py-[6px]"
+                  } ${
+                    isActive("/import-questions")
+                      ? "bg-amber-900/10 text-amber-950 shadow-[inset_0_0_0_1px_rgba(120,53,15,0.15)] dark:text-gray-100"
+                      : "text-amber-700 dark:text-gray-400 hover:text-amber-900 dark:hover:text-orange-300"
+                  }`}
+                >
+
+                  <div
+                    className={`flex items-center ${
+                      isUsersPage
+                        ? "justify-center"
+                        : "ml-3 gap-3"
+                    }`}
+                  >
+
+                    <i
+                      className={`bx bx-import flex-shrink-0 ${
+                        isUsersPage
+                          ? "text-[20px]"
+                          : "text-[18px]"
+                      } ${
+                        isDarkMode
+                          ? "text-gray-100 drop-shadow-[0_0_2px_rgba(255,255,255,0.35)]"
+                          : "text-amber-700"
+                      }`}
+                    />
+
+
+                    {!isUsersPage && (
+                      <span
+                        className={`outfit-500 text-[15px] whitespace-nowrap ${
+                          isActive("/import-questions")
+                            ? "font-semibold text-amber-950 dark:text-gray-100"
+                            : "text-amber-700 dark:text-gray-400 hover:text-amber-900 dark:hover:text-orange-300"
+                        }`}
+                      >
+                        Import
+                      </span>
+                    )}
+
+                  </div>
+
+                </Link>
+
+
+                {isUsersPage && (
+                  <span className="pointer-events-none absolute top-1/2 left-full ml-2 -translate-y-1/2 rounded-md bg-amber-950 px-2 py-1 text-xs whitespace-nowrap text-white opacity-0 shadow-lg transition-opacity duration-150 group-hover:opacity-100 dark:bg-gray-700">
+                    Import
+                  </span>
+                )}
+
+              </div>
+
+            </li>
+          )}
+
         </ul>
 
 
@@ -1811,9 +1894,10 @@ const Sidebar = ({
 
               {/* =================================================
                   EXPORT
+                  Visible to Faculty and up.
               ================================================= */}
 
-              {parsedRoleId >= 3 && (
+              {parsedRoleId >= 2 && (
                 <li className="group relative">
 
                   <div className="px-3">

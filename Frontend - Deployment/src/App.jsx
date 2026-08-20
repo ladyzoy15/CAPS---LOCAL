@@ -33,6 +33,7 @@ import PracticeExamInfo from "./pages/PracticeExamInfo";
 import PrintQualifyingExam from "./pages/PrintQualifyingExam";
 import PrintPersonalQuiz from "./pages/PrintPersonalQuiz";
 import SubjectOverview from "./pages/SubjectOverview";
+import ImportQuestions from "./pages/ImportQuestions";
 
 import Libraries from "./pages/Libraries";
 import Sessions from "./pages/Sessions";
@@ -45,11 +46,6 @@ import ArchivedQuiz from "./pages/ArchivedQuiz";
 
 import SubjectList from "./pages/SubjectList";
 import SubjectsArchive from "./pages/SubjectsArchive";
-
-/* =====================================================
-   IMPORT QUESTIONS
-   ===================================================== */
-import ImportQuestions from "./pages/ImportQuestions";
 
 import LandingPage from "./pages/LandingPage";
 
@@ -65,9 +61,9 @@ function App() {
     <Router>
       <Routes>
 
-        {/* =====================================================
+        {/* =========================
             PUBLIC ROUTES
-            ===================================================== */}
+        ========================= */}
 
         <Route path="/" element={<LandingPage />} />
 
@@ -78,16 +74,14 @@ function App() {
         <Route path="/forgot-user-code" element={<ForgotUserCodeForm />} />
         <Route path="/team-REVA" element={<Credits />} />
 
-        {/* Public Landing Page */}
-        <Route
-          path="/landing"
-          element={<LandingPage />}
-        />
+        <Route path="/landing" element={<LandingPage />} />
+
+        <Route path="/help" element={<TutorialLayout />} />
 
 
-        {/* =====================================================
-            LIBRARIES - PERSONAL QUIZZES
-            ===================================================== */}
+        {/* =========================
+            LIBRARIES
+        ========================= */}
 
         <Route
           path="/libraries"
@@ -100,9 +94,9 @@ function App() {
         </Route>
 
 
-        {/* =====================================================
+        {/* =========================
             SESSIONS
-            ===================================================== */}
+        ========================= */}
 
         <Route
           path="/sessions"
@@ -115,34 +109,23 @@ function App() {
         </Route>
 
 
-        {/* =====================================================
+        {/* =========================
             CLASS
-            ===================================================== */}
+        ========================= */}
 
         <Route
           path="/class"
           element={<ProtectedRoute element={<Layout />} />}
         >
-          <Route
-            index
-            element={<Class />}
-          />
-
-          <Route
-            path=":classID/students"
-            element={<ClassContent />}
-          />
-
-          <Route
-            path=":classID/quizzes"
-            element={<StudentClasses />}
-          />
+          <Route index element={<Class />} />
+          <Route path=":classID/students" element={<ClassContent />} />
+          <Route path=":classID/quizzes" element={<StudentClasses />} />
         </Route>
 
 
-        {/* =====================================================
+        {/* =========================
             ARCHIVED CLASS
-            ===================================================== */}
+        ========================= */}
 
         <Route
           path="/archived-class"
@@ -155,9 +138,9 @@ function App() {
         </Route>
 
 
-        {/* =====================================================
+        {/* =========================
             ARCHIVED QUIZZES
-            ===================================================== */}
+        ========================= */}
 
         <Route
           path="/archived-quiz"
@@ -170,9 +153,9 @@ function App() {
         </Route>
 
 
-        {/* =====================================================
+        {/* =========================
             REPORTS
-            ===================================================== */}
+        ========================= */}
 
         <Route
           path="/reports"
@@ -185,19 +168,9 @@ function App() {
         </Route>
 
 
-        {/* =====================================================
-            PUBLIC DOCUMENTATION
-            ===================================================== */}
-
-        <Route
-          path="/help"
-          element={<TutorialLayout />}
-        />
-
-
-        {/* =====================================================
+        {/* =========================
             PRACTICE EXAM RESULTS
-            ===================================================== */}
+        ========================= */}
 
         <Route
           path="/practice-exam-result"
@@ -215,49 +188,9 @@ function App() {
         </Route>
 
 
-        {/* =====================================================
-            PRINT QUALIFYING EXAM
-            ===================================================== */}
-
-        <Route
-          path="/print-qualification-exam"
-          element={<ProtectedRoute element={<Layout />} />}
-        >
-          <Route
-            index
-            element={<PrintQualifyingExam />}
-          />
-
-          <Route
-            path="content"
-            element={<PrintQualifyingExam />}
-          />
-        </Route>
-
-
-        {/* =====================================================
-            PRINT PERSONAL QUIZ
-            ===================================================== */}
-
-        <Route
-          path="/print-personal-quiz"
-          element={<ProtectedRoute element={<Layout />} />}
-        >
-          <Route
-            index
-            element={<PrintPersonalQuiz />}
-          />
-
-          <Route
-            path="content"
-            element={<PrintPersonalQuiz />}
-          />
-        </Route>
-
-
-        {/* =====================================================
+        {/* =========================
             PRACTICE EXAM
-            ===================================================== */}
+        ========================= */}
 
         <Route
           path="/practice-exam"
@@ -275,10 +208,6 @@ function App() {
         </Route>
 
 
-        {/* =====================================================
-            PRACTICE EXAM PREVIEW
-            ===================================================== */}
-
         <Route
           path="/practice-exam/preview/:subjectID"
           element={<ProtectedRoute element={<Layout />} />}
@@ -289,10 +218,6 @@ function App() {
           />
         </Route>
 
-
-        {/* =====================================================
-            EXAM PREVIEW
-            ===================================================== */}
 
         <Route
           path="/exam-preview"
@@ -310,9 +235,46 @@ function App() {
         </Route>
 
 
-        {/* =====================================================
+        {/* =========================
+            QUALIFYING EXAM
+        ========================= */}
+
+        <Route
+          path="/print-qualification-exam"
+          element={<ProtectedRoute element={<Layout />} />}
+        >
+          <Route index element={<PrintQualifyingExam />} />
+          <Route path="content" element={<PrintQualifyingExam />} />
+        </Route>
+
+
+        {/* =========================
+            IMPORT QUESTIONS
+        ========================= */}
+
+        <Route
+          path="/import-questions"
+          element={<ProtectedRoute element={<Layout />} />}
+        >
+          <Route index element={<ImportQuestions />} />
+        </Route>
+
+
+        {/* =========================
+            PERSONAL QUIZ
+        ========================= */}
+
+        <Route
+          path="/print-personal-quiz"
+          element={<ProtectedRoute element={<Layout />} />}
+        >
+          <Route index element={<PrintPersonalQuiz />} />
+        </Route>
+
+
+        {/* =========================
             STUDENT DASHBOARD
-            ===================================================== */}
+        ========================= */}
 
         <Route
           path="/student-dashboard"
@@ -330,9 +292,9 @@ function App() {
         </Route>
 
 
-        {/* =====================================================
-            FACULTY SUBJECTS
-            ===================================================== */}
+        {/* =========================
+            FACULTY
+        ========================= */}
 
         <Route
           path="/faculty/subjects"
@@ -348,11 +310,6 @@ function App() {
             element={<FacultyContent />}
           />
         </Route>
-
-
-        {/* =====================================================
-            FACULTY DASHBOARD
-            ===================================================== */}
 
         <Route
           path="/faculty-dashboard"
@@ -370,9 +327,9 @@ function App() {
         </Route>
 
 
-        {/* =====================================================
-            PROGRAM CHAIR SUBJECTS
-            ===================================================== */}
+        {/* =========================
+            PROGRAM CHAIR
+        ========================= */}
 
         <Route
           path="/program-chair/subjects"
@@ -388,11 +345,6 @@ function App() {
             element={<ProgramChairContent />}
           />
         </Route>
-
-
-        {/* =====================================================
-            PROGRAM CHAIR DASHBOARD
-            ===================================================== */}
 
         <Route
           path="/program-chair-dashboard"
@@ -410,9 +362,9 @@ function App() {
         </Route>
 
 
-        {/* =====================================================
-            ASSOCIATE DEAN SUBJECTS
-            ===================================================== */}
+        {/* =========================
+            ASSOCIATE DEAN
+        ========================= */}
 
         <Route
           path="/asso-dean/subjects"
@@ -434,11 +386,6 @@ function App() {
           />
         </Route>
 
-
-        {/* =====================================================
-            ASSOCIATE DEAN DASHBOARD
-            ===================================================== */}
-
         <Route
           path="/asso-dean-dashboard"
           element={<ProtectedRoute element={<Layout />} />}
@@ -455,9 +402,9 @@ function App() {
         </Route>
 
 
-        {/* =====================================================
-            DEAN SUBJECTS
-            ===================================================== */}
+        {/* =========================
+            DEAN
+        ========================= */}
 
         <Route
           path="/dean/subjects"
@@ -479,11 +426,6 @@ function App() {
           />
         </Route>
 
-
-        {/* =====================================================
-            DEAN DASHBOARD
-            ===================================================== */}
-
         <Route
           path="/dean-dashboard"
           element={<ProtectedRoute element={<Layout />} />}
@@ -495,139 +437,3 @@ function App() {
 
           <Route
             path="dashboard"
-            element={<FacultyDashboard />}
-          />
-        </Route>
-
-
-        {/* =====================================================
-            SUBJECT OVERVIEW
-            ===================================================== */}
-
-        <Route
-          path="/subject-overview/:subjectID"
-          element={<ProtectedRoute element={<Layout />} />}
-        >
-          <Route
-            index
-            element={<SubjectOverview />}
-          />
-        </Route>
-
-
-        {/* =====================================================
-            QUIZ OVERVIEW
-            ===================================================== */}
-
-        <Route
-          path="/quiz-overview"
-          element={<ProtectedRoute element={<Layout />} />}
-        >
-          <Route
-            index
-            element={<QuizOverview />}
-          />
-        </Route>
-
-
-        {/* =====================================================
-            QUIZ CONTENT
-            ===================================================== */}
-
-        <Route
-          path="/quiz-content"
-          element={<ProtectedRoute element={<Layout />} />}
-        >
-          <Route
-            index
-            element={<QuizContent />}
-          />
-        </Route>
-
-
-        {/* =====================================================
-            QUIZ INFO
-            ===================================================== */}
-
-        <Route
-          path="/quiz-info/:classPersonalQuizID"
-          element={<ProtectedRoute element={<Layout />} />}
-        >
-          <Route
-            index
-            element={<QuizInfo />}
-          />
-        </Route>
-
-
-        {/* =====================================================
-            STUDENT QUIZ
-            ===================================================== */}
-
-        <Route
-          path="/quiz/:classPersonalQuizID"
-          element={<ProtectedRoute element={<Layout />} />}
-        >
-          <Route
-            index
-            element={<StudentQuiz />}
-          />
-        </Route>
-
-
-        {/* =====================================================
-            STUDENT QUIZ RESULTS
-            ===================================================== */}
-
-        <Route
-          path="/quiz-result/:classPersonalQuizID"
-          element={<ProtectedRoute element={<Layout />} />}
-        >
-          <Route
-            index
-            element={<StudentQuizResults />}
-          />
-        </Route>
-
-
-        {/* =====================================================
-            USERS
-            ===================================================== */}
-
-        <Route
-          path="/users"
-          element={<ProtectedRoute element={<Layout />} />}
-        >
-          <Route
-            index
-            element={<Users />}
-          />
-
-          <Route
-            path="users"
-            element={<Users />}
-          />
-        </Route>
-
-
-        {/* =====================================================
-            IMPORT QUESTIONS
-            ===================================================== */}
-
-        <Route
-          path="/import"
-          element={<ProtectedRoute element={<Layout />} />}
-        >
-          <Route
-            index
-            element={<ImportQuestions />}
-          />
-        </Route>
-
-
-      </Routes>
-    </Router>
-  );
-}
-
-export default App;
