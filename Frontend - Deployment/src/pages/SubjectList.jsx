@@ -1598,22 +1598,6 @@ function SubjectList() {
                         <div className="space-y-5">
                           <div>
                             <label className="mb-1.5 block text-[13px] font-semibold text-gray-700">
-                              Subject Name <span className="text-red-500">*</span>
-                            </label>
-                            <div className="relative">
-                              <i className="bx bx-book-open absolute top-1/2 left-3 -translate-y-1/2 text-gray-400"></i>
-                              <input
-                                type="text"
-                                placeholder="e.g. Calculus 1"
-                                value={newSubjectName}
-                                onChange={(e) => setNewSubjectName(e.target.value)}
-                                className="w-full rounded-xl border border-gray-200 py-2.5 pr-3 pl-9 text-sm transition focus:border-orange-400 focus:ring-2 focus:ring-orange-100 focus:outline-none"
-                              />
-                            </div>
-                          </div>
-
-                          <div>
-                            <label className="mb-1.5 block text-[13px] font-semibold text-gray-700">
                               Subject Code <span className="text-red-500">*</span>
                             </label>
                             <div className="relative">
@@ -1629,6 +1613,22 @@ function SubjectList() {
                             <p className="mt-1 text-[11px] text-gray-400">
                               Enter the subject code (max 20 characters).
                             </p>
+                          </div>
+
+                          <div>
+                            <label className="mb-1.5 block text-[13px] font-semibold text-gray-700">
+                              Subject Name <span className="text-red-500">*</span>
+                            </label>
+                            <div className="relative">
+                              <i className="bx bx-book-open absolute top-1/2 left-3 -translate-y-1/2 text-gray-400"></i>
+                              <input
+                                type="text"
+                                placeholder="e.g. Calculus 1"
+                                value={newSubjectName}
+                                onChange={(e) => setNewSubjectName(e.target.value)}
+                                className="w-full rounded-xl border border-gray-200 py-2.5 pr-3 pl-9 text-sm transition focus:border-orange-400 focus:ring-2 focus:ring-orange-100 focus:outline-none"
+                              />
+                            </div>
                           </div>
 
                           <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
@@ -1781,29 +1781,7 @@ function SubjectList() {
                         id="subject-edit-form"
                         onSubmit={(e) => e.preventDefault()}
                       >
-                        <div className="space-y-5">
-                          <div>
-                            <label className="mb-1.5 block text-[13px] font-semibold text-gray-700">
-                              Subject Name <span className="text-red-500">*</span>
-                            </label>
-                            <div className="relative">
-                              <i className="bx bx-book-open absolute top-1/2 left-3 -translate-y-1/2 text-gray-400"></i>
-                              <input
-                                type="text"
-                                placeholder="e.g. Calculus 1"
-                                value={editedSubject.subjectName}
-                                onChange={(e) =>
-                                  setEditedSubject({
-                                    ...editedSubject,
-                                    subjectName: e.target.value,
-                                  })
-                                }
-                                className="w-full rounded-xl border border-gray-200 py-2.5 pr-3 pl-9 text-sm transition focus:border-orange-400 focus:ring-2 focus:ring-orange-100 focus:outline-none"
-                              />
-                            </div>
-                          </div>
-
-                          <div>
+                        <div>
                             <label className="mb-1.5 block text-[13px] font-semibold text-gray-700">
                               Subject Code <span className="text-red-500">*</span>
                             </label>
@@ -1827,6 +1805,29 @@ function SubjectList() {
                               Enter the subject code (max 20 characters).
                             </p>
                           </div>
+                          
+                        <div className="space-y-5">
+                          <div>
+                            <label className="mb-1.5 block text-[13px] font-semibold text-gray-700">
+                              Subject Name <span className="text-red-500">*</span>
+                            </label>
+                            <div className="relative">
+                              <i className="bx bx-book-open absolute top-1/2 left-3 -translate-y-1/2 text-gray-400"></i>
+                              <input
+                                type="text"
+                                placeholder="e.g. Calculus 1"
+                                value={editedSubject.subjectName}
+                                onChange={(e) =>
+                                  setEditedSubject({
+                                    ...editedSubject,
+                                    subjectName: e.target.value,
+                                  })
+                                }
+                                className="w-full rounded-xl border border-gray-200 py-2.5 pr-3 pl-9 text-sm transition focus:border-orange-400 focus:ring-2 focus:ring-orange-100 focus:outline-none"
+                              />
+                            </div>
+                          </div>
+
 
                           <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
                             <div>
