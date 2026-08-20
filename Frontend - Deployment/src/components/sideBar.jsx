@@ -486,6 +486,36 @@ const Sidebar = ({
   };
 
   // =========================================================
+  // IMPORT QUESTIONS URL
+  // =========================================================
+  // Keep the existing quiz/subject context when available.
+  // This prevents /import-questions from opening without the
+  // IDs needed by ImportQuestionModal.
+  const getImportQuestionsPath = () => {
+    const params = new URLSearchParams(location.search);
+
+    if (!params.get("subjectID") && selectedSubject?.subjectID) {
+      params.set("subjectID", String(selectedSubject.subjectID));
+    }
+
+    if (
+      !params.get("personalQuizID") &&
+      selectedSubject?.personalQuizID
+    ) {
+      params.set(
+        "personalQuizID",
+        String(selectedSubject.personalQuizID),
+      );
+    }
+
+    const query = params.toString();
+
+    return query
+      ? `/import-questions?${query}`
+      : "/import-questions";
+  };
+
+  // =========================================================
   // MOBILE
   // =========================================================
 
@@ -822,7 +852,7 @@ const Sidebar = ({
     <>
       <div
         ref={sidebarRef}
-        className={`fixed top-0 left-0 z-55 h-[100vh] overflow-visible border-r transition-all duration-300 ease-in-out ${
+        className={`fixed top-0 left-0 z-[999] h-[100vh] overflow-visible border-r transition-all duration-300 ease-in-out ${
           isUsersPage
             ? "w-[63px]"
             : "w-[220px]"
@@ -848,19 +878,30 @@ const Sidebar = ({
         ===================================================== */}
 
         <button
-          onClick={() =>
-            setIsCollapsed(
-              (prev) => !prev
-            )
+          type="button"
+          onClick={() => {
+            setIsCollapsed((prev) => !prev);
+          }}
+          aria-label={
+            isCollapsed
+              ? "Expand sidebar"
+              : "Collapse sidebar"
+          }
+          title={
+            isCollapsed
+              ? "Expand sidebar"
+              : "Collapse sidebar"
           }
           className="
+            pointer-events-auto
             absolute
             -right-3
             top-20
-            z-10
+            z-[1000]
             flex
             h-6
             w-6
+            cursor-pointer
             items-center
             justify-center
             rounded-full
@@ -1585,7 +1626,7 @@ const Sidebar = ({
                   <div className="px-3">
 
                     <Link
-                      to="/import-questions"
+                      to={getImportQuestionsPath()}
                       onClick={
                         handleMenuClick
                       }
@@ -1685,7 +1726,7 @@ const Sidebar = ({
                   EXPORT
               ================================================= */}
 
-              {parsedRoleId >= 3 && (
+              {parsedRoleId >= 2 && (
                 <li className="group relative">
 
                   <div className="px-3">
