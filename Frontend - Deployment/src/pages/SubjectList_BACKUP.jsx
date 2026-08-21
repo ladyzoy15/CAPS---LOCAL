@@ -1597,6 +1597,7 @@ function SubjectList() {
                                 className="w-full rounded-xl border border-gray-200 py-2.5 pr-3 pl-9 text-sm transition focus:border-orange-400 focus:ring-2 focus:ring-orange-100 focus:outline-none"
                               />
                             </div>
+
                             <p className="mt-1 text-[11px] text-gray-400">
                               Enter the subject code (max 20 characters).
                             </p>
@@ -2079,6 +2080,5 @@ function SubjectList() {
 }
 
 export default SubjectList;
-
 
 

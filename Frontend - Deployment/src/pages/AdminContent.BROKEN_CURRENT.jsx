@@ -605,62 +605,6 @@ const AdminContent = () => {
                 pendingCount={questions.filter((q) => q.status_id === 1).length}
               />
 
-            
-            </div>
-
-            {/* Add Question Section */}
-            {(activeTab === 0 || activeTab === 1) && (
-              <div>
-                {/* Show Add Question Button Only If No Active Question and There Are Questions */}
-                {!submittedQuestion && filteredQuestions.length > 0 && (
-                  <div className="fixed right-4 bottom-[110px] z-49 text-center sm:right-[-4px] sm:bottom-[4px] sm:p-4 lg:p-4">
-                    <button
-                      onClick={() => {
-                        setSubmittedQuestion("new");
-                        setIsAddingQuestion(true);
-
-                        setTimeout(() => {
-                          if (formRef.current) {
-                            const yOffset = -500;
-                            const y =
-                              formRef.current.getBoundingClientRect().top +
-                              window.pageYOffset +
-                              yOffset;
-
-                            window.scrollTo({ top: y, behavior: "smooth" });
-                          }
-                        }, 100);
-                      }}
-                      className="cursor-pointer rounded-full bg-orange-500 px-[15px] py-[15px] text-[14px] font-semibold text-white shadow-xl hover:bg-orange-600 lg:rounded-xl lg:px-4 lg:py-2"
-                    >
-                      <div className="flex items-center justify-center gap-2">
-                        <i className="bx bx-plus text-[24px] lg:text-[16px]"></i>
-                        <span className="outfit-400 hidden lg:block">
-                          Add Question
-                        </span>
-                      </div>
-                    </button>
-                  </div>
-                )}
-
-                <div ref={formRef}>
-                  {/* Show Combined Form */}
-                  {submittedQuestion === "new" && (
-                    <div className="transition-all duration-300 ease-out">
-                      <AddQuestionForm
-                        subjectID={selectedSubject.subjectID}
-                        onComplete={handleQuestionAdded}
-                        onCancel={() => setSubmittedQuestion(null)}
-                        activeTab={activeTab}
-                        isExamQuestionsEnabled={
-                          isExamQuestionsEnabled[selectedSubject?.subjectID]
-                        }
-                      />
-                    </div>
-                  )}
-                </div>
-              </div>
-            )}
 
             {/* Questions List */}
             {(activeTab === 0 || activeTab === 1 || activeTab === 4) && (

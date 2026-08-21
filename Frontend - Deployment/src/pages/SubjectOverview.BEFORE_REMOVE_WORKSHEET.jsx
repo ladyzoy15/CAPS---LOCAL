@@ -1,4 +1,4 @@
-﻿import React, { useEffect, useState } from "react";
+import React, { useEffect, useState } from "react";
 import { useNavigate, useLocation } from "react-router-dom";
 import ExamResultsTable from "../components/ExamResultsTable";
 import { Textfit } from "react-textfit";
@@ -363,6 +363,11 @@ const SubjectOverview = () => {
     }
   };
 
+  // Worksheet handler
+  const handleWorksheetClick = () => {
+    setIsWorksheetModalOpen(true);
+  };
+
   return (
     <>
       {/* Mobile version: block on mobile, hidden on md+ */}
@@ -377,7 +382,7 @@ const SubjectOverview = () => {
                 <i className="bx bx-book text-[16px]d mt-[1px]"></i>
                 <p className="outfit-400 text-[12px]">{subject.subjectCode}</p>
                 <span className="mx-1 align-middle leading-none text-gray-400">
-                  â€¢
+                  •
                 </span>
                 <p className="outfit-400 text-[12px]">
                   {subject.programName === "GE"
@@ -385,7 +390,7 @@ const SubjectOverview = () => {
                     : subject.programName || "-"}
                 </p>
                 <span className="mx-1 align-middle leading-none text-gray-400">
-                  â€¢
+                  •
                 </span>
                 <p className="outfit-400 text-[12px]">
                   {subject.yearLevel || "-"}
@@ -414,7 +419,7 @@ const SubjectOverview = () => {
 
                 <p className="outfit-400 text-[14px]">{subject.subjectCode}</p>
                 <span className="mx-1 mt-[1.5px] align-middle leading-none text-gray-400">
-                  â€¢
+                  •
                 </span>
                 <p className="outfit-400 text-[14px]">
                   {subject.programName === "GE"
@@ -422,7 +427,7 @@ const SubjectOverview = () => {
                     : subject.programName || "-"}
                 </p>
                 <span className="mx-1 mt-[1.5px] align-middle leading-none text-gray-400">
-                  â€¢
+                  •
                 </span>
                 <p className="outfit-400 text-[14px]">
                   {subject.yearLevel || "-"}
@@ -535,7 +540,7 @@ const SubjectOverview = () => {
                 <i className="bx bx-book mt-[1px] text-[16px]"></i>
                 <p className="outfit-400 text-[14px]">{subject.subjectCode}</p>
                 <span className="mx-1 mt-[2px] align-middle leading-none text-gray-400">
-                  â€¢
+                  •
                 </span>
                 <i className="bx bx-cog mt-[1px] text-[16px]"></i>
                 <p className="outfit-400 text-[14px]">
@@ -544,7 +549,7 @@ const SubjectOverview = () => {
                     : subject.programName || "-"}
                 </p>
                 <span className="mx-1 mt-[2px] align-middle leading-none text-gray-400">
-                  â€¢
+                  •
                 </span>
                 <i className="bx bx-people-diversity mt-[1px] text-[16px]"></i>
                 <p className="outfit-400 text-[14px]">
@@ -963,4 +968,3 @@ const SubjectOverview = () => {
 };
 
 export default SubjectOverview;
-

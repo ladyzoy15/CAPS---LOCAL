@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef } from "react";
+﻿import React, { useState, useEffect, useRef } from "react";
 import { useOutletContext } from "react-router-dom";
 import { useParams, useLocation } from "react-router-dom";
 
@@ -612,28 +612,6 @@ const ProgramChairContent = () => {
                 pendingCount={questions.filter((q) => q.status_id === 1).length}
               />
 
-              {/* Practice Exam Disabled Banner */}
-              {!isLoading &&
-                !isBannerClosed &&
-                !practiceExamSettings[selectedSubject?.subjectID]
-                  ?.isEnabled && (
-                  <div className="outfit-400 mx-0 mt-3 flex w-full items-center gap-2 border border-amber-200 bg-amber-50 px-4 py-2 sm:mx-auto sm:max-w-[1200px] sm:rounded-xl">
-                    <i className="bx bx-info-circle text-lg text-amber-600"></i>
-                    <p className="flex-1 text-[13px] text-amber-800">
-                      <span className="font-semibold">
-                        Practice Exam is not enabled.
-                      </span>{" "}
-                      Students won't be able to take practice exams for this
-                      subject.
-                    </p>
-                    <button
-                      onClick={() => setIsBannerClosed(true)}
-                      className="flex h-7 w-7 flex-shrink-0 items-center justify-center rounded-full text-amber-600 transition-colors hover:bg-amber-100 hover:text-amber-800 focus:outline-none"
-                      title="Close"
-                    >
-                      <i className="bx bx-x text-xl"></i>
-                    </button>
-                  </div>
                 )}
             </div>
 
@@ -776,15 +754,15 @@ const ProgramChairContent = () => {
                               <div className="flex items-center gap-3 text-[10px] text-gray-600 sm:gap-5 sm:text-[12px]">
                                 <div className="flex items-center gap-1 sm:gap-2">
                                   <span className="h-2.5 w-2.5 rounded-full bg-[#65A338] sm:h-3 sm:w-3"></span>
-                                  <span>Easy · {easyCount}</span>
+                                  <span>Easy Â· {easyCount}</span>
                                 </div>
                                 <div className="flex items-center gap-1 sm:gap-2">
                                   <span className="h-2.5 w-2.5 rounded-full bg-[#E68A19] sm:h-3 sm:w-3"></span>
-                                  <span>Moderate · {modCount}</span>
+                                  <span>Moderate Â· {modCount}</span>
                                 </div>
                                 <div className="flex items-center gap-1 sm:gap-2">
                                   <span className="h-2.5 w-2.5 rounded-full bg-[#E14343] sm:h-3 sm:w-3"></span>
-                                  <span>Hard · {hardCount}</span>
+                                  <span>Hard Â· {hardCount}</span>
                                 </div>
                               </div>
                             </div>
@@ -1033,11 +1011,11 @@ const ProgramChairContent = () => {
                                       <span className="rounded-lg px-2 py-1 text-[12px] capitalize">
                                         {question.difficulty?.name || "Easy"}
                                       </span>
-                                      <span> •</span>
+                                      <span> â€¢</span>
                                       <span className="rounded-lg px-2 py-1 text-[12px] capitalize">
                                         {question.coverage?.name || "Midterm"}
                                       </span>
-                                      <span> •</span>
+                                      <span> â€¢</span>
                                       <span className="rounded-lg px-2 py-1 text-[12px]">
                                         {question.score} PT
                                       </span>
@@ -1771,3 +1749,4 @@ const ProgramChairContent = () => {
 };
 
 export default ProgramChairContent;
+
