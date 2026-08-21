@@ -151,14 +151,16 @@ const Layout = () => {
     location.pathname.includes("/practice-exam") ||
     location.pathname.includes("/exam-preview");
 
+  // NOTE: This previously also matched the Subjects list routes
+  // (/dean/subjects, /faculty/subjects, etc.), which incorrectly
+  // shrank the main content's left margin to match the *collapsed*
+  // sidebar width (63px) even though the sidebar renders at its
+  // full 220px width on those pages. That caused the sidebar to
+  // overlap/cover the subject cards. Only /libraries and
+  // /archived-quiz actually need the narrower margin.
   const isLibrariesPage =
     location.pathname === "/libraries" ||
-    location.pathname === "/archived-quiz" ||
-    location.pathname === "/dean/subjects" ||
-    location.pathname === "/asso-dean/subjects" ||
-    location.pathname === "/program-chair/subjects" ||
-    location.pathname === "/faculty/subjects" ||
-    location.pathname === "/student/subjects";
+    location.pathname === "/archived-quiz";
 
   const isDashboard =
     location.pathname === "/admin-dashboard" ||

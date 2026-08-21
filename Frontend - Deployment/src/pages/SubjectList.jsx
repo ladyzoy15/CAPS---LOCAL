@@ -854,33 +854,23 @@ function SubjectList() {
               {/* Header with title and action buttons */}
               <div className="flex flex-wrap items-center justify-between gap-2">
                 <div className="min-w-0 flex-1">
-                  <p className="outfit-500 mt-1 text-[18px] break-words text-black">
-                    {searchTerm.trim() ? (
-                      <>
-                        Search results for &quot;{searchTerm}&quot;
-                        <span className="hidden md:inline">
-                          {" "}
-                          ({filteredSubjects.length})
-                        </span>
-                      </>
-                    ) : selectedProgramFilter === "All" ? (
-                      <>
-                        Qualifying exam
-                        <span className="hidden md:inline">
-                          {" "}
-                          ({filteredSubjects.length})
-                        </span>
-                      </>
-                    ) : (
-                      <>
-                        {getDisplayProgramName(selectedProgramFilter)}
-                        <span className="hidden md:inline">
-                          {" "}
-                          ({filteredSubjects.length})
-                        </span>
-                      </>
-                    )}
-                  </p>
+                  {searchTerm.trim() ? (
+                    <p className="outfit-500 mt-1 text-[18px] break-words text-black">
+                      Search results for &quot;{searchTerm}&quot;
+                      <span className="hidden md:inline">
+                        {" "}
+                        ({filteredSubjects.length})
+                      </span>
+                    </p>
+                  ) : selectedProgramFilter !== "All" ? (
+                    <p className="outfit-500 mt-1 text-[18px] break-words text-black">
+                      {getDisplayProgramName(selectedProgramFilter)}
+                      <span className="hidden md:inline">
+                        {" "}
+                        ({filteredSubjects.length})
+                      </span>
+                    </p>
+                  ) : null}
                 </div>
 
                 <div className="flex flex-shrink-0 items-center gap-1 md:gap-2">
@@ -995,23 +985,14 @@ function SubjectList() {
                     <button
                       type="button"
                       onClick={() => {
-                        if (Number(effectiveRoleId) === 2) {
-                          setShowAssignModal(true);
-                          fetchAvailableSubjects();
-                        } else {
-                          setShowAddModal(true);
-                        }
+                        setShowAddModal(true);
                       }}
-                      title={
-                        Number(effectiveRoleId) === 2
-                          ? "Assign subject"
-                          : "Create subject"
-                      }
+                      title="Create subject"
                       className="outfit-500 -mb-2 hidden cursor-pointer items-center rounded-xl bg-orange-500 p-2 text-[12px] font-medium text-white transition-colors hover:bg-orange-600 md:mb-0 md:inline-flex md:px-4 md:py-2 md:text-[14px]"
                     >
                       <i className="bx bx-plus text-[20px] md:mr-2 md:text-[16px]" />
                       <span className="hidden md:inline">
-                        {Number(roleId) === 2 ? "Assign subject" : "Create subject"}
+                        Create subject
                       </span>
                     </button>
                   )}
@@ -1053,19 +1034,11 @@ function SubjectList() {
                     />
                     <p className="outfit-400 text-[14px] text-gray-600">
                       {selectedProgramFilter === "All" ? (
-                        Number(effectiveRoleId) === 2 ? (
-                          <>
-                            No subjects assigned.
-                            <br />
-                            Use the Assign Subject button to assign one.
-                          </>
-                        ) : (
-                          <>
-                            No subjects found.
-                            <br />
-                            Use the Create Subject button to create one.
-                          </>
-                        )
+                        <>
+                          No subjects found.
+                          <br />
+                          Use the Create Subject button to create one.
+                        </>
                       ) : (
                         <>
                           No subjects found for{" "}
@@ -1374,12 +1347,7 @@ function SubjectList() {
               <button
                 type="button"
                 onClick={() => {
-                  if (Number(effectiveRoleId) === 2) {
-                    setShowAssignModal(true);
-                    fetchAvailableSubjects();
-                  } else {
-                    setShowAddModal(true);
-                  }
+                  setShowAddModal(true);
                 }}
                 className="outfit-400 flex cursor-pointer items-center gap-2 rounded-full bg-orange-500 p-4 text-[14px] font-medium text-white shadow-xl transition-colors hover:bg-orange-600"
               >
