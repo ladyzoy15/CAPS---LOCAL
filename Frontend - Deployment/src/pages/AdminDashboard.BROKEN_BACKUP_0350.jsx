@@ -28,9 +28,7 @@ const AdminContent = () => {
 
   // Context and state for subject and question management
   const { selectedSubject, setSelectedSubject } = useOutletContext();
-  // Practice Exam tab (index 0) was removed from SubjectCard, so the
-  // dashboard now opens directly on "Review Question" (index 1).
-  const [activeTab, setActiveTab] = useState(1);
+  const [activeTab, setActiveTab] = useState(0);
   const [questions, setQuestions] = useState([]);
   const [submittedQuestion, setSubmittedQuestion] = useState(null);
   const [editingQuestion, setEditingQuestion] = useState(null);
@@ -567,45 +565,8 @@ const AdminContent = () => {
   const [hoveredQuestionId, setHoveredQuestionId] = useState(null);
 
   return (
-    <div className="relative mt-10 flex min-h-screen w-full flex-1 flex-col justify-center py-2 pb-24 md:pb-2 lg:mt-2">
-      <div className="flex-1">
-        {selectedSubject ? (
-          <div className="w-full py-3">
-            <div className="w-full">
-              <SubjectCard
-                showToast={showToast}
-                subjectName={selectedSubject.subjectName}
-                subjectID={selectedSubject.subjectID}
-                subjectCode={selectedSubject.subjectCode}
-                programID={selectedSubject.programID}
-                yearLevelID={selectedSubject.yearLevelID}
-                university="JRMSU"
-                location="Dapitan City"
-                imageUrl={
-                  selectedSubject.imageUrl || "https://via.placeholder.com/60"
-                }
-                activeIndex={activeTab}
-                setActiveIndex={setActiveTab}
-                isLoading={isLoading}
-                onFetchQuestions={fetchQuestions}
-                programName={selectedSubject.programName}
-                yearLevel={selectedSubject.yearLevel}
-                setSelectedSubject={setSelectedSubject}
-                searchQuery={searchQuery}
-                setSearchQuery={setSearchQuery}
-                isExamQuestionsEnabled={
-                  isExamQuestionsEnabled[selectedSubject?.subjectID]
-                }
-                setIsExamQuestionsEnabled={(value) => {
-                  setIsExamQuestionsEnabled((prev) => ({
-                    ...prev,
-                    [selectedSubject?.subjectID]: value,
-                  }));
-                }}
-                pendingCount={questions.filter((q) => q.status_id === 1).length}
-              />
-
-            
+    
+                )}
             </div>
 
             {/* Add Question Section */}
@@ -1521,7 +1482,7 @@ const AdminContent = () => {
                         <span className="mt-4 text-[15px] text-gray-500">
                           No pending questions found
                         </span>
-                        <span className="text-[13px] text-gray-400">
+                        <span className="text-[13px] text-gray-400 dark:text-gray-500">
                           Questions awaiting approval will appear here
                         </span>
                       </div>
@@ -1535,7 +1496,7 @@ const AdminContent = () => {
                         <span className="mt-4 text-[14px] text-gray-600">
                           No questions added yet
                         </span>
-                        <span className="mb-6 text-[12px] text-gray-400">
+                        <span className="mb-6 text-[12px] text-gray-400 dark:text-gray-500">
                           Start building your question bank
                         </span>
                         <button
@@ -1583,7 +1544,7 @@ const AdminContent = () => {
             <span className="mt-4 text-[15px] text-gray-500">
               Select a Subject
             </span>
-            <span className="w-60 text-[13px] text-gray-400">
+            <span className="w-60 text-[13px] text-gray-400 dark:text-gray-500">
               To select a subject, press the subject icon on the navigation bar
             </span>
           </div>

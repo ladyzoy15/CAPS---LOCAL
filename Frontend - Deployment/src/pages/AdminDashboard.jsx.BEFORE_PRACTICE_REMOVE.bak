@@ -1,4 +1,4 @@
-﻿import React, { useState, useEffect, useRef } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import { useParams, useOutletContext, useLocation } from "react-router-dom";
 import AltButton from "../components/buttonAlt";
 import SubjectCard from "../components/subjectCard";
@@ -28,9 +28,7 @@ const AdminContent = () => {
 
   // Context and state for subject and question management
   const { selectedSubject, setSelectedSubject } = useOutletContext();
-  // Practice Exam tab (index 0) was removed from SubjectCard, so the
-  // dashboard now opens directly on "Review Question" (index 1).
-  const [activeTab, setActiveTab] = useState(1);
+  const [activeTab, setActiveTab] = useState(0);
   const [questions, setQuestions] = useState([]);
   const [submittedQuestion, setSubmittedQuestion] = useState(null);
   const [editingQuestion, setEditingQuestion] = useState(null);
@@ -605,7 +603,29 @@ const AdminContent = () => {
                 pendingCount={questions.filter((q) => q.status_id === 1).length}
               />
 
-            
+              {/* Practice Exam Disabled Banner */}
+              {!isLoading &&
+                !isBannerClosed &&
+                !practiceExamSettings[selectedSubject?.subjectID]
+                  ?.isEnabled && (
+                  <div className="outfit-400 mx-0 mt-3 flex w-full items-center gap-2 border border-amber-200 bg-amber-50 px-4 py-2 sm:mx-auto sm:max-w-[1200px] sm:rounded-xl">
+                    <i className="bx bx-info-circle text-lg text-amber-600"></i>
+                    <p className="flex-1 text-[13px] text-amber-800">
+                      <span className="font-semibold">
+                        Practice Exam is not enabled.
+                      </span>{" "}
+                      Students won't be able to take practice exams for this
+                      subject.
+                    </p>
+                    <button
+                      onClick={() => setIsBannerClosed(true)}
+                      className="flex h-7 w-7 flex-shrink-0 items-center justify-center rounded-full text-amber-600 transition-colors hover:bg-amber-100 hover:text-amber-800 focus:outline-none"
+                      title="Close"
+                    >
+                      <i className="bx bx-x text-xl"></i>
+                    </button>
+                  </div>
+                )}
             </div>
 
             {/* Add Question Section */}
@@ -747,15 +767,15 @@ const AdminContent = () => {
                               <div className="flex items-center gap-3 text-[10px] text-gray-600 sm:gap-5 sm:text-[12px]">
                                 <div className="flex items-center gap-1 sm:gap-2">
                                   <span className="h-2.5 w-2.5 rounded-full bg-[#65A338] sm:h-3 sm:w-3"></span>
-                                  <span>Easy Â· {easyCount}</span>
+                                  <span>Easy · {easyCount}</span>
                                 </div>
                                 <div className="flex items-center gap-1 sm:gap-2">
                                   <span className="h-2.5 w-2.5 rounded-full bg-[#E68A19] sm:h-3 sm:w-3"></span>
-                                  <span>Moderate Â· {modCount}</span>
+                                  <span>Moderate · {modCount}</span>
                                 </div>
                                 <div className="flex items-center gap-1 sm:gap-2">
                                   <span className="h-2.5 w-2.5 rounded-full bg-[#E14343] sm:h-3 sm:w-3"></span>
-                                  <span>Hard Â· {hardCount}</span>
+                                  <span>Hard · {hardCount}</span>
                                 </div>
                               </div>
                             </div>
@@ -1004,11 +1024,11 @@ const AdminContent = () => {
                                       <span className="rounded-lg px-2 py-1 text-[12px] capitalize">
                                         {question.difficulty?.name || "Easy"}
                                       </span>
-                                      <span> â€¢</span>
+                                      <span> •</span>
                                       <span className="rounded-lg px-2 py-1 text-[12px] capitalize">
                                         {question.coverage?.name || "Midterm"}
                                       </span>
-                                      <span> â€¢</span>
+                                      <span> •</span>
                                       <span className="rounded-lg px-2 py-1 text-[12px]">
                                         {question.score} PT
                                       </span>
@@ -1521,7 +1541,7 @@ const AdminContent = () => {
                         <span className="mt-4 text-[15px] text-gray-500">
                           No pending questions found
                         </span>
-                        <span className="text-[13px] text-gray-400">
+                        <span className="text-[13px] text-gray-400 dark:text-gray-500">
                           Questions awaiting approval will appear here
                         </span>
                       </div>
@@ -1535,7 +1555,7 @@ const AdminContent = () => {
                         <span className="mt-4 text-[14px] text-gray-600">
                           No questions added yet
                         </span>
-                        <span className="mb-6 text-[12px] text-gray-400">
+                        <span className="mb-6 text-[12px] text-gray-400 dark:text-gray-500">
                           Start building your question bank
                         </span>
                         <button
@@ -1583,7 +1603,7 @@ const AdminContent = () => {
             <span className="mt-4 text-[15px] text-gray-500">
               Select a Subject
             </span>
-            <span className="w-60 text-[13px] text-gray-400">
+            <span className="w-60 text-[13px] text-gray-400 dark:text-gray-500">
               To select a subject, press the subject icon on the navigation bar
             </span>
           </div>

@@ -1,42 +1,42 @@
 ﻿import React, { useState, useEffect, useRef } from "react";
-import { useParams, useOutletContext, useLocation } from "react-router-dom";
-import AltButton from "../components/buttonAlt";
-import SubjectCard from "../components/subjectCard";
+import { useOutletContext } from "react-router-dom";
 import AddQuestionForm from "../components/AddQuestionForm";
+import { useParams, useLocation } from "react-router-dom";
+
 import EditQuestionForm from "../components/EditQuestionForm";
-import DuplicateQuestionForm from "../components/DuplicateQuestionForm";
 import ConfirmModal from "../components/confirmModal";
 import Sort from "../components/sort";
 import ScrollToTopButton from "../components/scrollToTopButton";
+import SubjectCardFaculty from "../components/subjectCardFaculty";
 import SortType from "../components/sortType";
+import DuplicateQuestionForm from "../components/DuplicateQuestionForm";
+import AltButton from "../components/buttonAlt";
 import Toast from "../components/Toast";
 import useToast from "../hooks/useToast";
 import EmptyImage from "../assets/icons/empty.png";
 import Subject from "../assets/icons/papers.png";
 
-// Main admin dashboard component for managing questions and subjects
-const AdminContent = () => {
+// Main faculty dashboard component for managing questions
+const FacultyContent = () => {
+  // State for image modals and question management
   const location = useLocation();
   const params = new URLSearchParams(location.search);
   const subjectID = params.get("subjectID");
-  // State for image modals and question management
   const [modalImage, setModalImage] = useState(null);
+  const [pendingSort, setPendingSort] = useState("");
   const [isChoiceModalOpen, setIsChoiceModalOpen] = useState(false);
   const [isQuestionModalOpen, setisQuestionModalOpen] = useState(false);
   const [choiceModalImage, setchoiceModalImage] = useState(null);
-  const [pendingSort, setPendingSort] = useState("");
 
   // Context and state for subject and question management
   const { selectedSubject, setSelectedSubject } = useOutletContext();
-  // Practice Exam tab (index 0) was removed from SubjectCard, so the
-  // dashboard now opens directly on "Review Question" (index 1).
-  const [activeTab, setActiveTab] = useState(1);
+  const [activeTab, setActiveTab] = useState(0);
   const [questions, setQuestions] = useState([]);
   const [submittedQuestion, setSubmittedQuestion] = useState(null);
-  const [editingQuestion, setEditingQuestion] = useState(null);
-
-  // Refs for form and UI elements
   const formRef = useRef(null);
+
+  // State for form visibility
+  const [showChoiceForm, setShowChoiceForm] = useState(false);
 
   // State for search and sorting
   const [searchQuery, setSearchQuery] = useState("");
@@ -47,20 +47,9 @@ const AdminContent = () => {
   const [showConfirmModal, setShowConfirmModal] = useState(false);
   const [deleteQuestionID, setDeleteQuestionID] = useState(null);
 
+  // State for question editing
+  const [editQuestionID, setEditQuestionID] = useState(null);
   const [editText, setEditText] = useState("");
-
-  // State for form validation
-  const [areChoicesValid, setAreChoicesValid] = useState(false);
-  const handleChoicesValidity = (validity) => {
-    setAreChoicesValid(validity);
-  };
-  const buttonRef = useRef(null);
-
-  // State for approval modal
-  const [showApproveModal, setShowApproveModal] = useState(false);
-  const [selectedQuestionID, setSelectedQuestionID] = useState(null);
-  const [showBulkApproveModal, setShowBulkApproveModal] = useState(false);
-  const [pendingBulkApproveIds, setPendingBulkApproveIds] = useState([]);
 
   // State for loading and actions
   const [isDeleting, setIsDeleting] = useState(false);
@@ -72,59 +61,30 @@ const AdminContent = () => {
 
   const [expandedQuestionId, setExpandedQuestionId] = useState(null);
   const [dropdownOpen, setDropdownOpen] = useState(false);
-  const [showQuestionInfoId, setShowQuestionInfoId] = useState(null);
-
-  // State for multi-select
-  const [selectedQuestions, setSelectedQuestions] = useState([]);
-  const [isMultiSelectMode, setIsMultiSelectMode] = useState(false);
-  const selectAllRef = useRef(null);
-
-  // Clear selections when switching tabs
-  useEffect(() => {
-    setSelectedQuestions([]);
-    setIsMultiSelectMode(false);
-  }, [activeTab]);
-
-  // Hide mobile sidebar when banner is displayed (only on mobile)
-  useEffect(() => {
-    const mobileNav = document.getElementById("mobile-bottom-nav");
-    if (!mobileNav) return;
-
-    const handleResize = () => {
-      const isMobile = window.innerWidth < 1025;
-      if (activeTab === 4 && selectedQuestions.length > 0 && isMobile) {
-        mobileNav.style.display = "none";
-      } else {
-        mobileNav.style.display = "";
-      }
-    };
-
-    handleResize();
-    window.addEventListener("resize", handleResize);
-
-    return () => {
-      window.removeEventListener("resize", handleResize);
-      mobileNav.style.display = "";
-    };
-  }, [activeTab, selectedQuestions.length]);
 
   const dropdownRef = useRef(null);
 
+  // State for form visibility
+  const [showPracticeChoiceForm, setShowPracticeChoiceForm] = useState(false);
+  const [showExamChoiceForm, setShowExamChoiceForm] = useState(false);
+
   // State for question addition
   const [isAddingQuestion, setIsAddingQuestion] = useState(false);
+  const buttonRef = useRef(null);
+  const apiUrl = import.meta.env.VITE_API_BASE_URL;
 
-  // Use the toast hook
-  const { toast, showToast } = useToast();
+  // State for question editing
+  const [editingQuestion, setEditingQuestion] = useState(null);
 
   // State for question duplication
   const [duplicatingQuestion, setDuplicatingQuestion] = useState(null);
 
+  // Get toast functions from hook
+  const { toast, showToast } = useToast();
+
   // State for loading
   const [isLoading, setIsLoading] = useState(true);
 
-  const apiUrl = import.meta.env.VITE_API_BASE_URL;
-
-  // State for exam questions availability
   const [isExamQuestionsEnabled, setIsExamQuestionsEnabled] = useState({});
   const [practiceExamSettings, setPracticeExamSettings] = useState({});
   const [isBannerClosed, setIsBannerClosed] = useState(false);
@@ -177,65 +137,72 @@ const AdminContent = () => {
     }
   }, [selectedSubject, apiUrl]);
 
-  // Re-fetch settings when subjects list is refreshed (e.g. after saving settings)
-  useEffect(() => {
-    const handleRefresh = () => {
-      if (selectedSubject && selectedSubject.subjectID) {
-        const fetchUpdatedSettings = async () => {
-          const token = sessionStorage.getItem("token");
-          try {
-            const practiceResponse = await fetch(
-              `${apiUrl}/practice-settings/${selectedSubject.subjectID}`,
-              { headers: { Authorization: `Bearer ${token}` } },
-            );
-            if (practiceResponse.ok) {
-              const practiceData = await practiceResponse.json();
-              setPracticeExamSettings((prev) => ({
-                ...prev,
-                [selectedSubject.subjectID]: practiceData.data || null,
-              }));
-            }
-          } catch (err) {
-            console.error("Error re-fetching practice settings:", err);
-          }
-        };
-        fetchUpdatedSettings();
-      }
-    };
-    window.addEventListener("refreshSubjectsList", handleRefresh);
-    return () =>
-      window.removeEventListener("refreshSubjectsList", handleRefresh);
-  }, [selectedSubject, apiUrl]);
-
   // Effect to fetch questions when subject changes
   useEffect(() => {
     if (selectedSubject && selectedSubject.subjectID) {
       setIsBannerClosed(false);
       fetchQuestions();
       setSubmittedQuestion(null);
+      setShowPracticeChoiceForm(false);
+      setShowExamChoiceForm(false);
       setSearchQuery("");
       setSortOption("");
       setSubSortOption("");
     }
   }, [selectedSubject]);
 
-  // Function to handle successful question addition
-  const handleQuestionAdded = () => {
-    setSubmittedQuestion(null);
-    fetchQuestions();
-    showToast("Question is now pending for approval!", "success");
+  // Helper function to fix image URLs
+  const fixImageUrl = (url) => {
+    if (!url) return "";
+
+    // If it wrongly contains "http" inside the path
+    if (url.includes("http")) {
+      const parts = url.split("/http");
+      if (parts.length > 1) {
+        return "http" + parts[1]; // Fix the URL
+      }
+    }
+    return url;
   };
 
-  // Function to handle question editing
-  const handleEditClick = (question) => {
-    setEditingQuestion(question);
+  // Functions for question editing
+  const startEditing = (question) => {
+    setEditQuestionID(question.questionID);
+    setEditText(question.questionText);
   };
 
-  // Function to handle successful question edit
-  const handleEditComplete = () => {
-    setEditingQuestion(null);
-    fetchQuestions();
-    showToast("Question is now pending for approval!", "success");
+  const cancelEdit = () => {
+    setEditQuestionID(null);
+    setEditText("");
+  };
+
+  const saveEdit = async (questionID) => {
+    try {
+      const token = sessionStorage.getItem("token");
+      const response = await fetch(`${apiUrl}/questions/update/${questionID}`, {
+        method: "PUT",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${token}`,
+        },
+        body: JSON.stringify({ questionText: editText }),
+      });
+
+      if (!response.ok) {
+        throw new Error("Failed to update question");
+      }
+
+      setQuestions((prevQuestions) =>
+        prevQuestions.map((q) =>
+          q.questionID === questionID ? { ...q, questionText: editText } : q,
+        ),
+      );
+
+      cancelEdit();
+    } catch (error) {
+      console.error("Error updating question:", error);
+      showToast("Failed to update question. Please try again.", "error");
+    }
   };
 
   // Function to handle question deletion
@@ -261,7 +228,7 @@ const AdminContent = () => {
       showToast("Question deleted successfully!", "success");
     } catch (error) {
       console.error("Error deleting question:", error);
-      showToast("Failed to delete question", "error");
+      showToast("Failed to delete question. Please try again.", "error");
     } finally {
       setIsDeleting(false);
       setShowConfirmModal(false);
@@ -283,7 +250,7 @@ const AdminContent = () => {
       }
 
       const response = await fetch(
-        `${apiUrl}/subjects/${selectedSubject.subjectID}/questions`,
+        `${apiUrl}/faculty/my-questions/${selectedSubject.subjectID}`,
         {
           method: "GET",
           headers: {
@@ -299,7 +266,6 @@ const AdminContent = () => {
 
       const data = await response.json();
 
-      // Update questions with the formatted data from backend
       setQuestions(data.data || []);
     } catch (error) {
       console.error("Error fetching questions:", error);
@@ -377,148 +343,66 @@ const AdminContent = () => {
     setShowConfirmModal(true);
   };
 
+  // Function to handle successful question addition
+  const handleQuestionAdded = () => {
+    setSubmittedQuestion(null);
+    fetchQuestions();
+    showToast("Question is now pending for approval!", "success");
+  };
+
+  // Functions for question editing
+  const handleEditClick = (question) => {
+    setEditingQuestion(question);
+  };
+
+  const handleEditComplete = () => {
+    setEditingQuestion(null);
+    fetchQuestions();
+    showToast(
+      "Question edited successfully! Now waiting for approval",
+      "success",
+    );
+  };
+
   useEffect(() => {
-    if (submittedQuestion && formRef.current) {
+    setTimeout(() => {
+      setIsLoading(false);
+    }, 1000);
+  }, []);
+
+  useEffect(() => {
+    if (showPracticeChoiceForm && formRef.current) {
       formRef.current.scrollIntoView({ behavior: "smooth", block: "center" });
     }
-  }, [submittedQuestion]);
-
-  // Function to handle question approval
-  const approveQuestion = async (questionID) => {
-    try {
-      const token = sessionStorage.getItem("token");
-      setIsApproving(true);
-
-      const response = await fetch(`${apiUrl}/questions/${questionID}/status`, {
-        method: "PATCH",
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${token}`,
-        },
-      });
-
-      const data = await response.json();
-
-      if (!response.ok) {
-        throw new Error(data.message || "Failed to approve the question");
-      }
-
-      fetchQuestions();
-      showToast("Question approved successfully!", "success");
-    } catch (error) {
-      console.error("Error approving question:", error);
-      showToast(
-        error.message || "An error occurred while approving the question.",
-        "error",
-      );
-    } finally {
-      setIsApproving(false);
-      setShowApproveModal(false);
-    }
-  };
-
-  const getPendingQuestionIds = () =>
-    filteredQuestions
-      .filter((question) => question.status_id === 1)
-      .map((question) => question.questionID);
-
-  const approveMultipleQuestions = async (questionIDs) => {
-    if (!questionIDs.length) {
-      showToast("Please select questions to approve.", "error");
-      return;
-    }
-
-    try {
-      const token = sessionStorage.getItem("token");
-      setIsApproving(true);
-
-      const response = await fetch(`${apiUrl}/questions/approve-multiple`, {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${token}`,
-        },
-        body: JSON.stringify({ questionIDs }),
-      });
-
-      const data = await response.json();
-
-      if (!response.ok) {
-        throw new Error(
-          data.message || "Failed to approve the selected questions.",
-        );
-      }
-
-      const summary = data.summary || {
-        requested: questionIDs.length,
-        approved: 0,
-        skipped: 0,
-      };
-
-      fetchQuestions();
-      setSelectedQuestions([]);
-      setIsMultiSelectMode(false);
-
-      if (summary.approved === summary.requested) {
-        showToast(
-          `${summary.approved} question${summary.approved === 1 ? "" : "s"} approved successfully!`,
-          "success",
-        );
-      } else if (summary.approved > 0) {
-        showToast(
-          `${summary.approved} approved, ${summary.skipped} skipped.`,
-          "info",
-        );
-      } else {
-        showToast(
-          data.message || "No questions could be approved.",
-          "error",
-        );
-      }
-    } catch (error) {
-      console.error("Error approving questions:", error);
-      showToast(
-        error.message ||
-          "An error occurred while approving the selected questions.",
-        "error",
-      );
-    } finally {
-      setIsApproving(false);
-      setShowBulkApproveModal(false);
-      setPendingBulkApproveIds([]);
-    }
-  };
+  }, [showPracticeChoiceForm]);
 
   useEffect(() => {
-    if (listViewOnly) {
-      setShowChoices(true);
+    if (showExamChoiceForm && formRef.current) {
+      formRef.current.scrollIntoView({ behavior: "smooth", block: "center" });
     }
-  }, [listViewOnly]);
+  }, [showExamChoiceForm]);
 
+  // Effect to handle clicks outside dropdown
   useEffect(() => {
     const handleClickOutside = (event) => {
-      if (dropdownRef.current && !dropdownRef.current.contains(event.target)) {
+      if (
+        dropdownRef.current &&
+        !dropdownRef.current.contains(event.target) &&
+        buttonRef.current &&
+        !buttonRef.current.contains(event.target)
+      ) {
         setDropdownOpen(false);
       }
     };
 
-    if (dropdownOpen) {
-      document.addEventListener("mousedown", handleClickOutside);
-    }
+    // Add event listener for clicks outside
+    document.addEventListener("mousedown", handleClickOutside);
 
+    // Cleanup the event listener when the component unmounts
     return () => {
       document.removeEventListener("mousedown", handleClickOutside);
     };
-  }, [dropdownOpen]);
-
-  // Add this helper function at the top of the component
-  const getImageUrl = (path) => {
-    if (!path) return null;
-    if (path.startsWith("http://") || path.startsWith("https://")) {
-      return path;
-    }
-    return `${apiUrl}/storage/${path}`;
-  };
+  }, []);
 
   // Function to handle question duplication
   const handleDuplicateClick = (question) => {
@@ -544,6 +428,17 @@ const AdminContent = () => {
     }, {});
   };
 
+  // Add this helper function at the top of the component
+  const getImageUrl = (path) => {
+    if (!path) return null;
+    if (path.startsWith("http://") || path.startsWith("https://")) {
+      return path;
+    }
+    return `${apiUrl}/storage/${path}`;
+  };
+
+  const [hoveredQuestionId, setHoveredQuestionId] = useState(null);
+
   // State for showing difficulty counter popup
   const [showDifficultyCounter, setShowDifficultyCounter] = useState(false);
   const difficultyIconRef = useRef(null);
@@ -563,55 +458,15 @@ const AdminContent = () => {
     return () => document.removeEventListener("mousedown", handleClick);
   }, [showDifficultyCounter]);
 
-  // Add hoveredQuestionId state at the top of the component
-  const [hoveredQuestionId, setHoveredQuestionId] = useState(null);
-
   return (
-    <div className="relative mt-10 flex min-h-screen w-full flex-1 flex-col justify-center py-2 pb-24 md:pb-2 lg:mt-2">
-      <div className="flex-1">
-        {selectedSubject ? (
-          <div className="w-full py-3">
-            <div className="w-full">
-              <SubjectCard
-                showToast={showToast}
-                subjectName={selectedSubject.subjectName}
-                subjectID={selectedSubject.subjectID}
-                subjectCode={selectedSubject.subjectCode}
-                programID={selectedSubject.programID}
-                yearLevelID={selectedSubject.yearLevelID}
-                university="JRMSU"
-                location="Dapitan City"
-                imageUrl={
-                  selectedSubject.imageUrl || "https://via.placeholder.com/60"
-                }
-                activeIndex={activeTab}
-                setActiveIndex={setActiveTab}
-                isLoading={isLoading}
-                onFetchQuestions={fetchQuestions}
-                programName={selectedSubject.programName}
-                yearLevel={selectedSubject.yearLevel}
-                setSelectedSubject={setSelectedSubject}
-                searchQuery={searchQuery}
-                setSearchQuery={setSearchQuery}
-                isExamQuestionsEnabled={
-                  isExamQuestionsEnabled[selectedSubject?.subjectID]
-                }
-                setIsExamQuestionsEnabled={(value) => {
-                  setIsExamQuestionsEnabled((prev) => ({
-                    ...prev,
-                    [selectedSubject?.subjectID]: value,
-                  }));
-                }}
-                pendingCount={questions.filter((q) => q.status_id === 1).length}
-              />
-
-            
+ 
+                )}
             </div>
 
             {/* Add Question Section */}
             {(activeTab === 0 || activeTab === 1) && (
               <div>
-                {/* Show Add Question Button Only If No Active Question and There Are Questions */}
+                {/* Show Add Question Button Only If No Active Question */}
                 {!submittedQuestion && filteredQuestions.length > 0 && (
                   <div className="fixed right-4 bottom-[110px] z-49 text-center sm:right-[-4px] sm:bottom-[4px] sm:p-4 lg:p-4">
                     <button
@@ -663,7 +518,7 @@ const AdminContent = () => {
             )}
 
             {/* Questions List */}
-            {(activeTab === 0 || activeTab === 1 || activeTab === 4) && (
+            {(activeTab === 0 || activeTab === 1 || activeTab === 4) && ( // Practice Questions
               <div className="relative sm:mx-0">
                 <div className="w-full">
                   {isLoading ? (
@@ -695,7 +550,7 @@ const AdminContent = () => {
                           total > 0 ? (hardCount / total) * 100 : 0;
 
                         return (
-                          <div className="outfit-400 border-color relative mx-0 mt-4 mb-0 flex w-full max-w-3xl flex-col border bg-white p-4 sm:mx-auto sm:mt-4 sm:rounded-xl md:mb-0 md:rounded-xl">
+                          <div className="outfit-400 border-color relative mx-0 mt-4 mb-2 flex w-full max-w-3xl flex-col border bg-white p-4 sm:mx-auto sm:mt-4 sm:rounded-xl md:mb-4 md:rounded-xl">
                             {/* Top row */}
                             <div className="flex w-full items-center justify-between">
                               <div className="flex items-center gap-1 text-[14px] font-semibold text-gray-700">
@@ -764,128 +619,37 @@ const AdminContent = () => {
                       })()}
 
                       {/* Sort controls - below the difficulty box */}
-                      <div className="outfit-400 mx-0 my-3 flex w-full max-w-3xl items-center justify-between sm:mx-auto sm:my-4">
-                        <div className="ml-2 flex items-center sm:ml-0">
-                          {activeTab === 4 &&
-                            filteredQuestions.some(
-                              (q) => q.status_id === 1,
-                            ) && (
-                              <div className="flex items-center">
-                                {isMultiSelectMode ? (
-                                  <label className="flex cursor-pointer items-center gap-2 rounded-xl border border-gray-200 bg-white px-3 py-1.5 text-[14px] text-gray-700 transition-colors hover:bg-gray-50">
-                                    <input
-                                      type="checkbox"
-                                      onChange={(e) => {
-                                        const displayedIds = filteredQuestions
-                                          .filter((q) => q.status_id === 1)
-                                          .map((q) => q.questionID);
-                                        if (e.target.checked) {
-                                          setSelectedQuestions((prev) => {
-                                            const set = new Set(prev);
-                                            displayedIds.forEach((id) =>
-                                              set.add(id),
-                                            );
-                                            return Array.from(set);
-                                          });
-                                        } else {
-                                          setSelectedQuestions((prev) =>
-                                            prev.filter(
-                                              (id) =>
-                                                !displayedIds.includes(id),
-                                            ),
-                                          );
-                                          // Since they unchecked "Select All", we can turn off multi-select mode if everything gets cleared
-                                          setIsMultiSelectMode(false);
-                                        }
-                                      }}
-                                      checked={
-                                        filteredQuestions.filter(
-                                          (q) => q.status_id === 1,
-                                        ).length > 0 &&
-                                        filteredQuestions
-                                          .filter((q) => q.status_id === 1)
-                                          .every((q) =>
-                                            selectedQuestions.includes(
-                                              q.questionID,
-                                            ),
-                                          )
-                                      }
-                                      ref={(el) => {
-                                        if (el) {
-                                          const displayedIds = filteredQuestions
-                                            .filter((q) => q.status_id === 1)
-                                            .map((q) => q.questionID);
-                                          const selectedOnPageCount =
-                                            displayedIds.filter((id) =>
-                                              selectedQuestions.includes(id),
-                                            ).length;
-                                          if (
-                                            displayedIds.length === 0 ||
-                                            selectedOnPageCount === 0
-                                          ) {
-                                            el.indeterminate = false;
-                                          } else if (
-                                            selectedOnPageCount ===
-                                            displayedIds.length
-                                          ) {
-                                            el.indeterminate = false;
-                                          } else {
-                                            el.indeterminate = true;
-                                          }
-                                        }
-                                      }}
-                                      className="border-color h-4 w-4 cursor-pointer rounded border-orange-300 text-orange-500"
-                                    />
-                                    <span className="font-medium">
-                                      Select All
-                                    </span>
-                                  </label>
-                                ) : (
-                                  <button
-                                    onClick={() => setIsMultiSelectMode(true)}
-                                    className="flex cursor-pointer items-center gap-2 rounded-xl border border-gray-200 bg-white px-3 py-1.5 text-[14px] text-gray-700 transition-colors hover:bg-gray-50"
-                                  >
-                                    <i className="bx bx-checklist text-lg"></i>
-                                    <span className="font-medium">
-                                      Multi-Select
-                                    </span>
-                                  </button>
-                                )}
-                              </div>
-                            )}
-                        </div>
-                        <div className="flex items-center justify-end">
-                          {activeTab === 4 && (
-                            <SortType
-                              name="pendingSort"
-                              value={pendingSort}
-                              onChange={(e) => setPendingSort(e.target.value)}
-                              placeholder="Type"
-                              options={[
-                                { value: "", label: "All types" },
-                                {
-                                  value: "practiceQuestions",
-                                  label: "Practice Exam",
-                                },
-                                {
-                                  value: "examQuestions",
-                                  label: "Qualifying Exam",
-                                },
-                              ]}
-                              className="sm:w-35"
-                            />
-                          )}
-                          {activeTab === 4 && (
-                            <div className="mx-2 h-5 w-px bg-gray-300"></div>
-                          )}
-                          <div className="w-auto">
-                            <Sort
-                              sortOption={sortOption}
-                              setSortOption={setSortOption}
-                              subSortOption={subSortOption}
-                              setSubSortOption={setSubSortOption}
-                            />
-                          </div>
+                      <div className="outfit-400 mx-0 mb-2 flex w-full max-w-3xl items-center justify-end sm:mx-auto">
+                        {activeTab === 4 && (
+                          <SortType
+                            name="pendingSort"
+                            value={pendingSort}
+                            onChange={(e) => setPendingSort(e.target.value)}
+                            placeholder="Type"
+                            options={[
+                              { value: "", label: "All types" },
+                              {
+                                value: "practiceQuestions",
+                                label: "Practice Exam",
+                              },
+                              {
+                                value: "examQuestions",
+                                label: "Qualifying Exam",
+                              },
+                            ]}
+                            className="sm:w-35"
+                          />
+                        )}
+                        {activeTab === 4 && (
+                          <div className="mx-2 h-5 w-px bg-gray-300"></div>
+                        )}
+                        <div className="w-auto">
+                          <Sort
+                            sortOption={sortOption}
+                            setSortOption={setSortOption}
+                            subSortOption={subSortOption}
+                            setSubSortOption={setSubSortOption}
+                          />
                         </div>
                       </div>
 
@@ -944,50 +708,11 @@ const AdminContent = () => {
                               } `}
                             >
                               <div className="w-full max-w-full overflow-hidden break-words">
-                                <div className="flex items-center justify-between text-[14px] text-gray-500">
+                                <div className="outfit-400 flex items-center justify-between text-[14px] text-gray-500">
                                   {/* Always show points, coverage, and difficulty in list view */}
-                                  <div className="flex items-center gap-3">
-                                    {activeTab === 4 && isMultiSelectMode && (
-                                      <input
-                                        type="checkbox"
-                                        checked={selectedQuestions.includes(
-                                          question.questionID,
-                                        )}
-                                        onChange={(e) => {
-                                          e.stopPropagation();
-                                          const isCurrentlySelected =
-                                            selectedQuestions.includes(
-                                              question.questionID,
-                                            );
-                                          if (
-                                            isCurrentlySelected &&
-                                            selectedQuestions.length === 1
-                                          ) {
-                                            setSelectedQuestions([]);
-                                            setIsMultiSelectMode(false);
-                                          } else {
-                                            setSelectedQuestions((prev) =>
-                                              prev.includes(question.questionID)
-                                                ? prev.filter(
-                                                    (id) =>
-                                                      id !==
-                                                      question.questionID,
-                                                  )
-                                                : [
-                                                    ...prev,
-                                                    question.questionID,
-                                                  ],
-                                            );
-                                          }
-                                        }}
-                                        onClick={(e) => e.stopPropagation()}
-                                        className="h-4 w-4 cursor-pointer rounded border-gray-300 text-orange-500 focus:ring-orange-500"
-                                      />
-                                    )}
-                                    <span className="outfit-400 outfit-700 text-[12px]">
-                                      {index + 1}. MULTIPLE CHOICE
-                                    </span>
-                                  </div>
+                                  <span className="outfit-700 text-[12px]">
+                                    {index + 1}. MULTIPLE CHOICE
+                                  </span>
                                   <div className="relative flex min-h-[32px] items-center">
                                     {/* Badges */}
                                     <div
@@ -1042,8 +767,8 @@ const AdminContent = () => {
                                             }
                                           }}
                                         >
-                                          <i className="bx bx-trash text-[16px]"></i>
-                                          <span className="outfit-400 text-[12px]">
+                                          <i className="bx bx-trash text-[12px]"></i>
+                                          <span className="text-[12px]">
                                             Delete
                                           </span>
                                         </button>
@@ -1056,30 +781,9 @@ const AdminContent = () => {
                                             handleEditClick(question);
                                           }}
                                         >
-                                          <i className="bx bx-edit-alt text-[16px]"></i>
-                                          <span className="outfit-400 text-[12px]">
+                                          <i className="bx bx-edit-alt text-[12px]"></i>
+                                          <span className="text-[12px]">
                                             Edit
-                                          </span>
-                                        </button>
-                                        <button
-                                          className="outfit-400 mx-1 flex cursor-pointer items-center gap-1 rounded-xl border border-gray-200 px-3 py-[6px] text-gray-700 transition-colors hover:bg-gray-100"
-                                          title="Copy"
-                                          onClick={(e) => {
-                                            if (e.shiftKey) {
-                                              approveQuestion(
-                                                question.questionID,
-                                              );
-                                            } else {
-                                              setSelectedQuestionID(
-                                                question.questionID,
-                                              );
-                                              setShowApproveModal(true);
-                                            }
-                                          }}
-                                        >
-                                          <i className="bx bx-checks text-[16px]"></i>
-                                          <span className="outfit-400 text-[12px]">
-                                            Approve
                                           </span>
                                         </button>
                                       </div>
@@ -1111,34 +815,34 @@ const AdminContent = () => {
                                             }
                                           }}
                                         >
-                                          <i className="bx bx-trash text-[16px]"></i>
-                                          <span className="outfit-400 text-[12px]">
+                                          <i className="bx bx-trash text-[12px]"></i>
+                                          <span className="text-[12px]">
                                             Delete
                                           </span>
                                         </button>
                                         <button
-                                          className="outfit-400 mx-1 flex cursor-pointer items-center gap-1 rounded-xl border border-gray-200 px-3 py-[6px] text-gray-700 transition-colors hover:bg-gray-100"
+                                          className="outfit-400 border-color mx-1 flex cursor-pointer items-center gap-1 rounded-xl border px-3 py-[6px] text-gray-900 transition-colors hover:bg-gray-100"
                                           title="Copy"
                                           onClick={(e) => {
                                             e.stopPropagation();
                                             handleDuplicateClick(question);
                                           }}
                                         >
-                                          <i className="bx bx-copy text-[16px]"></i>
-                                          <span className="outfit-400 text-[12px]">
+                                          <i className="bx bx-copy text-[12px]"></i>
+                                          <span className="text-[12px]">
                                             Copy
                                           </span>
                                         </button>
                                         <button
-                                          className="outfit-400 mx-1 flex cursor-pointer items-center gap-1 rounded-xl border border-gray-200 px-3 py-[6px] text-gray-700 transition-colors hover:bg-gray-100"
+                                          className="outfit-400 mx-1 flex cursor-pointer items-center gap-1 rounded-xl border border-orange-500 px-3 py-[6px] text-orange-500 transition-colors hover:bg-orange-100"
                                           title="Edit"
                                           onClick={(e) => {
                                             e.stopPropagation();
                                             handleEditClick(question);
                                           }}
                                         >
-                                          <i className="bx bx-edit-alt text-[16px]"></i>
-                                          <span className="outfit-400 text-[12px]">
+                                          <i className="bx bx-edit-alt text-[12px]"></i>
+                                          <span className="text-[12px]">
                                             Edit
                                           </span>
                                         </button>
@@ -1146,7 +850,6 @@ const AdminContent = () => {
                                     )}
                                   </div>
                                 </div>
-
                                 {listViewOnly ? (
                                   expandedQuestionId === question.questionID ? (
                                     <div
@@ -1192,7 +895,6 @@ const AdminContent = () => {
                                     </div>
                                   </div>
                                 )}
-
                                 {/* Question image rendering, fixed structure */}
                                 {question.image &&
                                   (listViewOnly &&
@@ -1296,96 +998,94 @@ const AdminContent = () => {
                                     No choices added yet.
                                   </p>
                                 ))}
+                              {(!listViewOnly ||
+                                (listViewOnly &&
+                                  expandedQuestionId ===
+                                    question.questionID)) && (
+                                <>
+                                  <div className="my-3 h-px bg-gray-200"></div>
 
-                              {showQuestionInfoId === question.questionID &&
-                                (!listViewOnly ||
-                                  (listViewOnly &&
-                                    expandedQuestionId ===
-                                      question.questionID)) && (
-                                  <>
-                                    <div className="my-3 h-px bg-gray-200"></div>
-
-                                    <div className="outfit-400 ml-4 grid grid-cols-1 gap-1 text-[12px] text-gray-500 sm:grid-cols-2">
-                                      <div className="flex flex-col gap-1">
-                                        <div className="flex">
-                                          <span className="w-[100px]">
-                                            Created by:
-                                          </span>
-                                          <span>{question.creatorName}</span>
-                                        </div>
-                                        <div className="flex">
-                                          <span className="w-[100px]">
-                                            Date Created:
-                                          </span>
-                                          <span>
-                                            {new Date(
-                                              question.created_at,
-                                            ).toLocaleString("en-US", {
-                                              year: "numeric",
-                                              month: "long",
-                                              day: "numeric",
-                                              hour: "numeric",
-                                              minute: "2-digit",
-                                              hour12: true,
-                                            })}
-                                          </span>
-                                        </div>
-                                        <div className="flex sm:col-span-2">
-                                          <span className="w-[100px]">
-                                            Question Type:
-                                          </span>
-                                          <span>
-                                            {question.purpose_id === 2
-                                              ? "Practice Question"
-                                              : "Qualifying Exam Question"}
-                                          </span>
-                                        </div>
+                                  <div className="outfit-400 ml-4 grid grid-cols-1 gap-1 text-[12px] text-gray-500 sm:grid-cols-2">
+                                    <div className="flex flex-col gap-1">
+                                      <div className="flex">
+                                        <span className="w-[100px]">
+                                          Created by:
+                                        </span>
+                                        <span>{question.creatorName}</span>
                                       </div>
-                                      <div className="flex flex-col gap-1">
-                                        <div className="flex">
-                                          <span className="w-[100px]">
-                                            Modified by:
-                                          </span>
-                                          <span>
-                                            {question.editor
-                                              ? `${question.editor.firstName} ${question.editor.lastName}`
-                                              : "Not modified"}
-                                          </span>
-                                        </div>
-                                        <div className="flex">
-                                          <span className="w-[100px]">
-                                            Date Modified:
-                                          </span>
-                                          <span>
-                                            {new Date(
-                                              question.updated_at,
-                                            ).toLocaleString("en-US", {
-                                              year: "numeric",
-                                              month: "long",
-                                              day: "numeric",
-                                              hour: "numeric",
-                                              minute: "2-digit",
-                                              hour12: true,
-                                            })}
-                                          </span>
-                                        </div>
-                                        {question.approver && (
-                                          <div className="flex sm:col-span-2">
-                                            <span className="w-[100px]">
-                                              Approved by:
-                                            </span>
-                                            <span>
-                                              {question.approver.firstName &&
-                                              question.approver.lastName
-                                                ? `${question.approver.firstName} ${question.approver.lastName}`
-                                                : "Not approved"}
-                                            </span>
-                                          </div>
-                                        )}{" "}
+                                      <div className="flex">
+                                        <span className="w-[100px]">
+                                          Date Created:
+                                        </span>
+                                        <span>
+                                          {new Date(
+                                            question.created_at,
+                                          ).toLocaleString("en-US", {
+                                            year: "numeric",
+                                            month: "long",
+                                            day: "numeric",
+                                            hour: "numeric",
+                                            minute: "2-digit",
+                                            hour12: true,
+                                          })}
+                                        </span>
+                                      </div>
+                                      <div className="flex sm:col-span-2">
+                                        <span className="w-[100px]">
+                                          Question Type:
+                                        </span>
+                                        <span>
+                                          {question.purpose_id === 2
+                                            ? "Practice Question"
+                                            : "Qualifying Exam Question"}
+                                        </span>
                                       </div>
                                     </div>
-                                  </>
-                                )}
+                                    <div className="flex flex-col gap-1">
+                                      <div className="flex">
+                                        <span className="w-[100px]">
+                                          Modified by:
+                                        </span>
+                                        <span>
+                                          {question.editor
+                                            ? `${question.editor.firstName} ${question.editor.lastName}`
+                                            : "Not modified"}
+                                        </span>
+                                      </div>
+                                      <div className="flex">
+                                        <span className="w-[100px]">
+                                          Date Modified:
+                                        </span>
+                                        <span>
+                                          {new Date(
+                                            question.updated_at,
+                                          ).toLocaleString("en-US", {
+                                            year: "numeric",
+                                            month: "long",
+                                            day: "numeric",
+                                            hour: "numeric",
+                                            minute: "2-digit",
+                                            hour12: true,
+                                          })}
+                                        </span>
+                                      </div>
+                                      {question.approver && (
+                                        <div className="flex sm:col-span-2">
+                                          <span className="w-[100px]">
+                                            Approved by:
+                                          </span>
+                                          <span>
+                                            {question.approver.firstName &&
+                                            question.approver.lastName
+                                              ? `${question.approver.firstName} ${question.approver.lastName}`
+                                              : "Not approved"}
+                                          </span>
+                                        </div>
+                                      )}{" "}
+                                    </div>
+                                  </div>
+                                </>
+                              )}
 
                               {(!listViewOnly ||
                                 (listViewOnly &&
@@ -1394,47 +1094,16 @@ const AdminContent = () => {
                                 <>
                                   <div className="my-3 h-px bg-gray-200"></div>
 
-                                  <div className="mt-4 mb-1 flex justify-end gap-1">
-                                    <button
-                                      type="button"
-                                      className={`flex cursor-pointer items-center gap-1 rounded-xl border border-gray-200 px-3 py-[6px] text-gray-600 transition-colors hover:bg-gray-100 ${
-                                        showQuestionInfoId ===
-                                        question.questionID
-                                          ? "bg-gray-100"
-                                          : ""
-                                      }`}
-                                      title="Question info"
-                                      onClick={(e) => {
-                                        e.stopPropagation();
-                                        setShowQuestionInfoId((prev) =>
-                                          prev === question.questionID
-                                            ? null
-                                            : question.questionID,
-                                        );
-                                      }}
-                                    >
-                                      <i className="bx bx-info-circle text-[16px]"></i>
-                                      <span className="outfit-400 text-[12px]">
-                                        Info
-                                      </span>
-                                    </button>
+                                  <div className="mt-3 mb-1 flex justify-end gap-1">
                                     {question.status_id === 1 ? ( // 1 is pending
                                       <>
                                         <AltButton
                                           text="Remove"
                                           icon="bx bx-trash"
                                           className="hover:text-red-500"
-                                          onClick={(e) => {
-                                            if (e.shiftKey) {
-                                              handleDeleteQuestion(
-                                                question.questionID,
-                                              );
-                                            } else {
-                                              confirmDelete(
-                                                question.questionID,
-                                              );
-                                            }
-                                          }}
+                                          onClick={() =>
+                                            confirmDelete(question.questionID)
+                                          }
                                         />
 
                                         <AltButton
@@ -1446,24 +1115,6 @@ const AdminContent = () => {
                                             handleEditClick(question)
                                           }
                                         />
-                                        <AltButton
-                                          text="Approve"
-                                          textres="Approve"
-                                          icon="bx bx-checks"
-                                          className="hover:text-orange-500"
-                                          onClick={(e) => {
-                                            if (e.shiftKey) {
-                                              approveQuestion(
-                                                question.questionID,
-                                              );
-                                            } else {
-                                              setSelectedQuestionID(
-                                                question.questionID,
-                                              );
-                                              setShowApproveModal(true);
-                                            }
-                                          }}
-                                        />
                                       </>
                                     ) : (
                                       <>
@@ -1471,17 +1122,9 @@ const AdminContent = () => {
                                           text="Remove"
                                           icon="bx bx-trash"
                                           className="hover:text-red-500"
-                                          onClick={(e) => {
-                                            if (e.shiftKey) {
-                                              handleDeleteQuestion(
-                                                question.questionID,
-                                              );
-                                            } else {
-                                              confirmDelete(
-                                                question.questionID,
-                                              );
-                                            }
-                                          }}
+                                          onClick={() =>
+                                            confirmDelete(question.questionID)
+                                          }
                                         />
 
                                         <AltButton
@@ -1588,30 +1231,21 @@ const AdminContent = () => {
             </span>
           </div>
         )}
+        {modalImage && (
+          <div
+            className="lightbox-bg-image bg-opacity-70 fixed inset-0 z-55 flex items-center justify-center hover:cursor-pointer"
+            onClick={() => setModalImage(null)}
+          >
+            <div className="relative max-h-full max-w-full">
+              <img
+                src={modalImage}
+                className="max-h-[90vh] max-w-[90vw] rounded-md object-contain"
+              />
+            </div>
+          </div>
+        )}
 
-        {/* Confirmation Modals */}
-        <ConfirmModal
-          isOpen={showApproveModal}
-          onClose={() => setShowApproveModal(false)}
-          onConfirm={() => {
-            approveQuestion(selectedQuestionID);
-          }}
-          message="Are you sure you want to approve this question?"
-          isLoading={isApproving}
-          shiftHintText="Hold shift when approving to skip this modal."
-        />
-
-        <ConfirmModal
-          isOpen={showBulkApproveModal}
-          onClose={() => {
-            setShowBulkApproveModal(false);
-            setPendingBulkApproveIds([]);
-          }}
-          onConfirm={() => approveMultipleQuestions(pendingBulkApproveIds)}
-          message={`Are you sure you want to approve ${pendingBulkApproveIds.length} question${pendingBulkApproveIds.length === 1 ? "" : "s"}?`}
-          isLoading={isApproving}
-        />
-
+        {/* Confirmation Modal */}
         <ConfirmModal
           isOpen={showConfirmModal}
           onClose={() => setShowConfirmModal(false)}
@@ -1620,6 +1254,8 @@ const AdminContent = () => {
           isLoading={isDeleting}
           shiftHintText="Hold shift when deleting to skip this modal."
         />
+
+        <Toast message={toast.message} type={toast.type} show={toast.show} />
 
         {/* Image Modal (Full Size) */}
         {isChoiceModalOpen && (
@@ -1636,20 +1272,8 @@ const AdminContent = () => {
             </div>
           </div>
         )}
+        {!isLoading && <ScrollToTopButton />}
 
-        {modalImage && (
-          <div
-            className="lightbox-bg-image bg-opacity-70 fixed inset-0 z-55 flex items-center justify-center hover:cursor-pointer"
-            onClick={() => setModalImage(null)}
-          >
-            <div className="relative max-h-full max-w-full">
-              <img
-                src={modalImage}
-                className="max-h-[90vh] max-w-[90vw] rounded-md object-contain"
-              />
-            </div>
-          </div>
-        )}
         {editingQuestion && (
           <EditQuestionForm
             question={editingQuestion}
@@ -1660,6 +1284,8 @@ const AdminContent = () => {
             }
           />
         )}
+
+        {/* Add the DuplicateQuestionForm component */}
         {duplicatingQuestion && (
           <DuplicateQuestionForm
             question={duplicatingQuestion}
@@ -1671,66 +1297,9 @@ const AdminContent = () => {
           />
         )}
       </div>
-
-      {/* Selection Overlay Banner */}
-      {activeTab === 4 && selectedQuestions.length > 0 && (
-        <div className="outfit-400 fixed right-0 bottom-0 left-0 z-[60] lg:bottom-5 lg:left-[220px] lg:z-50">
-          <div className="px-0 lg:px-6">
-            <div className="rounded-none bg-gray-800 px-5 py-4 pb-8 shadow-lg lg:rounded-xl lg:pb-4">
-              <div className="flex items-center justify-between">
-                <div className="flex items-center gap-4">
-                  <span className="text-[14px] font-medium text-white">
-                    {selectedQuestions.length}{" "}
-                    {selectedQuestions.length === 1 ? "question" : "questions"}{" "}
-                    selected
-                  </span>
-                </div>
-                <div className="flex items-center gap-3">
-                  <button
-                    onClick={() => {
-                      setPendingBulkApproveIds(selectedQuestions);
-                      setShowBulkApproveModal(true);
-                    }}
-                    disabled={isApproving}
-                    className="flex cursor-pointer items-center gap-2 rounded-xl bg-white p-2 text-[14px] font-medium text-gray-900 transition-colors hover:bg-gray-100 disabled:opacity-50 md:px-4 md:py-2"
-                    aria-label="Approve selected questions"
-                  >
-                    <i className="bx bx-check text-lg"></i>
-                    <span className="hidden md:inline">Approve Selected</span>
-                  </button>
-                  <button
-                    onClick={() => {
-                      setPendingBulkApproveIds(getPendingQuestionIds());
-                      setShowBulkApproveModal(true);
-                    }}
-                    disabled={isApproving}
-                    className="flex cursor-pointer items-center gap-2 rounded-xl bg-white p-2 text-[14px] font-medium text-gray-900 transition-colors hover:bg-gray-100 disabled:opacity-50 md:px-4 md:py-2"
-                    aria-label="Approve all questions"
-                  >
-                    <i className="bx bx-copy-check text-lg"></i>
-                    <span className="hidden md:inline">Approve All</span>
-                  </button>
-                  <button
-                    onClick={() => {
-                      setSelectedQuestions([]);
-                      setIsMultiSelectMode(false);
-                    }}
-                    className="flex cursor-pointer items-center justify-center rounded-lg p-2 text-white transition-colors hover:bg-gray-700"
-                    aria-label="Close"
-                  >
-                    <i className="bx bx-x text-xl"></i>
-                  </button>
-                </div>
-              </div>
-            </div>
-          </div>
-        </div>
-      )}
-
-      <Toast message={toast.message} type={toast.type} show={toast.show} />
-      {!isLoading && <ScrollToTopButton />}
     </div>
   );
 };
 
-export default AdminContent;
+export default FacultyContent;
+
