@@ -21,7 +21,7 @@ export default function ExamGenerator({
   const { toast, showToast } = useToast();
   const [loading, setLoading] = useState(false);
   const [subjects, setSubjects] = useState([]);
-  const [selectedSubjects, setSelectedSubjects] = useState([]);
+  const [selectedSubjects, setselectedSubjects] = useState([]);
   const [mode, setMode] = useState("default");
   const [showConfirmClose, setShowConfirmClose] = useState(false);
   const [difficultyCounts, setDifficultyCounts] = useState({});
@@ -42,7 +42,7 @@ export default function ExamGenerator({
 
   useEffect(() => {
     if (initialSubject && isOpen) {
-      setSelectedSubjects([
+      setselectedSubjects([
         {
           subjectID: initialSubject.subjectID,
           subjectName: initialSubject.subjectName,
@@ -73,7 +73,7 @@ export default function ExamGenerator({
       return;
     }
     // Reset all state
-    setSelectedSubjects([]);
+    setselectedSubjects([]);
     setMode("default");
     setSettings({
       total_items: 10,
@@ -89,7 +89,7 @@ export default function ExamGenerator({
     setLoading(false);
     setShowConfirmClose(false);
     // Reset all state
-    setSelectedSubjects([]);
+    setselectedSubjects([]);
     setMode("default");
     setSettings({
       total_items: 10,
@@ -209,7 +209,7 @@ export default function ExamGenerator({
       const basePercentage = Math.floor(100 / (selectedSubjects.length + 1));
       const remainder = 100 - basePercentage * (selectedSubjects.length + 1);
 
-      setSelectedSubjects((prev) => [
+      setselectedSubjects((prev) => [
         ...prev.map((s, index) => ({
           ...s,
           percentage: index === 0 ? basePercentage + remainder : basePercentage,
@@ -220,7 +220,7 @@ export default function ExamGenerator({
   };
 
   const handleSubjectPercentageChange = (subjectID, value) => {
-    setSelectedSubjects((prev) =>
+    setselectedSubjects((prev) =>
       prev.map((s) =>
         s.subjectID === subjectID
           ? { ...s, percentage: value === "" ? "" : parseInt(value) || 0 }
@@ -230,7 +230,7 @@ export default function ExamGenerator({
   };
 
   const handleRemoveSubject = (subjectID) => {
-    setSelectedSubjects((prev) => {
+    setselectedSubjects((prev) => {
       const remaining = prev.filter((s) => s.subjectID !== subjectID);
       if (remaining.length > 0) {
         const newPercentage = Math.floor(100 / remaining.length);
@@ -394,7 +394,7 @@ export default function ExamGenerator({
           <div className="animate-fade-in-up relative z-10 mx-0 w-full rounded-t-2xl bg-white shadow-2xl">
             <div className="border-color flex items-center justify-between border-b px-4 py-2">
               <h2 className="text-[16px] outfit-500 text-amber sm:text-[14px]">
-                Generate Qualifying Exam
+                Generate Subject
               </h2>
               <button
                 onClick={handleClose}
@@ -440,7 +440,7 @@ export default function ExamGenerator({
                   </div>
                 )}
 
-                {/* Selected Subjects Section (always visible, mobile style) */}
+                {/* Selected subjects Section (always visible, mobile style) */}
                 {settings.exam_type !== "personal" &&
                   selectedSubjects.length > 0 && (
                     <>
@@ -449,7 +449,7 @@ export default function ExamGenerator({
 
                         <div className="mb-3 flex items-center justify-between">
                           <h3 className="text-[14px] outfit-500 text-gray-700">
-                            Subjects Included
+                            subjects Included
                           </h3>
                         </div>
 
@@ -810,7 +810,7 @@ export default function ExamGenerator({
             {/* Compact Header across the whole modal */}
             <div className="border-color flex w-full items-center justify-between border-b px-5 py-2">
               <h2 className="text-[17px] leading-none outfit-500 text-black">
-                Generate Qualifying Exam
+                Generate Subject
               </h2>
               <button
                 onClick={handleClose}
@@ -875,7 +875,7 @@ export default function ExamGenerator({
                             <div className="absolute top-0 left-0 h-[1px] w-full bg-gradient-to-r from-transparent via-gray-200 to-transparent" />
                             <div className="mb-3 flex items-center justify-between">
                               <h3 className="text-[14px] outfit-500 text-gray-900">
-                                Subjects included
+                                subjects included
                               </h3>
                             </div>
 
@@ -1269,3 +1269,11 @@ export default function ExamGenerator({
     </>
   );
 }
+
+
+
+
+
+
+
+

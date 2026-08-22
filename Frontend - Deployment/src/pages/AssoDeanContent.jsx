@@ -92,7 +92,7 @@ const AdminContent = () => {
   // Fetch QE enabled status and practice exam settings when subject changes
   useEffect(() => {
     if (selectedSubject && selectedSubject.subjectID) {
-      const fetchSubjectSettings = async () => {
+      const fetchSubjectsettings = async () => {
         const token = sessionStorage.getItem("token");
         try {
           // Fetch QE status
@@ -130,10 +130,10 @@ const AdminContent = () => {
             }));
           }
         } catch (err) {
-          console.error("Error fetching subject settings:", err);
+          console.error("Error fetching Qualifying Exam Settings:", err);
         }
       };
-      fetchSubjectSettings();
+      fetchSubjectsettings();
     }
   }, [selectedSubject, apiUrl]);
 
@@ -467,7 +467,7 @@ const AdminContent = () => {
                     <div className="flex w-full items-center justify-between">
                       {/* Tab Bar */}
                       <div className="flex rounded-t-xl">
-                        {["Practice Exam", "Qualifying Exam", "Pending"].map(
+                        {["Practice Exam", "Subject", "Pending"].map(
                           (item, index) => {
                             const isActive =
                               activeTab === (index === 2 ? 4 : index);
@@ -509,7 +509,7 @@ const AdminContent = () => {
                               },
                               {
                                 value: "examQuestions",
-                                label: "Qualifying Exam",
+                                label: "Subject",
                               },
                             ]}
                             className="sm:w-35"
@@ -1440,3 +1440,10 @@ const AdminContent = () => {
 };
 
 export default AdminContent;
+
+
+
+
+
+
+

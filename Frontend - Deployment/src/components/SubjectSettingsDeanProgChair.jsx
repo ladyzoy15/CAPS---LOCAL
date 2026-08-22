@@ -349,7 +349,7 @@ const PracticeExamConfig = ({
             <div className="animate-fade-in-up relative z-10 mx-0 w-full max-w-[480px] rounded-t-2xl bg-white shadow-2xl min-[448px]:mx-2 min-[448px]:rounded-md">
               <div className="border-color flex items-center justify-between border-b px-4 py-2">
                 <h2 className="text-[16px] font-semibold text-black sm:text-[14px]">
-                  Subject Settings
+                  Qualifying Exam Settings
                 </h2>
                 <button
                   onClick={handleCancelClick}
@@ -605,7 +605,7 @@ const PracticeExamConfig = ({
               {/* Compact Header across the whole modal */}
               <div className="border-color flex w-full items-center justify-between border-b px-5 py-2">
                 <h2 className="text-[17px] leading-none font-semibold text-black">
-                  Subject Settings
+                  Qualifying Exam Settings
                 </h2>
                 <button
                   onClick={handleCancelClick}
@@ -965,3 +965,9 @@ const PracticeExamConfig = ({
 };
 
 export default PracticeExamConfig;
+
+
+
+
+
+

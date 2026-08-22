@@ -77,6 +77,7 @@ function App() {
         <Route path="/reset-user-code" element={<ResetUserCodePage />} />
         <Route path="/forgot-user-code" element={<ForgotUserCodeForm />} />
         <Route path="/team-REVA" element={<Credits />} />
+        <Route path="/team-rvw" element={<Credits />} />
 
         {/* Public Landing Page */}
         <Route
@@ -216,7 +217,7 @@ function App() {
 
 
         {/* =====================================================
-            PRINT QUALIFYING EXAM
+            PRINT Subject
             ===================================================== */}
 
         <Route
@@ -331,7 +332,7 @@ function App() {
 
 
         {/* =====================================================
-            FACULTY SUBJECTS
+            FACULTY subjects
             ===================================================== */}
 
         <Route
@@ -371,7 +372,7 @@ function App() {
 
 
         {/* =====================================================
-            PROGRAM CHAIR SUBJECTS
+            PROGRAM CHAIR subjects
             ===================================================== */}
 
         <Route
@@ -411,7 +412,7 @@ function App() {
 
 
         {/* =====================================================
-            ASSOCIATE DEAN SUBJECTS
+            ASSOCIATE DEAN subjects
             ===================================================== */}
 
         <Route
@@ -456,7 +457,7 @@ function App() {
 
 
         {/* =====================================================
-            DEAN SUBJECTS
+            DEAN subjects
             ===================================================== */}
 
         <Route
@@ -631,3 +632,17 @@ function App() {
 }
 
 export default App;
+
+
+
+
+
+
+
+
+
+
+
+
+
+

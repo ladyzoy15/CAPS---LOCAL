@@ -1,0 +1,74 @@
+warning: in the working copy of 'Frontend - Deployment/src/pages/SubjectList.jsx', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'Frontend - Deployment/src/pages/SubjectsArchive.jsx', LF will be replaced by CRLF the next time Git touches it
+[1mdiff --git a/Frontend - Deployment/src/pages/SubjectList.jsx b/Frontend - Deployment/src/pages/SubjectList.jsx[m
+[1mindex 184e1631..645c9fde 100644[m
+[1m--- a/Frontend - Deployment/src/pages/SubjectList.jsx[m	
+[1m+++ b/Frontend - Deployment/src/pages/SubjectList.jsx[m	
+[36m@@ -440,7 +440,11 @@[m [mfunction SubjectList() {[m
+         return;[m
+       }[m
+ [m
+[31m-      const sortedSubjects = [...subjectsArray].sort((a, b) => {[m
+[32m+[m[32m      const activeSubjectsArray = subjectsArray.filter([m
+[32m+[m[32m        (subject) => subject && !subject.archived_at[m
+[32m+[m[32m      );[m
+[32m+[m
+[32m+[m[32m      const sortedSubjects = [...activeSubjectsArray].sort((a, b) => {[m
+         // First sort by program name[m
+         const programCompare = (a.programName || "").localeCompare([m
+           b.programName || "",[m
+[36m@@ -689,9 +693,9 @@[m [mfunction SubjectList() {[m
+ [m
+     try {[m
+       const response = await fetch([m
+[31m-        `${apiUrl}/subjects/${subjectToDelete.subjectID}/delete`,[m
+[32m+[m[32m        `${apiUrl}/subjects/${subjectToDelete.subjectID}/archive`,[m
+         {[m
+[31m-          method: "DELETE",[m
+[32m+[m[32m          method: "PATCH",[m
+           headers: {[m
+             "Content-Type": "application/json",[m
+             Authorization: `Bearer ${token}`,[m
+[36m@@ -2096,3 +2100,6 @@[m [mexport default SubjectList;[m
+ [m
+ [m
+ [m
+[41m+[m
+[41m+[m
+[41m+[m
+[1mdiff --git a/Frontend - Deployment/src/pages/SubjectsArchive.jsx b/Frontend - Deployment/src/pages/SubjectsArchive.jsx[m
+[1mindex f19c1ce5..4a66413d 100644[m
+[1m--- a/Frontend - Deployment/src/pages/SubjectsArchive.jsx[m	
+[1m+++ b/Frontend - Deployment/src/pages/SubjectsArchive.jsx[m	
+[36m@@ -110,12 +110,9 @@[m [mfunction SubjectsArchive() {[m
+     const archivedSubjects =[m
+       data.subjects.filter([m
+         (subject) =>[m
+[31m-          subject.isArchived === true ||[m
+[31m-          subject.is_archived === true ||[m
+[31m-          subject.archived === true ||[m
+[31m-          subject.archived_at !== null ||[m
+[31m-          subject.archivedAt !== null ||[m
+[31m-          subject.status === "archived",[m
+[32m+[m[32m          subject &&[m
+[32m+[m[32m          subject.archived_at !== null &&[m
+[32m+[m[32m          subject.archived_at !== undefined[m
+       );[m
+ [m
+     setSubjects([m
+[36m@@ -546,7 +543,7 @@[m [mfunction SubjectsArchive() {[m
+         for (const subjectID of selectedSubjects) {[m
+           const response =[m
+             await fetch([m
+[31m-              `${apiUrl}/subjects/${subjectID}/permanent-delete`,[m
+[32m+[m[32m              `${apiUrl}/subjects/${subjectID}/delete`,[m
+               {[m
+                 method: "DELETE",[m
+                 headers: {[m
+[36m@@ -1242,3 +1239,6 @@[m [mexport default SubjectsArchive;[m
+ [m
+ [m
+ [m
+[41m+[m
+[41m+[m
+[41m+[m

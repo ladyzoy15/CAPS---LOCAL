@@ -111,3 +111,9 @@ const Sort = ({ sortOption, setSortOption }) => {
 };
 
 export default Sort;
+
+
+
+
+
+

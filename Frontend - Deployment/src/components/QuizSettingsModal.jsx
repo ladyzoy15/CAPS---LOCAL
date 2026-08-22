@@ -1152,3 +1152,8 @@ const QuizSettingsModal = ({
 };
 
 export default QuizSettingsModal;
+
+
+
+
+

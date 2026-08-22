@@ -7,7 +7,7 @@ import notFoundImage from "../assets/icons/notfound.png";
 import noInternetImage from "../assets/icons/404notfound.png";
 import emptyImage from "../assets/icons/empty.png";
 import SubjectsIcon from "/src/assets/symbols/subjects.svg";
-import SubjectsIconH from "/src/assets/symbols/subjectshover.svg";
+import SubjectsIconH from "/src/assets/symbols/Subjectshover.svg";
 
 // Helper function to transform program names
 const getDisplayProgramName = (programName) => {
@@ -29,7 +29,7 @@ const SideBarDropDown = ({
   selectedSubject,
 }) => {
   const [subjects, setSubjects] = useState([]);
-  const [filteredSubjects, setFilteredSubjects] = useState([]);
+  const [filteredSubjects, setfilteredSubjects] = useState([]);
   const [searchTerm, setSearchTerm] = useState("");
   const [isOpen, setIsOpen] = useState(false);
   const [showAddModal, setShowAddModal] = useState(false);
@@ -51,7 +51,7 @@ const SideBarDropDown = ({
   const [selectedYearLevelID, setSelectedYearLevelID] = useState("");
 
   const [selectedYearLevel, setSelectedYearLevel] = useState(null);
-  const [showYearSubjects, setShowYearSubjects] = useState(false);
+  const [showYearSubjects, setshowYearSubjects] = useState(false);
   const [yearLevelPosition, setYearLevelPosition] = useState({ x: 0, y: 0 });
   const [showSearch, setShowSearch] = useState(false);
   const dropdownRef = useRef(null);
@@ -81,8 +81,8 @@ const SideBarDropDown = ({
         setIsSubjectFocused(false);
         setShowAddModal(false);
         setSearchTerm("");
-        setFilteredSubjects(subjects);
-        setShowYearSubjects(false);
+        setfilteredSubjects(subjects);
+        setshowYearSubjects(false);
       }
 
       // Only update states if we're transitioning between screen sizes
@@ -130,9 +130,9 @@ const SideBarDropDown = ({
       setIsSubjectFocused(false);
       setShowAddModal(false);
       setSearchTerm("");
-      setFilteredSubjects(subjects);
+      setfilteredSubjects(subjects);
       setIsExpanded(false);
-      setShowYearSubjects(false);
+      setshowYearSubjects(false);
     };
     window.addEventListener("closeSubjectSidebar", handleCloseSidebar);
     return () => {
@@ -286,7 +286,7 @@ const SideBarDropDown = ({
       });
 
       setSubjects(sortedSubjects);
-      setFilteredSubjects(sortedSubjects);
+      setfilteredSubjects(sortedSubjects);
     } catch (error) {
       if (error instanceof TypeError) {
         setNetworkError(true);
@@ -323,7 +323,7 @@ const SideBarDropDown = ({
         const newSubject = result.subject;
 
         setSubjects((prevSubjects) => [...prevSubjects, newSubject]);
-        setFilteredSubjects((prevSubjects) => [...prevSubjects, newSubject]);
+        setfilteredSubjects((prevSubjects) => [...prevSubjects, newSubject]);
         await fetchSubjects();
 
         setNewSubjectCode("");
@@ -357,8 +357,8 @@ const SideBarDropDown = ({
     if (!isExpanded) {
       setIsOpen(false);
       setSearchTerm("");
-      setFilteredSubjects(subjects);
-      setShowYearSubjects(false);
+      setfilteredSubjects(subjects);
+      setshowYearSubjects(false);
       setOpenMenuID(null);
       if (listRef.current) {
         listRef.current.scrollTo({ top: 0, behavior: "smooth" });
@@ -368,7 +368,7 @@ const SideBarDropDown = ({
 
   useEffect(() => {
     if (!searchTerm.trim()) {
-      setFilteredSubjects(subjects);
+      setfilteredSubjects(subjects);
     } else {
       const results = subjects.filter(
         (subject) =>
@@ -379,7 +379,7 @@ const SideBarDropDown = ({
             ?.toLowerCase()
             .includes(searchTerm.toLowerCase().trim()),
       );
-      setFilteredSubjects(results);
+      setfilteredSubjects(results);
     }
   }, [searchTerm, subjects]);
 
@@ -393,7 +393,7 @@ const SideBarDropDown = ({
   useEffect(() => {
     const handleClickOutside = (event) => {
       if (dropdownRef.current && !dropdownRef.current.contains(event.target)) {
-        setShowYearSubjects(false);
+        setshowYearSubjects(false);
       }
     };
 
@@ -434,9 +434,9 @@ const SideBarDropDown = ({
     setIsSubjectFocused(false);
     setShowAddModal(false);
     setSearchTerm("");
-    setFilteredSubjects(subjects);
+    setfilteredSubjects(subjects);
     setIsExpanded(false);
-    setShowYearSubjects(false);
+    setshowYearSubjects(false);
   };
 
   useEffect(() => {
@@ -502,9 +502,9 @@ const SideBarDropDown = ({
           setIsSubjectFocused(false);
           setShowAddModal(false);
           setSearchTerm("");
-          setFilteredSubjects(subjects);
+          setfilteredSubjects(subjects);
           setIsExpanded(false);
-          setShowYearSubjects(false);
+          setshowYearSubjects(false);
           setShowSearch(false);
         }
       };
@@ -543,9 +543,9 @@ const SideBarDropDown = ({
               setIsSubjectFocused(false);
               setShowAddModal(false);
               setSearchTerm("");
-              setFilteredSubjects(subjects);
+              setfilteredSubjects(subjects);
               setIsExpanded(false);
-              setShowYearSubjects(false);
+              setshowYearSubjects(false);
             }
           } else if (width >= 640) {
             // sm/md
@@ -562,9 +562,9 @@ const SideBarDropDown = ({
               setIsSubjectFocused(false);
               setShowAddModal(false);
               setSearchTerm("");
-              setFilteredSubjects(subjects);
+              setfilteredSubjects(subjects);
               setIsExpanded(false);
-              setShowYearSubjects(false);
+              setshowYearSubjects(false);
             }
           }
         }}
@@ -576,7 +576,7 @@ const SideBarDropDown = ({
         <div className="ml-3 flex items-center gap-3">
           <img
             src={isSubjectFocused ? SubjectsIconH : SubjectsIcon}
-            alt="Subjects"
+            alt="subjects"
             className="size-[18px] flex-shrink-0"
           />
           <span
@@ -595,7 +595,7 @@ const SideBarDropDown = ({
           <aside className="fixed top-0 left-[220px] hidden h-screen w-56 overflow-hidden border-r border-gray-200 bg-white px-4 py-4 md:block lg:w-64">
             <div>
               <h2 className="outfit-500 mb-4 text-[16px] tracking-wide text-black">
-                Subjects
+                subjects
               </h2>
               {/* Close button for small screens */}
               <button
@@ -604,9 +604,9 @@ const SideBarDropDown = ({
                   setIsSubjectFocused(false);
                   setShowAddModal(false);
                   setSearchTerm("");
-                  setFilteredSubjects(subjects);
+                  setfilteredSubjects(subjects);
                   setIsExpanded(false);
-                  setShowYearSubjects(false);
+                  setshowYearSubjects(false);
                 }}
                 className="absolute top-3 right-3.5 flex cursor-pointer items-center justify-center rounded-lg text-gray-700 transition duration-100 hover:text-gray-800"
                 title="Close"
@@ -670,12 +670,12 @@ const SideBarDropDown = ({
                       <button
                         type="button"
                         className="border-color flex flex-1 cursor-pointer items-center justify-between rounded-md border bg-white px-3 py-[8px] text-[13px] font-semibold hover:bg-gray-100 focus:outline-none sm:py-[3.5px]"
-                        onClick={() => setShowYearSubjects((prev) => !prev)}
+                        onClick={() => setshowYearSubjects((prev) => !prev)}
                       >
                         <span className="flex items-center gap-2 text-nowrap">
                           <i className="bx bx-list-ul text-2xl text-gray-500"></i>
                           {selectedYearLevel
-                            ? `${selectedYearLevel}${selectedYearLevel === "1" ? "st" : selectedYearLevel === "2" ? "nd" : selectedYearLevel === "3" ? "rd" : "th"} Year Subjects`
+                            ? `${selectedYearLevel}${selectedYearLevel === "1" ? "st" : selectedYearLevel === "2" ? "nd" : selectedYearLevel === "3" ? "rd" : "th"} Year subjects`
                             : "All Year Level"}
                         </span>
                         <i
@@ -691,7 +691,7 @@ const SideBarDropDown = ({
                           className="flex cursor-pointer items-center gap-2 px-1 py-2 text-sm hover:bg-orange-50"
                           onClick={() => {
                             setSelectedYearLevel("");
-                            setShowYearSubjects(false);
+                            setshowYearSubjects(false);
                           }}
                         >
                           <i className="bx bx-layer text-lg text-gray-700"></i>
@@ -703,11 +703,11 @@ const SideBarDropDown = ({
                             className="flex cursor-pointer items-center gap-2 rounded-sm px-1 py-2 text-[13px] hover:bg-gray-100"
                             onClick={() => {
                               setSelectedYearLevel(yearLevel);
-                              setShowYearSubjects(false);
+                              setshowYearSubjects(false);
                             }}
                           >
                             <i className="bx bx-layer text-[13px] text-gray-700"></i>
-                            {`${yearLevel}${yearLevel === "1" ? "st" : yearLevel === "2" ? "nd" : yearLevel === "3" ? "rd" : "th"} Year Subjects`}
+                            {`${yearLevel}${yearLevel === "1" ? "st" : yearLevel === "2" ? "nd" : yearLevel === "3" ? "rd" : "th"} Year subjects`}
                           </li>
                         ))}
                       </ul>
@@ -786,7 +786,7 @@ const SideBarDropDown = ({
               </div>
             </div>
 
-            {/* Subjects List (filtered by search or year level) */}
+            {/* subjects List (filtered by search or year level) */}
             <div className="custom-scrollbar flex-1 overflow-y-auto pb-16 sm:pb-4">
               <ul className="w-full">
                 {subjectLoading ? (
@@ -812,7 +812,7 @@ const SideBarDropDown = ({
                       className="h-32 w-32 opacity-80"
                     />
                     <span className="text-[14px] font-semibold text-gray-500">
-                      No Subjects Available
+                      No subjects Available
                     </span>
                   </div>
                 ) : searchTerm.trim() && filteredSubjects.length === 0 ? (
@@ -871,7 +871,7 @@ const SideBarDropDown = ({
                       </div>
                     ))
                 ) : !selectedYearLevel || selectedYearLevel === "" ? (
-                  // Show all subjects when "All Subjects" is selected
+                  // Show all subjects when "All subjects" is selected
                   Object.entries(
                     subjects.reduce((acc, subject) => {
                       const program = subject.programName || "Unassigned";
@@ -970,7 +970,7 @@ const SideBarDropDown = ({
                         className="h-32 w-32 opacity-80"
                       />
                       <span className="text-[14px] font-semibold text-gray-500">
-                        No Subjects Available
+                        No subjects Available
                       </span>
                     </div>
                   )
@@ -998,9 +998,9 @@ const SideBarDropDown = ({
                   setIsSubjectFocused(false);
                   setShowAddModal(false);
                   setSearchTerm("");
-                  setFilteredSubjects(subjects);
+                  setfilteredSubjects(subjects);
                   setIsExpanded(false);
-                  setShowYearSubjects(false);
+                  setshowYearSubjects(false);
                 }}
                 className="flex cursor-pointer items-center justify-center rounded-lg text-gray-700 transition duration-100 hover:text-gray-800"
                 title="Close"
@@ -1042,12 +1042,12 @@ const SideBarDropDown = ({
                       <button
                         type="button"
                         className="border-color flex flex-1 cursor-pointer items-center justify-between rounded-md border bg-white px-3 py-[8px] text-[13px] font-semibold hover:bg-gray-100 focus:outline-none sm:py-[3.5px]"
-                        onClick={() => setShowYearSubjects((prev) => !prev)}
+                        onClick={() => setshowYearSubjects((prev) => !prev)}
                       >
                         <span className="flex items-center gap-2 text-nowrap">
                           <i className="bx bx-list-ul text-2xl text-gray-500"></i>
                           {selectedYearLevel
-                            ? `${selectedYearLevel}${selectedYearLevel === "1" ? "st" : selectedYearLevel === "2" ? "nd" : selectedYearLevel === "3" ? "rd" : "th"} Year Subjects`
+                            ? `${selectedYearLevel}${selectedYearLevel === "1" ? "st" : selectedYearLevel === "2" ? "nd" : selectedYearLevel === "3" ? "rd" : "th"} Year subjects`
                             : "All Year Level"}
                         </span>
                         <i
@@ -1063,7 +1063,7 @@ const SideBarDropDown = ({
                           className="flex cursor-pointer items-center gap-2 px-2 py-2 text-sm hover:bg-orange-50"
                           onClick={() => {
                             setSelectedYearLevel("");
-                            setShowYearSubjects(false);
+                            setshowYearSubjects(false);
                           }}
                         >
                           <i className="bx bx-layer text-lg text-gray-700"></i>
@@ -1075,11 +1075,11 @@ const SideBarDropDown = ({
                             className="flex cursor-pointer items-center gap-2 rounded-sm px-2 py-2 text-[13px] hover:bg-gray-100"
                             onClick={() => {
                               setSelectedYearLevel(yearLevel);
-                              setShowYearSubjects(false);
+                              setshowYearSubjects(false);
                             }}
                           >
                             <i className="bx bx-layer text-[13px] text-gray-700"></i>
-                            {`${yearLevel}${yearLevel === "1" ? "st" : yearLevel === "2" ? "nd" : yearLevel === "3" ? "rd" : "th"} Year Subjects`}
+                            {`${yearLevel}${yearLevel === "1" ? "st" : yearLevel === "2" ? "nd" : yearLevel === "3" ? "rd" : "th"} Year subjects`}
                           </li>
                         ))}
                       </ul>
@@ -1157,7 +1157,7 @@ const SideBarDropDown = ({
               </div>
             </div>
 
-            {/* Subjects List (filtered by search or year level) */}
+            {/* subjects List (filtered by search or year level) */}
             <div className="custom-scrollbar flex-1 overflow-y-auto pb-16 sm:pb-4">
               <ul className="w-full">
                 {subjectLoading ? (
@@ -1183,7 +1183,7 @@ const SideBarDropDown = ({
                       className="h-32 w-32 opacity-80"
                     />
                     <span className="text-[14px] font-semibold text-gray-500">
-                      No Subjects Available
+                      No subjects Available
                     </span>
                   </div>
                 ) : searchTerm.trim() && filteredSubjects.length === 0 ? (
@@ -1245,7 +1245,7 @@ const SideBarDropDown = ({
                       </div>
                     ))
                 ) : !selectedYearLevel || selectedYearLevel === "" ? (
-                  // Show all subjects when "All Subjects" is selected
+                  // Show all subjects when "All subjects" is selected
                   Object.entries(
                     subjects.reduce((acc, subject) => {
                       const program = subject.programName || "Unassigned";
@@ -1350,7 +1350,7 @@ const SideBarDropDown = ({
                         className="h-32 w-32 opacity-80"
                       />
                       <span className="text-[14px] font-semibold text-gray-500">
-                        No Subjects Available
+                        No subjects Available
                       </span>
                     </div>
                   )
@@ -1536,3 +1536,10 @@ const SideBarDropDown = ({
 };
 
 export default SideBarDropDown;
+
+
+
+
+
+
+

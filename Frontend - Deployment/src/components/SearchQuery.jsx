@@ -24,3 +24,8 @@ const SearchQuery = ({ searchQuery, setSearchQuery, placeholder }) => {
 };
 
 export default SearchQuery;
+
+
+
+
+

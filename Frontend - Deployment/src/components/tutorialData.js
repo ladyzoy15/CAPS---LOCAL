@@ -130,7 +130,7 @@ export const navSections = [
       },
       {
         id: "managing-subjects",
-        title: "Managing Subjects",
+        title: "Managing subjects",
         icon: "bx-library",
       },
       { id: "viewing-reports", title: "Viewing Reports", icon: "bx-file" },
@@ -269,7 +269,7 @@ export const placeholderImages = {
   },
   printOfficial: {
     label: "Official Exam Print",
-    caption: "Generate and print official qualifying examination papers.",
+    caption: "Generate and print official Qualifying Examination papers.",
   },
   questionBank: {
     label: "Question Bank",
@@ -375,3 +375,11 @@ export const faqData = [
     a: "Practice exams draw questions from the official question bank and are available to all students for a subject. Quizzes are custom-created by faculty in the Libraries section and can be assigned to specific classes with deadlines and attempt limits.",
   },
 ];
+
+
+
+
+
+
+
+

@@ -469,10 +469,10 @@ const CombinedQuestionForm = ({
       !propIsExamQuestionsEnabled
     ) {
       setError(
-        "Adding of qualifying exam questions is currently disabled by the Dean",
+        "Adding of Qualifying Exam Questions is currently disabled by the Dean",
       );
       showToast(
-        "Adding of qualifying exam questions is currently disabled by the Dean",
+        "Adding of Qualifying Exam Questions is currently disabled by the Dean",
         "error",
       );
       return;
@@ -799,7 +799,7 @@ const CombinedQuestionForm = ({
   const getPurposeLabel = () => {
     const option = [
       { value: 2, label: "Practice" },
-      { value: 1, label: "Qualifying Exam" },
+      { value: 1, label: "Subject" },
     ].find((opt) => opt.value === formData.purpose_id);
     return option?.label || "Practice";
   };
@@ -886,7 +886,7 @@ const CombinedQuestionForm = ({
                 onChange={handleQuestionChange}
                 options={[
                   { value: 2, label: "Practice" },
-                  { value: 1, label: "Qualifying Exam" },
+                  { value: 1, label: "Subject" },
                 ]}
                 show={mode !== "quiz"}
                 label="Purpose"
@@ -1716,7 +1716,7 @@ const CombinedQuestionForm = ({
                       onChange={handleQuestionChange}
                       options={[
                         { value: 2, label: "Practice" },
-                        { value: 1, label: "Qualifying Exam" },
+                        { value: 1, label: "Subject" },
                       ]}
                       show={true}
                       label=""
@@ -1763,3 +1763,11 @@ const CombinedQuestionForm = ({
 };
 
 export default CombinedQuestionForm;
+
+
+
+
+
+
+
+

@@ -13,3 +13,9 @@ const AltButton = ({ text, icon, onClick, className, type }) => {
 };
 
 export default AltButton;
+
+
+
+
+
+

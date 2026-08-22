@@ -286,3 +286,8 @@ const EditClassModal = ({ isOpen, onClose, onSuccess, classData }) => {
 };
 
 export default EditClassModal;
+
+
+
+
+

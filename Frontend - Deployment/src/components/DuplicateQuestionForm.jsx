@@ -487,10 +487,10 @@ const DuplicateQuestionForm = ({
 
     if (formData.purpose_id === 1 && !propIsExamQuestionsEnabled) {
       setError(
-        "Adding of qualifying exam questions is currently disabled by the Dean",
+        "Adding of Qualifying Exam Questions is currently disabled by the Dean",
       );
       showToast(
-        "Adding of qualifying exam questions is currently disabled by the Dean",
+        "Adding of Qualifying Exam Questions is currently disabled by the Dean",
         "error",
       );
       return;
@@ -619,7 +619,7 @@ const DuplicateQuestionForm = ({
                 onChange={handleQuestionChange}
                 options={[
                   { value: 2, label: "Practice" },
-                  { value: 1, label: "Qualifying Exam" },
+                  { value: 1, label: "Subject" },
                 ]}
                 show={true}
                 label="Purpose"
@@ -1253,7 +1253,7 @@ const DuplicateQuestionForm = ({
                     onChange={handleQuestionChange}
                     options={[
                       { value: 2, label: "Practice" },
-                      { value: 1, label: "Qualifying Exam" },
+                      { value: 1, label: "Subject" },
                     ]}
                     show={true}
                     label=""
@@ -1330,3 +1330,10 @@ const DuplicateQuestionForm = ({
 };
 
 export default DuplicateQuestionForm;
+
+
+
+
+
+
+

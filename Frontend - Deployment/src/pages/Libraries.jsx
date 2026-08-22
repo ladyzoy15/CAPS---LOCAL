@@ -61,14 +61,14 @@ function getProgramDisplayName(rawName) {
   return PROGRAM_NAME_MAP[trimmed] || trimmed;
 }
 
-function ProgramSubjectSelector({
+function programSubjectselector({
   subjects,
   isSubjectsLoading,
   value,
   onChange,
 }) {
   const [selectedProgram, setSelectedProgram] = useState(null);
-  const [subjectSearch, setSubjectSearch] = useState("");
+  const [subjectSearch, setSubjectsearch] = useState("");
 
   // Group subjects by program
   const programMap = React.useMemo(() => {
@@ -110,7 +110,7 @@ function ProgramSubjectSelector({
           type="button"
           onClick={() => {
             setSelectedProgram(null);
-            setSubjectSearch("");
+            setSubjectsearch("");
           }}
           className="flex items-center gap-1.5 text-[13px] font-medium text-orange-500 hover:text-orange-600"
         >
@@ -124,7 +124,7 @@ function ProgramSubjectSelector({
           <input
             type="text"
             value={subjectSearch}
-            onChange={(e) => setSubjectSearch(e.target.value)}
+            onChange={(e) => setSubjectsearch(e.target.value)}
             placeholder="Search subjects..."
             className="w-full rounded-xl border border-gray-200 py-2 pr-3 pl-9 text-sm text-gray-900 focus:border-orange-400 focus:ring-2 focus:ring-orange-100 focus:outline-none"
           />
@@ -242,7 +242,7 @@ function Libraries() {
   });
 
   const [subjects, setSubjects] = useState([]);
-  const [isSubjectsLoading, setIsSubjectsLoading] = useState(false);
+  const [isSubjectsLoading, setisSubjectsLoading] = useState(false);
   const [quizzes, setQuizzes] = useState([]);
   const [isQuizzesLoading, setIsQuizzesLoading] = useState(false);
   const [filteredQuizzes, setFilteredQuizzes] = useState([]);
@@ -452,7 +452,7 @@ function Libraries() {
 
   useEffect(() => {
     const fetchSubjects = async () => {
-      setIsSubjectsLoading(true);
+      setisSubjectsLoading(true);
       setError(null); // Clear any previous errors
 
       try {
@@ -528,7 +528,7 @@ function Libraries() {
         setError(err.message || "Failed to load subjects. Please try again.");
         console.error("Error loading subjects:", err);
       } finally {
-        setIsSubjectsLoading(false);
+        setisSubjectsLoading(false);
       }
     };
 
@@ -1489,7 +1489,7 @@ function Libraries() {
 
                       {/* Step 3 – Program → Subject drill-down */}
                       {currentStep === 3 && formData.quiz_type_id === "1" && (
-                        <ProgramSubjectSelector
+                        <programSubjectselector
                           subjects={subjects}
                           isSubjectsLoading={isSubjectsLoading}
                           value={formData.subjectID}
@@ -2289,3 +2289,8 @@ function Libraries() {
 }
 
 export default Libraries;
+
+
+
+
+

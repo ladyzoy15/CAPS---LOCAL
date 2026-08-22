@@ -1,4 +1,4 @@
-﻿import React, { useState, useEffect, useRef } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import { useParams, useOutletContext, useLocation } from "react-router-dom";
 import AltButton from "../components/buttonAlt";
 import SubjectCard from "../components/subjectCard";
@@ -132,7 +132,7 @@ const AdminContent = () => {
   // Fetch QE enabled status and practice exam settings when subject changes
   useEffect(() => {
     if (selectedSubject && selectedSubject.subjectID) {
-      const fetchSubjectSettings = async () => {
+      const fetchSubjectsettings = async () => {
         const token = sessionStorage.getItem("token");
         try {
           // Fetch QE status
@@ -170,10 +170,10 @@ const AdminContent = () => {
             }));
           }
         } catch (err) {
-          console.error("Error fetching subject settings:", err);
+          console.error("Error fetching Qualifying Exam Settings:", err);
         }
       };
-      fetchSubjectSettings();
+      fetchSubjectsettings();
     }
   }, [selectedSubject, apiUrl]);
 
@@ -747,15 +747,15 @@ const AdminContent = () => {
                               <div className="flex items-center gap-3 text-[10px] text-gray-600 sm:gap-5 sm:text-[12px]">
                                 <div className="flex items-center gap-1 sm:gap-2">
                                   <span className="h-2.5 w-2.5 rounded-full bg-[#65A338] sm:h-3 sm:w-3"></span>
-                                  <span>Easy Â· {easyCount}</span>
+                                  <span>Easy · {easyCount}</span>
                                 </div>
                                 <div className="flex items-center gap-1 sm:gap-2">
                                   <span className="h-2.5 w-2.5 rounded-full bg-[#E68A19] sm:h-3 sm:w-3"></span>
-                                  <span>Moderate Â· {modCount}</span>
+                                  <span>Moderate · {modCount}</span>
                                 </div>
                                 <div className="flex items-center gap-1 sm:gap-2">
                                   <span className="h-2.5 w-2.5 rounded-full bg-[#E14343] sm:h-3 sm:w-3"></span>
-                                  <span>Hard Â· {hardCount}</span>
+                                  <span>Hard · {hardCount}</span>
                                 </div>
                               </div>
                             </div>
@@ -869,7 +869,7 @@ const AdminContent = () => {
                                 },
                                 {
                                   value: "examQuestions",
-                                  label: "Qualifying Exam",
+                                  label: "Subject",
                                 },
                               ]}
                               className="sm:w-35"
@@ -1004,11 +1004,11 @@ const AdminContent = () => {
                                       <span className="rounded-lg px-2 py-1 text-[12px] capitalize">
                                         {question.difficulty?.name || "Easy"}
                                       </span>
-                                      <span> â€¢</span>
+                                      <span> •</span>
                                       <span className="rounded-lg px-2 py-1 text-[12px] capitalize">
                                         {question.coverage?.name || "Midterm"}
                                       </span>
-                                      <span> â€¢</span>
+                                      <span> •</span>
                                       <span className="rounded-lg px-2 py-1 text-[12px]">
                                         {question.score} PT
                                       </span>
@@ -1734,3 +1734,10 @@ const AdminContent = () => {
 };
 
 export default AdminContent;
+
+
+
+
+
+
+

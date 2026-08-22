@@ -1,8 +1,8 @@
-﻿import { useEffect, useState, useRef } from "react";
+import { useEffect, useState, useRef } from "react";
 import { Link, useLocation, useNavigate } from "react-router-dom";
 
-import AllSubjectsDropDownProgramChair from "./subjectsProgramChair";
-import AssignedSubjectsDropDown from "./subjectsFaculty";
+import AllSubjectsDropDownProgramChair from "./SubjectsProgramChair";
+import AssignedSubjectsDropDown from "./SubjectsFaculty";
 import PrintExamModal from "./PrintExamModal";
 import { logoutUser } from "../utils/logoutUser";
 import useToast from "../hooks/useToast";
@@ -28,8 +28,8 @@ import UsersIconH from "/src/assets/symbols/usershove.svg";
 import PrintIcon from "/src/assets/symbols/print.svg";
 import PrintIconH from "/src/assets/symbols/printhover.svg";
 
-import SubjectsIcon from "/src/assets/symbols/subjects.svg";
-import SubjectsIconH from "/src/assets/symbols/subjectshover.svg";
+import SubjectsIcon from "/src/assets/symbols/Subjects.svg";
+import SubjectsIconH from "/src/assets/symbols/Subjectshover.svg";
 
 
 const getRoleName = (roleId) => {
@@ -544,34 +544,34 @@ const Sidebar = ({
 
       return (
         location.pathname ===
-          "/dean/subjects/archive" ||
+          "/dean/Subjects/archive" ||
         location.pathname ===
-          "/asso-dean/subjects/archive"
+          "/asso-dean/Subjects/archive"
       );
 
     }
 
 
-    if (path === "/dean/subjects/archive") {
+    if (path === "/dean/Subjects/archive") {
 
       return (
         location.pathname ===
-          "/dean/subjects/archive" ||
+          "/dean/Subjects/archive" ||
         location.pathname.startsWith(
-          "/dean/subjects/archive/"
+          "/dean/Subjects/archive/"
         )
       );
 
     }
 
 
-    if (path === "/asso-dean/subjects/archive") {
+    if (path === "/asso-dean/Subjects/archive") {
 
       return (
         location.pathname ===
-          "/asso-dean/subjects/archive" ||
+          "/asso-dean/Subjects/archive" ||
         location.pathname.startsWith(
-          "/asso-dean/subjects/archive/"
+          "/asso-dean/Subjects/archive/"
         )
       );
 
@@ -902,7 +902,7 @@ const Sidebar = ({
                   )}
 
 
-                  {/* SUBJECTS */}
+                  {/* Subjects */}
 
                   {parsedRoleId >= 2 && (
                     <div className="flex h-16 flex-1 flex-col items-center justify-center">
@@ -910,12 +910,12 @@ const Sidebar = ({
                       <Link
                         to={
                           parsedRoleId === 2
-                            ? "/faculty/subjects"
+                            ? "/faculty/Subjects"
                             : parsedRoleId === 3
-                              ? "/program-chair/subjects"
+                              ? "/program-chair/Subjects"
                               : parsedRoleId === 4
-                                ? "/dean/subjects"
-                                : "/asso-dean/subjects"
+                                ? "/dean/Subjects"
+                                : "/asso-dean/Subjects"
                         }
                         onClick={() => {
 
@@ -929,12 +929,12 @@ const Sidebar = ({
                         className={`flex flex-col items-center transition-colors ${
                           isActive(
                             parsedRoleId === 2
-                              ? "/faculty/subjects"
+                              ? "/faculty/Subjects"
                               : parsedRoleId === 3
-                                ? "/program-chair/subjects"
+                                ? "/program-chair/Subjects"
                                 : parsedRoleId === 4
-                                  ? "/dean/subjects"
-                                  : "/asso-dean/subjects"
+                                  ? "/dean/Subjects"
+                                  : "/asso-dean/Subjects"
                           )
                             ? "text-amber-950 dark:text-gray-100"
                             : "text-amber-700 dark:text-gray-400 hover:text-amber-900 dark:hover:text-orange-300"
@@ -947,12 +947,12 @@ const Sidebar = ({
                             src={
                               isActive(
                                 parsedRoleId === 2
-                                  ? "/faculty/subjects"
+                                  ? "/faculty/Subjects"
                                   : parsedRoleId === 3
-                                    ? "/program-chair/subjects"
+                                    ? "/program-chair/Subjects"
                                     : parsedRoleId === 4
-                                      ? "/dean/subjects"
-                                      : "/asso-dean/subjects"
+                                      ? "/dean/Subjects"
+                                      : "/asso-dean/Subjects"
                               )
                                 ? SubjectsIconH
                                 : SubjectsIcon
@@ -962,12 +962,12 @@ const Sidebar = ({
                             style={getDarkIconStyle(
                               isActive(
                                 parsedRoleId === 2
-                                  ? "/faculty/subjects"
+                                  ? "/faculty/Subjects"
                                   : parsedRoleId === 3
-                                    ? "/program-chair/subjects"
+                                    ? "/program-chair/Subjects"
                                     : parsedRoleId === 4
-                                      ? "/dean/subjects"
-                                      : "/asso-dean/subjects"
+                                      ? "/dean/Subjects"
+                                      : "/asso-dean/Subjects"
                               )
                             )}
                           />
@@ -994,26 +994,24 @@ const Sidebar = ({
                       <Link
                         to={
                           parsedRoleId === 5
-                            ? "/asso-dean/subjects/archive"
-                            : "/dean/subjects/archive"
+                            ? "/asso-dean/Subjects/archive"
+                            : "/dean/Subjects/archive"
                         }
                         onClick={handleMenuClick}
                         className={`flex flex-col items-center transition-colors ${
                           isActive("/archive")
                             ? "text-amber-950 dark:text-gray-100"
-                            : "text-amber-700 dark:text-gray-400 hover:text-amber-900 dark:hover:text-orange-300"
+                            : "text-amber-700 dark:text-gray-400"
                         }`}
                       >
 
                         <span className="mb-1 flex h-6 w-6 items-center justify-center">
 
-                          {/* SAME COLOR AS OTHER ICONS */}
-
                           <i
                             className={`bx bx-archive text-[22px] ${
                               isActive("/archive")
-                                ? "text-amber-950 dark:text-gray-100"
-                                : "text-amber-700 dark:text-gray-400"
+                                ? "text-orange-500"
+                                : "text-black dark:text-gray-100"
                             }`}
                           />
 
@@ -1040,7 +1038,7 @@ const Sidebar = ({
                         className={`flex flex-col items-center transition-colors ${
                           isActive("/import")
                             ? "text-amber-950 dark:text-gray-100"
-                            : "text-amber-700 dark:text-gray-400 hover:text-amber-900 dark:hover:text-orange-300"
+                            : "text-amber-700 dark:text-gray-400"
                         }`}
                       >
 
@@ -1049,8 +1047,8 @@ const Sidebar = ({
                           <i
                             className={`bx bx-import text-[22px] ${
                               isActive("/import")
-                                ? "text-amber-950 dark:text-gray-100"
-                                : "text-amber-700 dark:text-gray-400"
+                                ? "text-orange-500"
+                                : "text-black dark:text-gray-100"
                             }`}
                           />
 
@@ -1743,7 +1741,7 @@ const Sidebar = ({
 
 
         {/* =====================================================
-            SUBJECTS / IMPORT / EXPORT / ARCHIVE
+            Subjects / IMPORT / EXPORT / ARCHIVE
         ===================================================== */}
 
         {(parsedRoleId === 2 ||
@@ -1760,24 +1758,24 @@ const Sidebar = ({
             <ul>
 
               {/* =================================================
-                  SUBJECTS
+                  Subjects
               ================================================= */}
 
               {classes.map(
                 (item, index) => {
 
-                  const subjectsPath =
+                  const SubjectsPath =
                     parsedRoleId === 2
-                      ? "/faculty/subjects"
+                      ? "/faculty/Subjects"
                       : parsedRoleId === 3
-                        ? "/program-chair/subjects"
+                        ? "/program-chair/Subjects"
                         : parsedRoleId === 4
-                          ? "/dean/subjects"
-                          : "/asso-dean/subjects";
+                          ? "/dean/Subjects"
+                          : "/asso-dean/Subjects";
 
 
                   const subjectActive =
-                    isActive(subjectsPath);
+                    isActive(SubjectsPath);
 
 
                   return (
@@ -1798,7 +1796,7 @@ const Sidebar = ({
                       <div className="mt-0 px-3">
 
                         <Link
-                          to={subjectsPath}
+                          to={SubjectsPath}
                           onClick={handleMenuClick}
                           className={`group flex cursor-pointer items-center rounded-lg transition-colors hover:bg-amber-900/10 dark:hover:bg-orange-500/10 ${
                             isUsersPage
@@ -1930,8 +1928,8 @@ const Sidebar = ({
                             : "size-[18px]"
                         } ${
                           isActive("/import")
-                            ? "text-amber-950 dark:text-gray-100"
-                            : "text-amber-700 dark:text-gray-400"
+                            ? "text-orange-500"
+                            : "text-black dark:text-gray-100"
                         }`}
                       >
 
@@ -2068,8 +2066,8 @@ const Sidebar = ({
                     <Link
                       to={
                         parsedRoleId === 5
-                          ? "/asso-dean/subjects/archive"
-                          : "/dean/subjects/archive"
+                          ? "/asso-dean/Subjects/archive"
+                          : "/dean/Subjects/archive"
                       }
                       onClick={() => {
 
@@ -2109,8 +2107,8 @@ const Sidebar = ({
                               : "text-[18px]"
                           } ${
                             isActive("/archive")
-                              ? "text-amber-950 dark:text-gray-100"
-                              : "text-amber-700 dark:text-gray-400"
+                              ? "text-orange-500"
+                              : "text-black dark:text-gray-100"
                           }`}
                           title="Archive"
                         />

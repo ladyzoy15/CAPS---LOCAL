@@ -289,7 +289,7 @@ export default function LoginPage() {
                 "
               >
                 A platform designed to help students practice and prepare
-                for qualifying exams while assessing their knowledge
+                for subjects while assessing their knowledge
                 through randomized questions.
               </p>
             </div>
@@ -1390,3 +1390,10 @@ export default function LoginPage() {
     </>
   );
 }
+
+
+
+
+
+
+

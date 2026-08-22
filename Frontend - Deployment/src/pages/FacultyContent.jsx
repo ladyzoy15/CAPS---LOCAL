@@ -1,4 +1,4 @@
-﻿import React, { useState, useEffect, useRef } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import { useOutletContext } from "react-router-dom";
 import AddQuestionForm from "../components/AddQuestionForm";
 import { useParams, useLocation } from "react-router-dom";
@@ -92,7 +92,7 @@ const FacultyContent = () => {
   // Fetch QE enabled status and practice exam settings when subject changes
   useEffect(() => {
     if (selectedSubject && selectedSubject.subjectID) {
-      const fetchSubjectSettings = async () => {
+      const fetchSubjectsettings = async () => {
         const token = sessionStorage.getItem("token");
         try {
           // Fetch QE status
@@ -130,10 +130,10 @@ const FacultyContent = () => {
             }));
           }
         } catch (err) {
-          console.error("Error fetching subject settings:", err);
+          console.error("Error fetching Qualifying Exam Settings:", err);
         }
       };
-      fetchSubjectSettings();
+      fetchSubjectsettings();
     }
   }, [selectedSubject, apiUrl]);
 
@@ -492,7 +492,7 @@ const FacultyContent = () => {
                   }));
                 }}
                 refreshSubjects={() => {
-                  // Dispatch the event to refresh assigned subjects in subjectsFaculty.jsx
+                  // Dispatch the event to refresh assigned subjects in SubjectsFaculty.jsx
                   window.dispatchEvent(new Event("refreshSubjectsList"));
                 }}
                 pendingCount={questions.filter((q) => q.status_id === 1).length}
@@ -640,15 +640,15 @@ const FacultyContent = () => {
                               <div className="flex items-center gap-3 text-[10px] text-gray-600 sm:gap-5 sm:text-[12px]">
                                 <div className="flex items-center gap-1 sm:gap-2">
                                   <span className="h-2.5 w-2.5 rounded-full bg-[#65A338] sm:h-3 sm:w-3"></span>
-                                  <span>Easy Â· {easyCount}</span>
+                                  <span>Easy · {easyCount}</span>
                                 </div>
                                 <div className="flex items-center gap-1 sm:gap-2">
                                   <span className="h-2.5 w-2.5 rounded-full bg-[#E68A19] sm:h-3 sm:w-3"></span>
-                                  <span>Moderate Â· {modCount}</span>
+                                  <span>Moderate · {modCount}</span>
                                 </div>
                                 <div className="flex items-center gap-1 sm:gap-2">
                                   <span className="h-2.5 w-2.5 rounded-full bg-[#E14343] sm:h-3 sm:w-3"></span>
-                                  <span>Hard Â· {hardCount}</span>
+                                  <span>Hard · {hardCount}</span>
                                 </div>
                               </div>
                             </div>
@@ -672,7 +672,7 @@ const FacultyContent = () => {
                               },
                               {
                                 value: "examQuestions",
-                                label: "Qualifying Exam",
+                                label: "Subject",
                               },
                             ]}
                             className="sm:w-35"
@@ -767,11 +767,11 @@ const FacultyContent = () => {
                                       <span className="rounded-lg px-2 py-1 text-[12px] capitalize">
                                         {question.difficulty?.name || "Easy"}
                                       </span>
-                                      <span> â€¢</span>
+                                      <span> •</span>
                                       <span className="rounded-lg px-2 py-1 text-[12px] capitalize">
                                         {question.coverage?.name || "Midterm"}
                                       </span>
-                                      <span> â€¢</span>
+                                      <span> •</span>
                                       <span className="rounded-lg px-2 py-1 text-[12px]">
                                         {question.score} PT
                                       </span>
@@ -1340,4 +1340,11 @@ const FacultyContent = () => {
 };
 
 export default FacultyContent;
+
+
+
+
+
+
+
 

@@ -493,6 +493,42 @@ class SubjectController extends Controller
     }
 
     /**
+     * Archive a subject. Only accessible by the Dean or Associate Dean.
+     */
+    public function archive($subjectID)
+    {
+        $user = Auth::user();
+
+        if (!$user || !in_array($user->roleID, [4, 5])) {
+            return response()->json([
+                'message' => 'Unauthorized.'
+            ], 403);
+        }
+
+        $subject = Subject::where('subjectID', $subjectID)->first();
+
+        if (!$subject) {
+            return response()->json([
+                'message' => 'Subject not found.'
+            ], 404);
+        }
+
+        try {
+            $subject->archived_at = now();
+            $subject->save();
+
+            return response()->json([
+                'success' => true,
+                'message' => 'Subject archived successfully.'
+            ], 200);
+        } catch (\Exception $e) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Failed to archive subject.'
+            ], 500);
+        }
+    }
+    /**
      * Get subjects for the student's program (including GE subjects) that have practice exam settings.
      * Returns whether each subject is enabled for practice exams and the configured question count.
      */
@@ -760,4 +796,40 @@ class SubjectController extends Controller
             ], 500);
         }
     }
+
+    /**
+     * Get all archived subjects.
+     * Only accessible by the Dean or Associate Dean.
+     */
+    public function archived()
+    {
+        $user = Auth::user();
+
+        if (!$user || !in_array($user->roleID, [4, 5])) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Unauthorized.'
+            ], 403);
+        }
+
+        try {
+            $subjects = Subject::whereNotNull('archived_at')
+                ->orderByDesc('archived_at')
+                ->get();
+
+            return response()->json([
+                'success' => true,
+                'subjects' => $subjects
+            ], 200);
+
+        } catch (\Exception $e) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Failed to load archived subjects.'
+            ], 500);
+        }
+    }
 }
+
+
+

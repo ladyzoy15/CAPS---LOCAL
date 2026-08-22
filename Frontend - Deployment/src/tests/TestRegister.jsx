@@ -8,7 +8,7 @@ import SideBarToolTip from "./sidebarTooltip";
 import Toast from "./Toast";
 import useToast from "../hooks/useToast";
 
-const AssignedSubjectsDropDown = ({
+const assignedSubjectsDropDown = ({
   item,
   isExpanded,
   setIsExpanded,
@@ -19,9 +19,9 @@ const AssignedSubjectsDropDown = ({
   homePath,
 }) => {
   const [subjects, setSubjects] = useState([]);
-  const [filteredSubjects, setFilteredSubjects] = useState([]);
+  const [filteredSubjects, setfilteredSubjects] = useState([]);
   const [searchTerm, setSearchTerm] = useState("");
-  const [assignedSubjects, setAssignedSubjects] = useState([]);
+  const [assignedSubjects, setassignedSubjects] = useState([]);
   const [isOpen, setIsOpen] = useState(false);
   const [showAddModal, setShowAddModal] = useState(false);
   const [selectedSubject, setLocalSelectedSubject] = useState(null);
@@ -49,7 +49,7 @@ const AssignedSubjectsDropDown = ({
   const [searchUnassigned, setSearchUnassigned] = useState("");
 
   const [selectedYearLevel, setSelectedYearLevel] = useState(null);
-  const [showYearSubjects, setShowYearSubjects] = useState(false);
+  const [showYearSubjects, setshowYearSubjects] = useState(false);
   const [yearLevelPosition, setYearLevelPosition] = useState({ x: 0, y: 0 });
 
   const yearLevelOptions = ["1", "2", "3", "4"];
@@ -106,7 +106,7 @@ const AssignedSubjectsDropDown = ({
       );
 
       setSubjects(sortedSubjects);
-      setFilteredSubjects(sortedSubjects);
+      setfilteredSubjects(sortedSubjects);
     } catch (error) {
       console.error("Error fetching subjects:", error);
     } finally {
@@ -114,7 +114,7 @@ const AssignedSubjectsDropDown = ({
     }
   };
 
-  const fetchAssignedSubjects = async () => {
+  const fetchassignedSubjects = async () => {
     const token = localStorage.getItem("token");
     setSubjectLoading(true);
     try {
@@ -132,8 +132,8 @@ const AssignedSubjectsDropDown = ({
           a.subjectCode.localeCompare(b.subjectCode),
         );
 
-        setAssignedSubjects(sortedSubjects);
-        setFilteredSubjects(sortedSubjects);
+        setassignedSubjects(sortedSubjects);
+        setfilteredSubjects(sortedSubjects);
       } else {
         console.error("Failed to fetch assigned subjects:", response.status);
       }
@@ -146,7 +146,7 @@ const AssignedSubjectsDropDown = ({
 
   useEffect(() => {
     const timer = setTimeout(() => {
-      fetchAssignedSubjects();
+      fetchassignedSubjects();
     }, 300);
 
     return () => clearTimeout(timer);
@@ -156,7 +156,7 @@ const AssignedSubjectsDropDown = ({
     if (!isExpanded) {
       setIsOpen(false);
       setSearchTerm("");
-      setFilteredSubjects(subjects);
+      setfilteredSubjects(subjects);
       if (listRef.current) {
         listRef.current.scrollTo({ top: 0, behavior: "smooth" });
       }
@@ -165,7 +165,7 @@ const AssignedSubjectsDropDown = ({
 
   useEffect(() => {
     if (!searchTerm.trim()) {
-      setFilteredSubjects(assignedSubjects);
+      setfilteredSubjects(assignedSubjects);
     } else {
       const results = assignedSubjects.filter(
         (subject) =>
@@ -176,7 +176,7 @@ const AssignedSubjectsDropDown = ({
             ?.toLowerCase()
             .includes(searchTerm.toLowerCase().trim()),
       );
-      setFilteredSubjects(results);
+      setfilteredSubjects(results);
     }
   }, [searchTerm, assignedSubjects]);
 
@@ -227,12 +227,12 @@ const AssignedSubjectsDropDown = ({
           setSelectedSubject(null);
         }
 
-        await fetchAssignedSubjects();
+        await fetchassignedSubjects();
 
         setSubjects((prevSubjects) =>
           prevSubjects.filter((subject) => subject.subjectID !== subjectID),
         );
-        setFilteredSubjects((prevSubjects) =>
+        setfilteredSubjects((prevSubjects) =>
           prevSubjects.filter((subject) => subject.subjectID !== subjectID),
         );
       } else {
@@ -266,7 +266,7 @@ const AssignedSubjectsDropDown = ({
       if (response.ok) {
         const result = await response.json();
 
-        await fetchAssignedSubjects();
+        await fetchassignedSubjects();
 
         setSelectedSubjectForAssignment(null);
         setShowAddModal(false);
@@ -286,7 +286,7 @@ const AssignedSubjectsDropDown = ({
 
   useEffect(() => {
     if (!isExpanded) {
-      setShowYearSubjects(false);
+      setshowYearSubjects(false);
     }
   }, [isExpanded]);
 
@@ -304,11 +304,11 @@ const AssignedSubjectsDropDown = ({
           } else {
             setIsOpen(!isOpen);
             setIsSubjectFocused(!isOpen);
-            setShowYearSubjects(false);
+            setshowYearSubjects(false);
           }
         }}
       >
-        <SideBarToolTip label="Subjects" isExpanded={isExpanded}>
+        <SideBarToolTip label="subjects" isExpanded={isExpanded}>
           <i className={`bx ${item.icon} mt-1 text-2xl`}></i>
         </SideBarToolTip>
         <span
@@ -318,7 +318,7 @@ const AssignedSubjectsDropDown = ({
               : "pointer-events-none invisible ml-0 opacity-0"
           }`}
         >
-          Subjects
+          subjects
         </span>
         {isExpanded && (
           <div className="mr-1 ml-auto flex items-center justify-center">
@@ -359,7 +359,7 @@ const AssignedSubjectsDropDown = ({
               onClick={() => {
                 setSearchTerm("");
                 setShowAddModal(true);
-                setShowYearSubjects(false);
+                setshowYearSubjects(false);
               }}
             >
               <i className="bx bx-plus text-[16px]"></i>
@@ -410,7 +410,7 @@ const AssignedSubjectsDropDown = ({
                     const rect = e.currentTarget.getBoundingClientRect();
                     setYearLevelPosition({ x: rect.right + 10, y: rect.top });
                     setSelectedYearLevel(yearLevel);
-                    setShowYearSubjects(true);
+                    setshowYearSubjects(true);
                     setOpenMenuID(null);
                   }}
                 >
@@ -424,9 +424,9 @@ const AssignedSubjectsDropDown = ({
               <li className="mt-4 border-t border-gray-200 pt-4">
                 <button
                   onClick={() => {
-                    setShowYearSubjects(false);
+                    setshowYearSubjects(false);
                     setOpenMenuID(null);
-                    fetchAssignedSubjects();
+                    fetchassignedSubjects();
                   }}
                   className="border-color flex w-full cursor-pointer items-center justify-center gap-2 rounded-md border px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
                 >
@@ -439,7 +439,7 @@ const AssignedSubjectsDropDown = ({
         </ul>
       </div>
 
-      {/* Floating Subjects Panel */}
+      {/* Floating subjects Panel */}
       {showYearSubjects &&
         selectedYearLevel &&
         createPortal(
@@ -449,7 +449,7 @@ const AssignedSubjectsDropDown = ({
               className="lightbox-bg fixed inset-0 z-54 hidden sm:block"
               style={{ pointerEvents: "auto" }}
               onClick={() => {
-                setShowYearSubjects(false);
+                setshowYearSubjects(false);
                 setOpenMenuID(null);
               }}
             />
@@ -458,13 +458,13 @@ const AssignedSubjectsDropDown = ({
               className="lightbox-bg fixed inset-0 z-55 flex items-end justify-center min-[448px]:items-center sm:hidden"
               onMouseDown={(e) => {
                 if (e.target === e.currentTarget) {
-                  setShowYearSubjects(false);
+                  setshowYearSubjects(false);
                   setOpenMenuID(null);
                 }
               }}
               onTouchStart={(e) => {
                 if (e.target === e.currentTarget) {
-                  setShowYearSubjects(false);
+                  setshowYearSubjects(false);
                   setOpenMenuID(null);
                 }
               }}
@@ -482,17 +482,17 @@ const AssignedSubjectsDropDown = ({
                 >
                   <div className="flex items-center justify-between">
                     <h3 className="text-[16px] font-semibold text-gray-700">
-                      {`${selectedYearLevel}${selectedYearLevel === "1" ? "st" : selectedYearLevel === "2" ? "nd" : selectedYearLevel === "3" ? "rd" : "th"} Year Subjects`}
+                      {`${selectedYearLevel}${selectedYearLevel === "1" ? "st" : selectedYearLevel === "2" ? "nd" : selectedYearLevel === "3" ? "rd" : "th"} Year subjects`}
                     </h3>
                     <button
                       onMouseDown={(e) => {
                         e.stopPropagation();
-                        setShowYearSubjects(false);
+                        setshowYearSubjects(false);
                         setOpenMenuID(null);
                       }}
                       onTouchStart={(e) => {
                         e.stopPropagation();
-                        setShowYearSubjects(false);
+                        setshowYearSubjects(false);
                         setOpenMenuID(null);
                       }}
                       className="cursor-pointer text-gray-500 hover:text-gray-700"
@@ -557,7 +557,7 @@ const AssignedSubjectsDropDown = ({
                                 setSelectedSubject(null);
                                 handleSelectSubject(subject);
                                 navigate(homePath);
-                                setShowYearSubjects(false);
+                                setshowYearSubjects(false);
                                 setOpenMenuID(null);
                               }}
                               onTouchStart={(e) => {
@@ -566,7 +566,7 @@ const AssignedSubjectsDropDown = ({
                                 setSelectedSubject(null);
                                 handleSelectSubject(subject);
                                 navigate(homePath);
-                                setShowYearSubjects(false);
+                                setshowYearSubjects(false);
                                 setOpenMenuID(null);
                               }}
                             >
@@ -647,7 +647,7 @@ const AssignedSubjectsDropDown = ({
                       setShowDeleteModal(true);
                       setTimeout(() => {
                         setOpenMenuID(null);
-                        setShowYearSubjects(false);
+                        setshowYearSubjects(false);
                       }, 50);
                     }}
                   >
@@ -676,10 +676,10 @@ const AssignedSubjectsDropDown = ({
               <div className="border-b border-gray-200 p-2">
                 <div className="flex items-center justify-between">
                   <h3 className="px-2 text-sm font-semibold text-gray-700">
-                    {`${selectedYearLevel}${selectedYearLevel === "1" ? "st" : selectedYearLevel === "2" ? "nd" : selectedYearLevel === "3" ? "rd" : "th"} Year Subjects`}
+                    {`${selectedYearLevel}${selectedYearLevel === "1" ? "st" : selectedYearLevel === "2" ? "nd" : selectedYearLevel === "3" ? "rd" : "th"} Year subjects`}
                   </h3>
                   <button
-                    onClick={() => setShowYearSubjects(false)}
+                    onClick={() => setshowYearSubjects(false)}
                     className="cursor-pointer text-gray-500 hover:text-gray-700"
                   >
                     <i className="bx bx-x text-xl"></i>
@@ -733,7 +733,7 @@ const AssignedSubjectsDropDown = ({
                                 setSelectedSubject(null);
                                 handleSelectSubject(subject);
                                 navigate(homePath);
-                                setShowYearSubjects(false);
+                                setshowYearSubjects(false);
                                 setOpenMenuID(null);
                               }}
                             >
@@ -811,7 +811,7 @@ const AssignedSubjectsDropDown = ({
               setShowDeleteModal(true);
               setTimeout(() => {
                 setOpenMenuID(null);
-                setShowYearSubjects(false);
+                setshowYearSubjects(false);
               }, 50);
             }}
           >
@@ -1010,4 +1010,11 @@ const AssignedSubjectsDropDown = ({
   );
 };
 
-export default AssignedSubjectsDropDown;
+export default assignedSubjectsDropDown;
+
+
+
+
+
+
+

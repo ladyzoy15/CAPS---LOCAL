@@ -44,3 +44,9 @@ export async function getCroppedImg(imageSrc, pixelCrop) {
     }, "image/png");
   });
 }
+
+
+
+
+
+

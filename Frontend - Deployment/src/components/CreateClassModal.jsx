@@ -292,3 +292,8 @@ const CreateClassModal = ({ isOpen, onClose, onSuccess }) => {
 };
 
 export default CreateClassModal;
+
+
+
+
+

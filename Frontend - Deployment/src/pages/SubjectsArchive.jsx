@@ -31,6 +31,27 @@ function SubjectsArchive() {
   };
 
   // ============================================================
+  // SAFE JSON PARSER
+  //
+  // Some backend responses are being sent with a stray character
+  // (e.g. a leading quote) before the actual JSON body, which
+  // breaks response.json(). This strips anything before the
+  // first '{' or '[' so valid JSON can still be parsed.
+  // ============================================================
+
+  const safeParseJSON = async (response) => {
+    const text = await response.text();
+    const braceIndex = text.indexOf("{");
+    const bracketIndex = text.indexOf("[");
+    let start = braceIndex;
+    if (bracketIndex !== -1 && (braceIndex === -1 || bracketIndex < braceIndex)) {
+      start = bracketIndex;
+    }
+    const cleaned = start > 0 ? text.slice(start) : text;
+    return JSON.parse(cleaned);
+  };
+
+  // ============================================================
   // GENERIC RESPONSE PARSER
   // ============================================================
 
@@ -38,7 +59,7 @@ function SubjectsArchive() {
     let data = {};
 
     try {
-      data = await response.json();
+      data = await safeParseJSON(response);
     } catch {
       data = {};
     }
@@ -70,7 +91,7 @@ function SubjectsArchive() {
 
   try {
     const response = await fetch(
-      `${apiUrl}/subjects?archived=true`,
+      `${apiUrl}/subjects/archived`,
       {
         method: "GET",
         headers: {
@@ -87,7 +108,7 @@ function SubjectsArchive() {
       );
     }
 
-    const data = await response.json();
+    const data = await safeParseJSON(response);
 
     console.log(
       "Archived subjects response:",
@@ -118,11 +139,7 @@ function SubjectsArchive() {
           subject.status === "archived",
       );
 
-    setSubjects(
-      archivedSubjects.length > 0
-        ? archivedSubjects
-        : data.subjects,
-    );
+    setSubjects(archivedSubjects);
 
     setSelectedSubjects([]);
   } catch (err) {

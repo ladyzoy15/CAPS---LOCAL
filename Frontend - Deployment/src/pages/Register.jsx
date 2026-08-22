@@ -398,7 +398,7 @@ export default function Register() {
 
               <p className="mt-20 mr-10 hidden max-w-xs text-center text-sm text-gray-500 lg:block">
                 A platform designed to help students practice and prepare
-                for qualifying exams while assessing their knowledge
+                for subjects while assessing their knowledge
                 through randomized questions.
               </p>
             </div>
@@ -1808,3 +1808,10 @@ export default function Register() {
     </>
   );
 }
+
+
+
+
+
+
+

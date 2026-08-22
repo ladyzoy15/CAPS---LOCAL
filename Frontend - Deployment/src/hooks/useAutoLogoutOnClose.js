@@ -30,3 +30,9 @@ const useAutoLogoutOnClose = () => {
 };
 
 export default useAutoLogoutOnClose;
+
+
+
+
+
+
