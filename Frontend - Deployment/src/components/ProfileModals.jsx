@@ -895,3 +895,8 @@ export function clearPersistedAvatarColor(userInfo) {
   const key = getAvatarColorKey(userInfo);
   localStorage.removeItem("avatarColor_" + key);
 }
+
+
+
+
+

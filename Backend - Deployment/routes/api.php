@@ -329,7 +329,9 @@ Route::middleware(['auth:sanctum', 'role:4,5'])->group(function () {
 
     // Subject management
     Route::post('/add-subjects', [SubjectController::class, 'store']);
+    Route::get('/subjects/archived', [SubjectController::class, 'archived']);
     Route::delete('/subjects/{subjectID}/delete', [SubjectController::class, 'destroy']);
+    Route::delete('/subjects/{subjectID}/permanent-delete', [SubjectController::class, 'permanentDelete']);
     Route::put('/subjects/{subjectID}/update', [SubjectController::class, 'update']);
 
     // User deletion (Dean and Associate Dean only)
@@ -357,3 +359,5 @@ Route::get('storage/choices/{filename}', function ($filename) {
     }
     return response()->file($path);
 })->middleware('image.cors');
+
+

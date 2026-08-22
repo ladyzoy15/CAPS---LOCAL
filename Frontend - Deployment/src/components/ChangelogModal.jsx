@@ -34,7 +34,7 @@ const SECTIONS = [
       },
       {
         name: "Question Management",
-        desc: "Create, edit, and delete questions inline. Import from Qualifying Exam or Practice modules, or duplicate existing questions for faster setup.",
+        desc: "Create, edit, and delete questions inline. Import from Subject or Practice modules, or duplicate existing questions for faster setup.",
       },
       {
         name: "Quiz Session Monitoring",
@@ -43,7 +43,7 @@ const SECTIONS = [
     ],
   },
   {
-    title: "Reports (Practice & Qualifying Exams)",
+    title: "Reports (Practice & subjects)",
     tags: ["New"],
     features: [
       {
@@ -52,7 +52,7 @@ const SECTIONS = [
       },
       {
         name: "Recent Participants & Leaderboard",
-        desc: "See recent Qualifying Exam participants and a global Qualifying Exam leaderboard.",
+        desc: "See recent Subject participants and a global Subject leaderboard.",
       },
     ],
   },
@@ -93,8 +93,8 @@ const SECTIONS = [
     tags: ["New"],
     features: [
       {
-        name: "Account Deletion & Qualifying Exam Controls",
-        desc: "Deans can delete user accounts and toggle Qualifying Exam question creation and editing.",
+        name: "Account Deletion & Subject Controls",
+        desc: "Deans can delete user accounts and toggle Qualifying Exam Question creation and editing.",
       },
     ],
   },
@@ -103,8 +103,8 @@ const SECTIONS = [
     tags: ["Fixed"],
     features: [
       {
-        name: "Qualifying Exam PDF & Sorting Fixes",
-        desc: "Fixed Qualifying Exam PDF generation, subject numbering alignment, and improved question sorting logic.",
+        name: "Subject PDF & Sorting Fixes",
+        desc: "Fixed Subject PDF generation, subject numbering alignment, and improved question sorting logic.",
       },
       {
         name: "UI & Navigation Polish",
@@ -361,3 +361,11 @@ const ChangelogModal = ({ onClose }) => {
 };
 
 export default ChangelogModal;
+
+
+
+
+
+
+
+

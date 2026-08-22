@@ -31,7 +31,7 @@ const STEPS = [
     image: Step3Img,
     items: [
       "Click Manage Questions to add new questions, edit existing ones, or remove questions as needed.",
-      "If your quiz is subject-based, you can also import questions from Practice Exams or the Qualifying Exam question bank.",
+      "If your quiz is subject-based, you can also import questions from Practice Exams or the Qualifying Exam Question bank.",
     ],
   },
   {
@@ -196,3 +196,10 @@ const QuizWalkthroughModal = ({ onClose }) => {
 };
 
 export default QuizWalkthroughModal;
+
+
+
+
+
+
+

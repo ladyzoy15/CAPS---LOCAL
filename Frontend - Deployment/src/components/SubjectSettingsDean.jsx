@@ -420,7 +420,7 @@ const PracticeExamConfig = ({
             <div className="animate-fade-in-up relative z-10 mx-0 w-full max-w-[480px] rounded-t-2xl bg-white shadow-2xl min-[448px]:mx-2 min-[448px]:rounded-md">
               <div className="border-color flex items-center justify-between border-b px-4 py-2">
                 <h2 className="text-[16px] font-semibold text-black sm:text-[14px]">
-                  Subject Settings
+                  Qualifying Exam Settings
                 </h2>
                 <button
                   onClick={handleCancelClick}
@@ -696,7 +696,7 @@ const PracticeExamConfig = ({
               {/* Compact Header across the whole modal */}
               <div className="border-color flex w-full items-center justify-between border-b px-5 py-2">
                 <h2 className="text-[17px] leading-none font-semibold text-black">
-                  Subject Settings
+                  Qualifying Exam Settings
                 </h2>
                 <button
                   onClick={handleCancelClick}
@@ -718,7 +718,7 @@ const PracticeExamConfig = ({
                         onClick={() => handleSidebarScroll("qe")}
                         type="button"
                       >
-                        Qualifying Exam
+                        Subject
                       </button>
                       <button
                         className={`w-full px-4 py-3 text-left text-[13px] font-semibold transition-colors ${activeSection === "practice" ? "border-l-4 border-orange-500 bg-orange-50 text-orange-600" : "border-l-4 border-transparent text-gray-700"}`}
@@ -752,7 +752,7 @@ const PracticeExamConfig = ({
                                 Enable Question Entry
                               </div>
                               <div className="text-[10px] text-gray-500">
-                                Allow adding qualifying exam questions for this
+                                Allow adding Qualifying Exam Questions for this
                                 subject.
                               </div>
                             </div>
@@ -1112,3 +1112,11 @@ const PracticeExamConfig = ({
 };
 
 export default PracticeExamConfig;
+
+
+
+
+
+
+
+

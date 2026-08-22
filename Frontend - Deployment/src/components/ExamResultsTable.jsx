@@ -700,3 +700,8 @@ const ExamResultsTable = ({
 };
 
 export default ExamResultsTable;
+
+
+
+
+

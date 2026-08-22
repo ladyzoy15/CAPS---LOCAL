@@ -179,7 +179,7 @@ const SubjectCard = ({
 
   const tabs = [
     { label: "Practice Exam", index: 0 },
-    { label: "Qualifying Exam", index: 1 },
+    { label: "Subject", index: 1 },
     { label: "Pending", index: 4 },
   ];
 
@@ -1043,3 +1043,12 @@ const SubjectCard = ({
 };
 
 export default SubjectCard;
+
+
+
+
+
+
+
+
+

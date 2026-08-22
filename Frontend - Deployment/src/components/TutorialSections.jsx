@@ -141,8 +141,8 @@ export const IntroductionSection = () => (
       />
       <FeatureCard
         icon="bx-certification"
-        title="Qualifying Exams"
-        description="Prepare for your qualifying exams with targeted assessments designed to build mastery."
+        title="subjects"
+        description="Prepare for your subjects with targeted assessments designed to build mastery."
       />
       <FeatureCard
         icon="bx-chart-network"
@@ -483,7 +483,7 @@ export const AnalyticsSection = () => (
 );
 
 /* ─── SECTION: Subject Selection ─── */
-export const SubjectSelectionSection = () => (
+export const subjectSelectionSection = () => (
   <div>
     <SectionHeader
       tag="Student Features"
@@ -681,12 +681,12 @@ export const ApprovingQuestionsSection = () => (
   </div>
 );
 
-/* ─── SECTION: Managing Subjects ─── */
+/* ─── SECTION: Managing subjects ─── */
 export const ManagingSubjectsSection = () => (
   <div>
     <SectionHeader
       tag="Program Chair Features"
-      title="Managing Subjects"
+      title="Managing subjects"
       subtitle="Add, edit, and organize subjects within your program."
     />
     <ScreenshotPlaceholder
@@ -789,7 +789,7 @@ export const PrintingOfficialSection = () => (
     <SectionHeader
       tag="Admin / Dean"
       title="Printing Official Exams"
-      subtitle="Generate official qualifying examination papers."
+      subtitle="Generate official Qualifying Examination papers."
     />
     <p className="mb-4 text-sm leading-relaxed text-gray-600">
       Administrators and Deans can generate official, formatted examination
@@ -798,7 +798,7 @@ export const PrintingOfficialSection = () => (
     </p>
     <ScreenshotPlaceholder
       label="Official Exam Print"
-      caption="Generate and print official qualifying examination papers."
+      caption="Generate and print official Qualifying Examination papers."
     />
     <Divider />
   </div>
@@ -1258,3 +1258,11 @@ export const FAQSection = ({ faqData }) => {
     </div>
   );
 };
+
+
+
+
+
+
+
+

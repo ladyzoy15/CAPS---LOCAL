@@ -99,3 +99,8 @@ export const SearchBarTrigger = ({
 );
 
 export default SearchBar;
+
+
+
+
+

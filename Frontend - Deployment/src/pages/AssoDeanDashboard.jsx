@@ -50,7 +50,7 @@ const AssoDeanDashboard = () => {
           </button>
 
           <p className="text-[12px] text-gray-400">
-            Use the sidebar to navigate to Subjects, Classes, Sessions, and
+            Use the sidebar to navigate to subjects, Classes, Sessions, and
             more.
           </p>
         </div>
@@ -64,3 +64,9 @@ const AssoDeanDashboard = () => {
 };
 
 export default AssoDeanDashboard;
+
+
+
+
+
+

@@ -1,4 +1,4 @@
-﻿import React, { useState, useEffect } from "react";
+import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 
 import collegeLogo from "/src/assets/college-logo.png";
@@ -170,8 +170,8 @@ function LandingPage() {
 
     window.alert(
       "Chrome hasn't fired the install prompt yet.\n\n" +
-        "Try: ⋮ menu → Save and share → Install REVA JRMSU (or Install page).\n\n" +
-        "If that's missing: DevTools → Application → Manifest (fix any errors), " +
+        "Try: ? menu ? Save and share ? Install REVA JRMSU (or Install page).\n\n" +
+        "If that's missing: DevTools ? Application ? Manifest (fix any errors), " +
         "then hard refresh (Ctrl+Shift+R). Use Chrome or Edge on HTTPS.",
     );
   };
@@ -333,7 +333,7 @@ function LandingPage() {
               >
 
                 {/* =====================================================
-                    HERO CONTENT — REFERENCE DESIGN
+                    HERO CONTENT � REFERENCE DESIGN
                 ====================================================== */}
 
                 <div className="relative mx-auto min-h-[790px] max-w-[1280px] text-center md:min-h-[820px]">
@@ -452,7 +452,7 @@ function LandingPage() {
                     </button>
                   </div>
 
-                  {/* Engineering disciplines — 4 display-only cards with BROWN BORDERS */}
+                  {/* Engineering disciplines � 4 display-only cards with BROWN BORDERS */}
                   <div className="relative z-40 mx-auto mt-10 grid max-w-[1160px] grid-cols-2 gap-4 px-4 md:mt-12 md:grid-cols-4 md:gap-5 md:px-0">
 
                     {/* CIVIL - Brown Border */}
@@ -865,7 +865,7 @@ function LandingPage() {
 
                 <p className="text-gray-700 md:text-[14px] lg:text-base">
 
-                  Use focused review materials for major and qualifying exams
+                  Use focused review materials for major and subjects
                   to strengthen mastery and build exam confidence.
 
                 </p>
@@ -1382,7 +1382,7 @@ function LandingPage() {
             >
 
               <p className="outfit-400">
-                © 2026 REVA – Review Evaluation and Validation Assessment.
+                � 2026 REVA � Review Evaluation and Validation Assessment.
               </p>
 
               <p className="outfit-400">
@@ -1503,3 +1503,9 @@ function LandingPage() {
 }
 
 export default LandingPage;
+
+
+
+
+
+

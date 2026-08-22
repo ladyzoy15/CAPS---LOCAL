@@ -1,4 +1,4 @@
-﻿import React, { useEffect, useState, useRef } from "react";
+import React, { useEffect, useState, useRef } from "react";
 import SortCustomDropdown from "/src/components/sortCustomDropdown";
 import ConfirmModal from "/src/components/confirmModal";
 import LoadingOverlay from "/src/components/loadingOverlay";
@@ -990,7 +990,7 @@ const UserList = () => {
       case 5:
         return "Associate Dean";
       default:
-        return "â€”";
+        return "—";
     }
   };
 
@@ -2305,7 +2305,7 @@ const UserList = () => {
                             ) : (
                               <div className={readOnlyFieldClass}>
                                 <span className="truncate">
-                                  {selectedUser.campus || "â€”"}
+                                  {selectedUser.campus || "—"}
                                 </span>
                               </div>
                             )}
@@ -2336,7 +2336,7 @@ const UserList = () => {
                             ) : (
                               <div className={readOnlyFieldClass}>
                                 <span className="truncate">
-                                  {selectedUser.program || "â€”"}
+                                  {selectedUser.program || "—"}
                                 </span>
                               </div>
                             )}
@@ -2379,7 +2379,7 @@ const UserList = () => {
                                       : "text-red-600"
                                 }`}
                               >
-                                {selectedUser.status || "â€”"}
+                                {selectedUser.status || "—"}
                               </span>
                             </div>
                           </div>
@@ -2751,7 +2751,7 @@ const UserList = () => {
                                 <span>{user.userCode}</span>
                                 {user.email && (
                                   <>
-                                    <span>â€¢</span>
+                                    <span>•</span>
                                     <span className="outfit-400-400 max-w-[200px] truncate">
                                       {user.email}
                                     </span>
@@ -3310,3 +3310,9 @@ const UserList = () => {
 };
 
 export default UserList;
+
+
+
+
+
+

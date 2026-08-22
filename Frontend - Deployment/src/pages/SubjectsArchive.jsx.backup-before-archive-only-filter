@@ -1,0 +1,1246 @@
+import React, { useEffect, useMemo, useState } from "react";
+import { Archive, RotateCcw, Trash2, Search, ChevronDown } from "lucide-react";
+
+function SubjectsArchive() {
+  const apiUrl = import.meta.env.VITE_API_BASE_URL;
+
+  // ============================================================
+  // STATE
+  // ============================================================
+
+  const [subjects, setSubjects] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState("");
+
+  const [searchTerm, setSearchTerm] = useState("");
+  const [selectedYearLevel, setSelectedYearLevel] = useState("All");
+
+  const [selectedSubjects, setSelectedSubjects] = useState([]);
+
+  const [isRestoring, setIsRestoring] = useState(false);
+  const [isDeleting, setIsDeleting] = useState(false);
+
+  const [showDeleteModal, setShowDeleteModal] = useState(false);
+
+  // ============================================================
+  // TOKEN
+  // ============================================================
+
+  const getToken = () => {
+    return sessionStorage.getItem("token");
+  };
+
+  // ============================================================
+  // GENERIC RESPONSE PARSER
+  // ============================================================
+
+  const parseResponse = async (response) => {
+    let data = {};
+
+    try {
+      data = await response.json();
+    } catch {
+      data = {};
+    }
+
+    if (!response.ok) {
+      throw new Error(
+        data?.message ||
+          data?.error ||
+          `Request failed with status ${response.status}.`,
+      );
+    }
+
+    return data;
+  };
+
+  // ============================================================
+  // FETCH ARCHIVED SUBJECTS
+  //
+  // IMPORTANT:
+  // Try the existing archive endpoints first.
+  // This avoids using the missing /subjects/archived route.
+  // ============================================================
+
+  const fetchArchivedSubjects = async () => {
+  setLoading(true);
+  setError("");
+
+  const token = sessionStorage.getItem("token");
+
+  try {
+    const response = await fetch(
+      `${apiUrl}/subjects?archived=true`,
+      {
+        method: "GET",
+        headers: {
+          Accept: "application/json",
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${token}`,
+        },
+      },
+    );
+
+    if (!response.ok) {
+      throw new Error(
+        `HTTP ${response.status}: Failed to fetch archived subjects.`,
+      );
+    }
+
+    const data = await response.json();
+
+    console.log(
+      "Archived subjects response:",
+      data,
+    );
+
+    if (!data.success) {
+      throw new Error(
+        data.message ||
+          "Failed to fetch archived subjects.",
+      );
+    }
+
+    if (!Array.isArray(data.subjects)) {
+      throw new Error(
+        "Invalid archived subjects response.",
+      );
+    }
+
+    const archivedSubjects =
+      data.subjects.filter(
+        (subject) =>
+          subject.isArchived === true ||
+          subject.is_archived === true ||
+          subject.archived === true ||
+          (subject.archived_at !== null && subject.archived_at !== undefined) ||
+          (subject.archivedAt !== null && subject.archivedAt !== undefined) ||
+          subject.status === "archived",
+      );
+
+    setSubjects(
+      archivedSubjects.length > 0
+        ? archivedSubjects
+        : data.subjects,
+    );
+
+    setSelectedSubjects([]);
+  } catch (err) {
+    console.error(
+      "Failed to load archived subjects:",
+      err,
+    );
+
+    setSubjects([]);
+    setSelectedSubjects([]);
+
+    setError(
+      err?.message ||
+        "Failed to load archived subjects.",
+    );
+  } finally {
+    setLoading(false);
+  }
+};
+  // ============================================================
+  // LOAD
+  // ============================================================
+
+  useEffect(() => {
+    fetchArchivedSubjects();
+  }, []);
+
+  // ============================================================
+  // SUBJECT ID
+  // ============================================================
+
+  const getSubjectID = (subject) => {
+    return (
+      subject?.subjectID ??
+      subject?.subject_id ??
+      subject?.id
+    );
+  };
+
+  // ============================================================
+  // YEAR LEVEL
+  // ============================================================
+
+  const getYearLevel = (subject) => {
+    return (
+      subject?.yearLevel ??
+      subject?.year_level ??
+      subject?.yearLevelName ??
+      subject?.year_level_name ??
+      ""
+    );
+  };
+
+  const formatYearLevel = (subject) => {
+    const value = getYearLevel(subject);
+
+    if (!value) {
+      return "—";
+    }
+
+    const text = String(value);
+
+    if (
+      text
+        .toLowerCase()
+        .includes("year")
+    ) {
+      return text;
+    }
+
+    const number = parseInt(text, 10);
+
+    if (!Number.isNaN(number)) {
+      if (number === 1) {
+        return "1st Year";
+      }
+
+      if (number === 2) {
+        return "2nd Year";
+      }
+
+      if (number === 3) {
+        return "3rd Year";
+      }
+
+      return `${number}th Year`;
+    }
+
+    return text;
+  };
+
+  // ============================================================
+  // YEAR LEVEL OPTIONS
+  // ============================================================
+
+  const yearLevelOptions = useMemo(() => {
+    const values = subjects
+      .map((subject) =>
+        String(getYearLevel(subject)),
+      )
+      .filter(Boolean);
+
+    return [
+      "All",
+      ...Array.from(
+        new Set(values),
+      ),
+    ];
+  }, [subjects]);
+
+  // ============================================================
+  // FILTERED SUBJECTS
+  // ============================================================
+
+  const filteredSubjects = useMemo(() => {
+    const search =
+      searchTerm
+        .trim()
+        .toLowerCase();
+
+    return subjects.filter(
+      (subject) => {
+        const subjectName =
+          String(
+            subject?.subjectName ||
+              subject?.name ||
+              "",
+          ).toLowerCase();
+
+        const subjectCode =
+          String(
+            subject?.subjectCode ||
+              subject?.code ||
+              "",
+          ).toLowerCase();
+
+        const programName =
+          String(
+            subject?.programName ||
+              subject?.program ||
+              "",
+          ).toLowerCase();
+
+        const yearLevel =
+          String(
+            getYearLevel(subject),
+          );
+
+        const matchesSearch =
+          !search ||
+          subjectName.includes(search) ||
+          subjectCode.includes(search) ||
+          programName.includes(search);
+
+        const matchesYear =
+          selectedYearLevel === "All" ||
+          yearLevel ===
+            String(
+              selectedYearLevel,
+            );
+
+        return (
+          matchesSearch &&
+          matchesYear
+        );
+      },
+    );
+  }, [
+    subjects,
+    searchTerm,
+    selectedYearLevel,
+  ]);
+
+  // ============================================================
+  // FILTERED IDS
+  // ============================================================
+
+  const filteredIDs = useMemo(() => {
+    return filteredSubjects
+      .map(getSubjectID)
+      .filter(
+        (id) =>
+          id !== undefined &&
+          id !== null,
+      )
+      .map((id) => String(id));
+  }, [filteredSubjects]);
+
+  // ============================================================
+  // SELECTED IDS
+  // ============================================================
+
+  const selectedIDs =
+    selectedSubjects.map((id) =>
+      String(id),
+    );
+
+  // ============================================================
+  // SELECT ALL STATE
+  // ============================================================
+
+  const allSelected =
+    filteredIDs.length > 0 &&
+    filteredIDs.every((id) =>
+      selectedIDs.includes(id),
+    );
+
+  const someSelected =
+    filteredIDs.some((id) =>
+      selectedIDs.includes(id),
+    );
+
+  // ============================================================
+  // SELECT ONE
+  // ============================================================
+
+  const handleSelectSubject = (
+    subjectID,
+    checked,
+  ) => {
+    const id = String(subjectID);
+
+    setSelectedSubjects(
+      (previous) => {
+        const current =
+          previous.map((value) =>
+            String(value),
+          );
+
+        if (checked) {
+          if (
+            current.includes(id)
+          ) {
+            return current;
+          }
+
+          return [
+            ...current,
+            id,
+          ];
+        }
+
+        return current.filter(
+          (value) =>
+            value !== id,
+        );
+      },
+    );
+  };
+
+  // ============================================================
+  // SELECT ALL
+  // ============================================================
+
+  const handleSelectAll = (
+    checked,
+  ) => {
+    if (!checked) {
+      setSelectedSubjects(
+        (previous) =>
+          previous.filter(
+            (id) =>
+              !filteredIDs.includes(
+                String(id),
+              ),
+          ),
+      );
+
+      return;
+    }
+
+    setSelectedSubjects(
+      (previous) => {
+        const merged = [
+          ...previous.map(
+            (id) => String(id),
+          ),
+          ...filteredIDs,
+        ];
+
+        return Array.from(
+          new Set(merged),
+        );
+      },
+    );
+  };
+
+  // ============================================================
+  // RESTORE SUBJECTS
+  // ============================================================
+
+  const handleRestore = async () => {
+    if (
+      selectedSubjects.length ===
+        0 ||
+      isRestoring ||
+      isDeleting
+    ) {
+      return;
+    }
+
+    setIsRestoring(true);
+    setError("");
+
+    const token = getToken();
+
+    try {
+      const failedSubjects = [];
+
+      for (const subjectID of selectedSubjects) {
+        const response =
+          await fetch(
+            `${apiUrl}/subjects/${subjectID}/restore`,
+            {
+              method: "PATCH",
+              headers: {
+                Accept:
+                  "application/json",
+                "Content-Type":
+                  "application/json",
+                ...(token
+                  ? {
+                      Authorization: `Bearer ${token}`,
+                    }
+                  : {}),
+              },
+              credentials:
+                "include",
+            },
+          );
+
+        try {
+          await parseResponse(
+            response,
+          );
+        } catch (err) {
+          console.error(
+            `Failed to restore subject ${subjectID}:`,
+            err,
+          );
+
+          failedSubjects.push(
+            subjectID,
+          );
+        }
+      }
+
+      if (
+        failedSubjects.length >
+        0
+      ) {
+        throw new Error(
+          `Failed to restore ${failedSubjects.length} subject(s).`,
+        );
+      }
+
+      const restoredIDs =
+        selectedSubjects.map(
+          (id) => String(id),
+        );
+
+      setSubjects(
+        (previous) =>
+          previous.filter(
+            (subject) =>
+              !restoredIDs.includes(
+                String(
+                  getSubjectID(
+                    subject,
+                  ),
+                ),
+              ),
+          ),
+      );
+
+      setSelectedSubjects([]);
+
+      window.dispatchEvent(
+        new Event(
+          "refreshSubjectsList",
+        ),
+      );
+    } catch (err) {
+      console.error(
+        "Restore error:",
+        err,
+      );
+
+      setError(
+        err?.message ||
+          "Failed to restore selected subjects.",
+      );
+    } finally {
+      setIsRestoring(false);
+    }
+  };
+
+  // ============================================================
+  // PERMANENT DELETE
+  // ============================================================
+
+  const handlePermanentDelete =
+    async () => {
+      if (
+        selectedSubjects.length ===
+          0 ||
+        isRestoring ||
+        isDeleting
+      ) {
+        return;
+      }
+
+      setIsDeleting(true);
+      setError("");
+
+      const token = getToken();
+
+      try {
+        const failedSubjects = [];
+
+        for (const subjectID of selectedSubjects) {
+          const response =
+            await fetch(
+              `${apiUrl}/subjects/${subjectID}/delete`,
+              {
+                method: "DELETE",
+                headers: {
+                  Accept:
+                    "application/json",
+                  "Content-Type":
+                    "application/json",
+                  ...(token
+                    ? {
+                        Authorization: `Bearer ${token}`,
+                      }
+                    : {}),
+                },
+                credentials:
+                  "include",
+              },
+            );
+
+          try {
+            await parseResponse(
+              response,
+            );
+          } catch (err) {
+            console.error(
+              `Failed to permanently delete subject ${subjectID}:`,
+              err,
+            );
+
+            failedSubjects.push(
+              subjectID,
+            );
+          }
+        }
+
+        if (
+          failedSubjects.length >
+          0
+        ) {
+          throw new Error(
+            `Failed to permanently delete ${failedSubjects.length} subject(s).`,
+          );
+        }
+
+        const deletedIDs =
+          selectedSubjects.map(
+            (id) => String(id),
+          );
+
+        setSubjects(
+          (previous) =>
+            previous.filter(
+              (subject) =>
+                !deletedIDs.includes(
+                  String(
+                    getSubjectID(
+                      subject,
+                    ),
+                  ),
+                ),
+            ),
+        );
+
+        setSelectedSubjects([]);
+
+        setShowDeleteModal(
+          false,
+        );
+
+        window.dispatchEvent(
+          new Event(
+            "refreshSubjectsList",
+          ),
+        );
+      } catch (err) {
+        console.error(
+          "Permanent delete error:",
+          err,
+        );
+
+        setError(
+          err?.message ||
+            "Failed to permanently delete selected subjects.",
+        );
+      } finally {
+        setIsDeleting(false);
+      }
+    };
+
+  // ============================================================
+  // SUBJECT IMAGE
+  // ============================================================
+
+  const getSubjectImage = (
+    subject,
+  ) => {
+    return (
+      subject?.image ||
+      subject?.subjectImage ||
+      subject?.image_url ||
+      subject?.subject_image ||
+      null
+    );
+  };
+
+  // ============================================================
+  // RENDER
+  // ============================================================
+
+  return (
+    <div className="min-h-screen w-full bg-[#fff8ef] px-4 py-6 dark:bg-[#0b0f14] sm:px-6 lg:px-8">
+
+      <div className="mx-auto w-full max-w-6xl pb-32">
+
+        {/* ======================================================
+            TITLE
+        ====================================================== */}
+
+        <div className="mb-7">
+
+          <h1 className="outfit-700 text-2xl font-bold text-gray-900 dark:text-gray-100">
+            Archived Subjects
+          </h1>
+
+        </div>
+
+        {/* ======================================================
+            SEARCH + YEAR LEVEL
+        ====================================================== */}
+
+        <div className="mb-6 flex w-full items-center gap-4">
+
+          <div className="relative min-w-0 flex-1">
+
+            <Search
+              size={18}
+              className="absolute top-1/2 left-3.5 -translate-y-1/2 text-gray-400"
+            />
+
+            <input
+              type="text"
+              value={searchTerm}
+              onChange={(event) =>
+                setSearchTerm(
+                  event.target.value,
+                )
+              }
+              placeholder="Search subjects..."
+              className="outfit-400 h-11 w-full rounded-xl border border-gray-200 bg-white pl-11 pr-4 text-sm text-gray-800 outline-none transition focus:border-orange-400 focus:ring-2 focus:ring-orange-100 dark:border-gray-700 dark:bg-[#11161d] dark:text-gray-100"
+            />
+
+          </div>
+
+          <div className="relative shrink-0">
+
+            <select
+              value={
+                selectedYearLevel
+              }
+              onChange={(event) =>
+                setSelectedYearLevel(
+                  event.target.value,
+                )
+              }
+              className="outfit-400 h-11 min-w-[155px] appearance-none rounded-xl border border-gray-200 bg-white px-4 pr-10 text-sm text-gray-800 outline-none focus:border-orange-400 dark:border-gray-700 dark:bg-[#11161d] dark:text-gray-100"
+            >
+
+              {yearLevelOptions.map(
+                (year) => (
+                  <option
+                    key={year}
+                    value={year}
+                  >
+                    {year === "All"
+                      ? "All Year Levels"
+                      : formatYearLevel(
+                          {
+                            yearLevel:
+                              year,
+                          },
+                        )}
+                  </option>
+                ),
+              )}
+
+            </select>
+
+            <ChevronDown
+              size={17}
+              className="pointer-events-none absolute top-1/2 right-3 -translate-y-1/2 text-gray-500"
+            />
+
+          </div>
+
+        </div>
+
+        {/* ======================================================
+            COUNT
+        ====================================================== */}
+
+        <div className="mb-5 flex items-center justify-between">
+
+          <p className="outfit-400 text-sm text-gray-600 dark:text-gray-400">
+
+            {filteredSubjects.length}{" "}
+            subject(s)
+
+          </p>
+
+          {selectedSubjects.length >
+            0 && (
+            <p className="outfit-500 text-sm font-semibold text-orange-600 dark:text-orange-400">
+
+              {selectedSubjects.length}{" "}
+              selected
+
+            </p>
+          )}
+
+        </div>
+
+        {/* ======================================================
+            ERROR
+        ====================================================== */}
+
+        {error && (
+
+          <div className="mb-5 flex items-center justify-between gap-4 rounded-xl border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-700 dark:border-red-900/50 dark:bg-red-950/20 dark:text-red-300">
+
+            <span>
+              {error}
+            </span>
+
+            <button
+              type="button"
+              onClick={
+                fetchArchivedSubjects
+              }
+              className="shrink-0 font-semibold underline"
+            >
+              Retry
+            </button>
+
+          </div>
+
+        )}
+
+        {/* ======================================================
+            LOADING
+        ====================================================== */}
+
+        {loading ? (
+
+          <div className="rounded-xl border border-gray-200 bg-white px-6 py-16 text-center dark:border-gray-700 dark:bg-[#11161d]">
+
+            <div className="mx-auto mb-3 h-8 w-8 animate-spin rounded-full border-2 border-orange-200 border-t-orange-500" />
+
+            <p className="text-sm text-gray-400">
+              Loading archived subjects...
+            </p>
+
+          </div>
+
+        ) : filteredSubjects.length ===
+          0 ? (
+
+          /* ====================================================
+             EMPTY
+          ==================================================== */
+
+          <div className="rounded-xl border border-dashed border-gray-300 bg-white px-6 py-16 text-center dark:border-gray-700 dark:bg-[#11161d]">
+
+            <Archive
+              size={40}
+              className="mx-auto mb-3 text-gray-300 dark:text-gray-600"
+            />
+
+            <p className="font-semibold text-gray-600 dark:text-gray-300">
+              No archived subjects.
+            </p>
+
+            <p className="mt-1 text-sm text-gray-400">
+              Subjects that you archive
+              will appear here.
+            </p>
+
+          </div>
+
+        ) : (
+
+          /* ====================================================
+             SUBJECT TABLE
+          ==================================================== */
+
+          <div className="overflow-hidden rounded-xl border border-gray-200 bg-white dark:border-gray-700 dark:bg-[#11161d]">
+
+            <div className="overflow-x-auto">
+
+              <table className="w-full">
+
+                <thead className="border-b border-gray-200 dark:border-gray-700">
+
+                  <tr>
+
+                    {/* SELECT ALL */}
+
+                    <th className="w-16 px-4 py-4 text-center">
+
+                      <input
+                        type="checkbox"
+                        checked={
+                          allSelected
+                        }
+                        ref={(element) => {
+                          if (element) {
+                            element.indeterminate =
+                              someSelected &&
+                              !allSelected;
+                          }
+                        }}
+                        onChange={(
+                          event,
+                        ) =>
+                          handleSelectAll(
+                            event.target
+                              .checked,
+                          )
+                        }
+                        className="h-4 w-4 cursor-pointer rounded border-gray-400 text-orange-500 focus:ring-orange-500"
+                        aria-label="Select all subjects"
+                      />
+
+                    </th>
+
+                    {/* ONLY ONE COLUMN */}
+                    {/* NO ACTIONS COLUMN */}
+
+                    <th className="px-4 py-4 text-left text-sm font-semibold text-gray-900 dark:text-gray-100">
+
+                      Subject Information
+
+                    </th>
+
+                  </tr>
+
+                </thead>
+
+                <tbody className="divide-y divide-gray-200 dark:divide-gray-700">
+
+                  {filteredSubjects.map(
+                    (subject) => {
+                      const subjectID =
+                        getSubjectID(
+                          subject,
+                        );
+
+                      const isSelected =
+                        selectedIDs.includes(
+                          String(
+                            subjectID,
+                          ),
+                        );
+
+                      const image =
+                        getSubjectImage(
+                          subject,
+                        );
+
+                      return (
+
+                        <tr
+                          key={
+                            subjectID
+                          }
+                          className={`transition-colors ${
+                            isSelected
+                              ? "bg-orange-50/60 dark:bg-orange-500/5"
+                              : "hover:bg-gray-50 dark:hover:bg-white/[0.02]"
+                          }`}
+                        >
+
+                          {/* CHECKBOX */}
+
+                          <td className="w-16 px-4 py-4 text-center align-middle">
+
+                            <input
+                              type="checkbox"
+                              checked={
+                                isSelected
+                              }
+                              onChange={(
+                                event,
+                              ) =>
+                                handleSelectSubject(
+                                  subjectID,
+                                  event
+                                    .target
+                                    .checked,
+                                )
+                              }
+                              className="h-4 w-4 cursor-pointer rounded border-gray-400 text-orange-500 focus:ring-orange-500"
+                            />
+
+                          </td>
+
+                          {/* SUBJECT INFO */}
+
+                          <td className="px-4 py-4">
+
+                            <div className="flex items-center gap-3">
+
+                              {/* IMAGE */}
+
+                              <div className="flex h-10 w-10 shrink-0 items-center justify-center overflow-hidden rounded-lg bg-gray-100 dark:bg-gray-800">
+
+                                {image ? (
+
+                                  <img
+                                    src={
+                                      image
+                                    }
+                                    alt=""
+                                    className="h-full w-full object-cover"
+                                  />
+
+                                ) : (
+
+                                  <Archive
+                                    size={20}
+                                    className="text-gray-400"
+                                  />
+
+                                )}
+
+                              </div>
+
+                              {/* TEXT */}
+
+                              <div className="min-w-0">
+
+                                <p className="outfit-600 truncate text-sm font-semibold text-gray-900 dark:text-gray-100">
+
+                                  {subject.subjectName ||
+                                    subject.name ||
+                                    "Unnamed Subject"}
+
+                                </p>
+
+                                <p className="mt-0.5 text-xs text-gray-500 dark:text-gray-400">
+
+                                  {subject.subjectCode ||
+                                    subject.code ||
+                                    "—"}
+
+                                  <span className="mx-2">
+                                    •
+                                  </span>
+
+                                  {formatYearLevel(
+                                    subject,
+                                  )}
+
+                                </p>
+
+                              </div>
+
+                            </div>
+
+                          </td>
+
+                        </tr>
+
+                      );
+                    },
+                  )}
+
+                </tbody>
+
+              </table>
+
+            </div>
+
+          </div>
+
+        )}
+
+      </div>
+
+      {/* ========================================================
+          BOTTOM ACTION BAR
+          ALWAYS VISIBLE
+      ======================================================== */}
+
+      <div className="fixed right-0 bottom-0 left-0 z-40 border-t border-gray-200 bg-white/95 px-4 py-3 shadow-[0_-4px_20px_rgba(0,0,0,0.08)] backdrop-blur-md dark:border-gray-700 dark:bg-[#11161d]/95">
+
+        <div className="mx-auto flex w-full max-w-6xl items-center justify-between gap-4">
+
+          {/* LEFT */}
+
+          <div>
+
+            <p className="outfit-600 text-sm font-semibold text-gray-900 dark:text-gray-100">
+
+              {selectedSubjects.length}{" "}
+              selected
+
+            </p>
+
+            <p className="hidden text-xs text-gray-500 sm:block dark:text-gray-400">
+
+              Select one or more subjects
+              to take action.
+
+            </p>
+
+          </div>
+
+          {/* RIGHT BUTTONS */}
+
+          <div className="flex items-center gap-2">
+
+            {/* RESTORE */}
+
+            <button
+              type="button"
+              onClick={
+                handleRestore
+              }
+              disabled={
+                selectedSubjects.length ===
+                  0 ||
+                isRestoring ||
+                isDeleting
+              }
+              className="flex items-center gap-2 rounded-lg border border-green-500 bg-green-500 px-4 py-2.5 text-sm font-semibold text-white transition hover:bg-green-600 disabled:cursor-not-allowed disabled:border-green-200 disabled:bg-green-100 disabled:text-green-400"
+            >
+
+              <RotateCcw
+                size={17}
+              />
+
+              <span>
+                {isRestoring
+                  ? "Restoring..."
+                  : "Restore"}
+              </span>
+
+            </button>
+
+            {/* PERMANENT DELETE */}
+
+            <button
+              type="button"
+              onClick={() =>
+                setShowDeleteModal(
+                  true,
+                )
+              }
+              disabled={
+                selectedSubjects.length ===
+                  0 ||
+                isRestoring ||
+                isDeleting
+              }
+              className="flex items-center gap-2 rounded-lg border border-red-500 bg-red-500 px-4 py-2.5 text-sm font-semibold text-white transition hover:bg-red-600 disabled:cursor-not-allowed disabled:border-red-200 disabled:bg-red-100 disabled:text-red-400"
+            >
+
+              <Trash2
+                size={17}
+              />
+
+              <span>
+                Permanently Delete
+              </span>
+
+            </button>
+
+          </div>
+
+        </div>
+
+      </div>
+
+      {/* ========================================================
+          DELETE CONFIRMATION MODAL
+      ======================================================== */}
+
+      {showDeleteModal && (
+
+        <div className="fixed inset-0 z-[100] flex items-center justify-center bg-black/40 px-4 backdrop-blur-sm">
+
+          <div className="w-full max-w-md rounded-2xl bg-white p-6 shadow-2xl dark:bg-[#11161d]">
+
+            <div className="mb-4 flex items-center gap-3">
+
+              <div className="flex h-11 w-11 items-center justify-center rounded-full bg-red-100 text-red-600 dark:bg-red-500/10 dark:text-red-400">
+
+                <Trash2
+                  size={22}
+                />
+
+              </div>
+
+              <div>
+
+                <h2 className="text-lg font-semibold text-gray-900 dark:text-gray-100">
+
+                  Permanently Delete?
+
+                </h2>
+
+                <p className="text-sm text-gray-500 dark:text-gray-400">
+
+                  This action cannot be undone.
+
+                </p>
+
+              </div>
+
+            </div>
+
+            <p className="mb-6 text-sm leading-6 text-gray-600 dark:text-gray-300">
+
+              Are you sure you want to
+              permanently delete{" "}
+
+              <strong className="text-gray-900 dark:text-gray-100">
+
+                {selectedSubjects.length}{" "}
+                subject
+                {selectedSubjects.length !==
+                1
+                  ? "s"
+                  : ""}
+
+              </strong>
+
+              ?
+
+            </p>
+
+            <div className="flex justify-end gap-2">
+
+              <button
+                type="button"
+                onClick={() =>
+                  setShowDeleteModal(
+                    false,
+                  )
+                }
+                disabled={
+                  isDeleting
+                }
+                className="rounded-lg bg-gray-100 px-4 py-2.5 text-sm font-semibold text-gray-700 hover:bg-gray-200 disabled:opacity-50 dark:bg-gray-800 dark:text-gray-200 dark:hover:bg-gray-700"
+              >
+                Cancel
+              </button>
+
+              <button
+                type="button"
+                onClick={
+                  handlePermanentDelete
+                }
+                disabled={
+                  isDeleting
+                }
+                className="flex items-center gap-2 rounded-lg bg-red-600 px-4 py-2.5 text-sm font-semibold text-white hover:bg-red-700 disabled:cursor-not-allowed disabled:opacity-50"
+              >
+
+                <Trash2
+                  size={17}
+                />
+
+                {isDeleting
+                  ? "Deleting..."
+                  : "Permanently Delete"}
+
+              </button>
+
+            </div>
+
+          </div>
+
+        </div>
+
+      )}
+
+    </div>
+  );
+}
+
+export default SubjectsArchive;
+
+
+
+
+
+

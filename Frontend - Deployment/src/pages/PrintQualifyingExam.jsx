@@ -959,7 +959,7 @@ export default function PrintQualifyingExam() {
                         COLLEGE OF ENGINEERING
                       </div>
                       <div className="pdf-header mt-2 text-[13.33px] leading-tight font-extrabold uppercase">
-                        QUALIFYING EXAMINATION
+                        Qualifying Examination
                       </div>
                     </div>
 
@@ -1472,7 +1472,7 @@ export default function PrintQualifyingExam() {
                     COLLEGE OF ENGINEERING
                   </div>
                   <div className="pdf-header mt-2 text-[13.33px] leading-tight font-extrabold uppercase">
-                    QUALIFYING EXAMINATION
+                    Qualifying Examination
                   </div>
                 </div>
 
@@ -1783,7 +1783,7 @@ export default function PrintQualifyingExam() {
           <div className="mb-4 hidden space-y-2 text-sm text-gray-700 min-[1200px]:block">
             {subjects && subjects.length > 0 && (
               <div>
-                <span className="mb-1 text-[14px] font-medium">Subjects:</span>
+                <span className="mb-1 text-[14px] font-medium">subjects:</span>
                 <div className="ml-2">
                   {subjects.map((subject, idx) => (
                     <div key={idx} className="text-[14px]">
@@ -1859,3 +1859,10 @@ export default function PrintQualifyingExam() {
     </div>
   );
 }
+
+
+
+
+
+
+

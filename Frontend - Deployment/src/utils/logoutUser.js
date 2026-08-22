@@ -9,3 +9,9 @@ export function logoutUser(showToast, navigate, message) {
     window.location.reload();
   }, 500); // Adjust delay as needed to match your toast duration
 }
+
+
+
+
+
+

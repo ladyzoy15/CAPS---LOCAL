@@ -979,3 +979,8 @@ const QuizResultsTable = ({ classPersonalQuizID, personalQuizID }) => {
 };
 
 export default QuizResultsTable;
+
+
+
+
+

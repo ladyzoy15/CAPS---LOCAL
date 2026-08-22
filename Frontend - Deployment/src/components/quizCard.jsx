@@ -505,3 +505,9 @@ const QuizCard = ({
 };
 
 export default QuizCard;
+
+
+
+
+
+

@@ -14,3 +14,9 @@ const Button = ({ text, textres, icon, onClick, className, type }) => {
 };
 
 export default Button;
+
+
+
+
+
+

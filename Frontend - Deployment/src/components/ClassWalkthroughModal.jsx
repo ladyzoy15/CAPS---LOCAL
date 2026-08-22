@@ -198,3 +198,8 @@ const ClassWalkthroughModal = ({ onClose }) => {
 };
 
 export default ClassWalkthroughModal;
+
+
+
+
+

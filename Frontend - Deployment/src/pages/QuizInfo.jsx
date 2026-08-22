@@ -778,3 +778,9 @@ const QuizInfo = () => {
 };
 
 export default QuizInfo;
+
+
+
+
+
+

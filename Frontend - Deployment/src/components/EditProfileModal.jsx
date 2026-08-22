@@ -140,3 +140,8 @@ const EditProfileModal = ({ isOpen, onClose }) => {
 };
 
 export default EditProfileModal;
+
+
+
+
+

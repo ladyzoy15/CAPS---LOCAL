@@ -1,4 +1,4 @@
-﻿import React, { useEffect, useState } from "react";
+import React, { useEffect, useState } from "react";
 import { useNavigate, useLocation } from "react-router-dom";
 import ExamResultsTable from "../components/ExamResultsTable";
 import { Textfit } from "react-textfit";
@@ -377,7 +377,7 @@ const SubjectOverview = () => {
                 <i className="bx bx-book text-[16px]d mt-[1px]"></i>
                 <p className="outfit-400 text-[12px]">{subject.subjectCode}</p>
                 <span className="mx-1 align-middle leading-none text-gray-400">
-                  â€¢
+                  •
                 </span>
                 <p className="outfit-400 text-[12px]">
                   {subject.programName === "GE"
@@ -385,7 +385,7 @@ const SubjectOverview = () => {
                     : subject.programName || "-"}
                 </p>
                 <span className="mx-1 align-middle leading-none text-gray-400">
-                  â€¢
+                  •
                 </span>
                 <p className="outfit-400 text-[12px]">
                   {subject.yearLevel || "-"}
@@ -414,7 +414,7 @@ const SubjectOverview = () => {
 
                 <p className="outfit-400 text-[14px]">{subject.subjectCode}</p>
                 <span className="mx-1 mt-[1.5px] align-middle leading-none text-gray-400">
-                  â€¢
+                  •
                 </span>
                 <p className="outfit-400 text-[14px]">
                   {subject.programName === "GE"
@@ -422,7 +422,7 @@ const SubjectOverview = () => {
                     : subject.programName || "-"}
                 </p>
                 <span className="mx-1 mt-[1.5px] align-middle leading-none text-gray-400">
-                  â€¢
+                  •
                 </span>
                 <p className="outfit-400 text-[14px]">
                   {subject.yearLevel || "-"}
@@ -535,7 +535,7 @@ const SubjectOverview = () => {
                 <i className="bx bx-book mt-[1px] text-[16px]"></i>
                 <p className="outfit-400 text-[14px]">{subject.subjectCode}</p>
                 <span className="mx-1 mt-[2px] align-middle leading-none text-gray-400">
-                  â€¢
+                  •
                 </span>
                 <i className="bx bx-cog mt-[1px] text-[16px]"></i>
                 <p className="outfit-400 text-[14px]">
@@ -544,7 +544,7 @@ const SubjectOverview = () => {
                     : subject.programName || "-"}
                 </p>
                 <span className="mx-1 mt-[2px] align-middle leading-none text-gray-400">
-                  â€¢
+                  •
                 </span>
                 <i className="bx bx-people-diversity mt-[1px] text-[16px]"></i>
                 <p className="outfit-400 text-[14px]">
@@ -555,28 +555,6 @@ const SubjectOverview = () => {
               {/* Bottom left buttons */}
               {!isFaculty && (
                 <div className="absolute bottom-4 left-4 flex gap-2">
-                  <button
-                    className="border-color flex cursor-pointer items-center gap-2 rounded-xl border bg-white px-4 py-2 text-[14px] font-medium text-gray-700 transition hover:bg-gray-100"
-                    onClick={handleWorksheetClick}
-                  >
-                    <svg
-                      xmlns="http://www.w3.org/2000/svg"
-                      width="16"
-                      height="16"
-                      viewBox="0 0 24 24"
-                      fill="none"
-                      stroke="currentColor"
-                      strokeWidth="2.25"
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                      className="lucide lucide-download-icon lucide-download"
-                    >
-                      <path d="M12 15V3" />
-                      <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" />
-                      <path d="m7 10 5 5 5-5" />
-                    </svg>
-                    <span className="outfit-500">Worksheet</span>
-                  </button>
                   <button
                     className="border-color flex cursor-pointer items-center gap-2 rounded-xl border bg-white px-4 py-2 text-[14px] font-medium text-gray-700 transition hover:bg-gray-100"
                     onClick={handleEditClick}
@@ -963,4 +941,11 @@ const SubjectOverview = () => {
 };
 
 export default SubjectOverview;
+
+
+
+
+
+
+
 

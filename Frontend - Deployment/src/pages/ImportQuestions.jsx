@@ -190,7 +190,7 @@ const ImportQuestions = () => {
 
   // Destination selection
   const [subjects, setSubjects] = useState([]);
-  const [isSubjectsLoading, setIsSubjectsLoading] = useState(false);
+  const [isSubjectsLoading, setisSubjectsLoading] = useState(false);
   const [selectedSubjectId, setSelectedSubjectId] = useState("");
 
   const fileInputRef = useRef(null);
@@ -201,7 +201,7 @@ const ImportQuestions = () => {
   // Fetch subjects so the user can pick the destination subject before importing
   useEffect(() => {
     const fetchSubjects = async () => {
-      setIsSubjectsLoading(true);
+      setisSubjectsLoading(true);
       try {
         const token = sessionStorage.getItem("token");
         const response = await fetch(
@@ -232,7 +232,7 @@ const ImportQuestions = () => {
       } catch (err) {
         console.error("Error loading subjects:", err);
       } finally {
-        setIsSubjectsLoading(false);
+        setisSubjectsLoading(false);
       }
     };
 
@@ -327,7 +327,7 @@ const ImportQuestions = () => {
     e.target.value = "";
   };
 
-  // Saves every detected line straight to the Subject question bank
+  // Saves every detected line straight to the Qualifying Exam Question bank
   // (mirrors the "Subject-based" path used by AddQuestionForm), then jumps
   // into that subject's page to show the result.
   const handleImport = async (linesToImport) => {
@@ -541,3 +541,8 @@ const ImportQuestions = () => {
 };
 
 export default ImportQuestions;
+
+
+
+
+

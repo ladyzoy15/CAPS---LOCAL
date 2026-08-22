@@ -16,6 +16,7 @@ import notFoundImage from "../assets/icons/notfound.png";
 import noInternetImage from "../assets/icons/404notfound.png";
 import emptyImage from "../assets/icons/empty.png";
 import AdminContent from "./AdminContent";
+import { getToken } from "../utils/authStorage";
 
 import ReportsIcon from "/src/assets/symbols/reports.svg";
 
@@ -211,7 +212,7 @@ function SubjectList() {
   ]);
 
   const [subjects, setSubjects] = useState([]);
-  const [filteredSubjects, setFilteredSubjects] = useState([]);
+  const [filteredSubjects, setfilteredSubjects] = useState([]);
   const [selectedProgramFilter, setSelectedProgramFilter] = useState("All");
   const [subjectLoading, setSubjectLoading] = useState(false);
   const [networkError, setNetworkError] = useState(false);
@@ -381,7 +382,7 @@ function SubjectList() {
       );
     }
 
-    setFilteredSubjects(filtered);
+    setfilteredSubjects(filtered);
   }, [selectedProgramFilter, selectedYearLevelFilter, subjects, searchTerm]);
 
   // Fetch subjects
@@ -440,7 +441,11 @@ function SubjectList() {
         return;
       }
 
-      const sortedSubjects = [...subjectsArray].sort((a, b) => {
+      const activeSubjectsArray = subjectsArray.filter(
+        (subject) => subject && !subject.archived_at
+      );
+
+      const sortedSubjects = [...activeSubjectsArray].sort((a, b) => {
         // First sort by program name
         const programCompare = (a.programName || "").localeCompare(
           b.programName || "",
@@ -461,7 +466,7 @@ function SubjectList() {
       }
 
       setSubjects(sortedSubjects);
-      setFilteredSubjects(sortedSubjects);
+      setfilteredSubjects(sortedSubjects);
     } catch (error) {
       if (error instanceof TypeError) {
         setNetworkError(true);
@@ -474,7 +479,7 @@ function SubjectList() {
   // Fetch programs and year levels
   useEffect(() => {
     const fetchPrograms = async () => {
-      const token = sessionStorage.getItem("token");
+      const token = getToken();
 
       try {
         const res = await fetch(`${apiUrl}/programs`, {
@@ -689,9 +694,9 @@ function SubjectList() {
 
     try {
       const response = await fetch(
-        `${apiUrl}/subjects/${subjectToDelete.subjectID}/delete`,
+        `${apiUrl}/subjects/${subjectToDelete.subjectID}/archive`,
         {
-          method: "DELETE",
+          method: "PATCH",
           headers: {
             "Content-Type": "application/json",
             Authorization: `Bearer ${token}`,
@@ -865,7 +870,7 @@ function SubjectList() {
                       </>
                     ) : selectedProgramFilter === "All" ? (
                       <>
-                        Qualifying exam
+                        Subject
                         <span className="hidden md:inline">
                           {" "}
                           ({filteredSubjects.length})
@@ -1019,7 +1024,7 @@ function SubjectList() {
               </div>
             </div>
 
-            {/* Subjects List */}
+            {/* subjects List */}
             <div className="md:px-4">
               {subjectLoading ? (
                 <div className="outfit-400 flex h-64 items-center justify-center">
@@ -1101,7 +1106,7 @@ function SubjectList() {
                             )}
                           </div>
 
-                          {/* Subjects Grid for this Program */}
+                          {/* subjects Grid for this Program */}
                           <div className="mt-4 grid grid-cols-1 space-y-2 space-x-2 px-2 md:grid-cols-[repeat(auto-fill,minmax(20rem,20rem))] md:gap-2 lg:px-4">
                             {programSubjects.map((subject) => {
                               const headerBackground = getHeaderBackground(
@@ -2079,6 +2084,24 @@ function SubjectList() {
 }
 
 export default SubjectList;
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 

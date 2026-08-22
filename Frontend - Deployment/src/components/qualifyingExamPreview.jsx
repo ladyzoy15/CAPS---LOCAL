@@ -368,7 +368,7 @@ export default function ExamPreviewModal({ previewData, onClose, loading }) {
                   </div>
 
                   <div className="mt-2 text-[13.33px] leading-tight font-extrabold uppercase">
-                    QUALIFYING EXAMINATION
+                    Qualifying Examination
                   </div>
                 </div>
                 {/* Right Logo */}
@@ -638,3 +638,10 @@ export default function ExamPreviewModal({ previewData, onClose, loading }) {
     </div>
   );
 }
+
+
+
+
+
+
+

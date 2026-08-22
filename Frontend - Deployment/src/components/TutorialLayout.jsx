@@ -13,7 +13,7 @@ import {
   TimerSection,
   ScoresSection,
   AnalyticsSection,
-  SubjectSelectionSection,
+  subjectSelectionSection,
   ClassesOverviewSection,
   CreatingClassSection,
   JoiningClassSection,
@@ -54,7 +54,7 @@ const SECTION_MAP = {
   timer: TimerSection,
   scores: ScoresSection,
   analytics: AnalyticsSection,
-  "subject-selection": SubjectSelectionSection,
+  "subject-selection": subjectSelectionSection,
   "classes-overview": ClassesOverviewSection,
   "creating-class": CreatingClassSection,
   "joining-class": JoiningClassSection,
@@ -451,3 +451,9 @@ const TutorialLayout = () => {
 };
 
 export default TutorialLayout;
+
+
+
+
+
+

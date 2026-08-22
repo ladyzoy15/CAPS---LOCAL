@@ -283,7 +283,7 @@ const ImportQuestionModal = ({
                     : "text-gray-500 hover:text-gray-700"
                 }`}
               >
-                {tab === "qualifying" ? "Qualifying Exam" : "Practice Exam"}
+                {tab === "qualifying" ? "Subject" : "Practice Exam"}
               </button>
             ))}
           </div>
@@ -317,7 +317,7 @@ const ImportQuestionModal = ({
               <div className="py-10 text-center text-sm text-gray-500">
                 {searchQuery
                   ? "No questions match your search."
-                  : `No ${activeTab === "qualifying" ? "qualifying exam" : "practice exam"} questions for this subject.`}
+                  : `No ${activeTab === "qualifying" ? "Subject" : "practice exam"} questions for this subject.`}
               </div>
             ) : (
               <>
@@ -439,3 +439,11 @@ const ImportQuestionModal = ({
 };
 
 export default ImportQuestionModal;
+
+
+
+
+
+
+
+
