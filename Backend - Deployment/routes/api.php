@@ -328,11 +328,21 @@ Route::middleware(['auth:sanctum', 'role:4,5'])->group(function () {
     Route::patch('/users/{userID}/credentials', [UserController::class, 'updateUserCredentials']);
 
     // Subject management
-    Route::post('/add-subjects', [SubjectController::class, 'store']);
-    Route::get('/subjects/archived', [SubjectController::class, 'archived']);
-    Route::delete('/subjects/{subjectID}/delete', [SubjectController::class, 'destroy']);
-    Route::delete('/subjects/{subjectID}/permanent-delete', [SubjectController::class, 'permanentDelete']);
-    Route::put('/subjects/{subjectID}/update', [SubjectController::class, 'update']);
+  // Subject management
+
+// Subject management
+
+Route::post('/add-subjects', [SubjectController::class, 'store']);
+
+Route::get('/subjects/archived', [SubjectController::class, 'archived']);
+
+Route::patch('/subjects/{subjectID}/archive', [SubjectController::class, 'destroy']);
+
+Route::patch('/subjects/{subjectID}/restore', [SubjectController::class, 'restore']);
+
+Route::delete('/subjects/{subjectID}/permanent-delete', [SubjectController::class, 'permanentDelete']);
+
+Route::put('/subjects/{subjectID}/update', [SubjectController::class, 'update']);
 
     // User deletion (Dean and Associate Dean only)
     Route::delete('/users/{userID}', [UserController::class, 'deleteUser']);

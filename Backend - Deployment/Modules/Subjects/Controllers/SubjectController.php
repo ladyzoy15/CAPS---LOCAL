@@ -88,17 +88,18 @@ class SubjectController extends Controller
 
             // Get subjects based on role
             $query = DB::table('subjects as s')
-                ->join('programs as p', 'p.programID', '=', 's.programID')
-                ->join('year_levels as yl', 'yl.yearLevelID', '=', 's.yearLevelID')
-                ->select(
-                    's.subjectID',
-                    's.subjectCode',
-                    's.subjectName',
-                    's.programID',
-                    'p.programName',
-                    's.yearLevelID',
-                    'yl.name as yearLevel'
-                );
+            ->join('programs as p', 'p.programID', '=', 's.programID')
+            ->join('year_levels as yl', 'yl.yearLevelID', '=', 's.yearLevelID')
+            ->whereNull('s.archived_at')
+            ->select(
+                's.subjectID',
+                's.subjectCode',
+                's.subjectName',
+                's.programID',
+                 'p.programName',
+                 's.yearLevelID',
+                 'yl.name as yearLevel'
+    );
 
             // Add subquery to get last question added date by any faculty (roleID 2) for this subject
             // This applies to all roles (1,2,3,4,5)
@@ -197,18 +198,19 @@ class SubjectController extends Controller
                 ], 401);
             }
 
-            $subjects = DB::table('subjects as s')
-                ->leftJoin('programs as p', 'p.programID', '=', 's.programID')
-                ->leftJoin('year_levels as yl', 'yl.yearLevelID', '=', 's.yearLevelID')
-                ->select(
-                    's.subjectID',
-                    's.subjectCode',
-                    's.subjectName',
-                    's.programID',
-                    'p.programName',
-                    's.yearLevelID',
-                    'yl.name as yearLevel'
-                )
+          $subjects = DB::table('subjects as s')
+    ->leftJoin('programs as p', 'p.programID', '=', 's.programID')
+    ->leftJoin('year_levels as yl', 'yl.yearLevelID', '=', 's.yearLevelID')
+    ->whereNull('s.archived_at')
+    ->select(
+        's.subjectID',
+        's.subjectCode',
+        's.subjectName',
+        's.programID',
+        'p.programName',
+        's.yearLevelID',
+        'yl.name as yearLevel'
+    )
                 ->addSelect(DB::raw("(
                     SELECT MAX(q.created_at) 
                     FROM questions q
@@ -456,78 +458,61 @@ class SubjectController extends Controller
         ];
     }
 
-    /**
-     * Delete a subject. Only accessible by the Dean.
-     */
-    public function destroy($subjectID)
-    {
-        $user = Auth::user();
+   /**
+ * Archive a subject.
+ * Only accessible by the Dean or Associate Dean.
+ */
+public function destroy($subjectID)
+{
+    $user = Auth::user();
 
-        // Only Dean or Associate Dean can delete subjects
-        if (!in_array($user->roleID, [4, 5])) {
-            return response()->json([
-                'message' => 'Unauthorized. Only the Dean or Associate Dean can delete subjects.'
-            ], 403);
-        }
-
-        $subject = Subject::where('subjectID', $subjectID)->first();
-
-        if (!$subject) {
-            return response()->json([
-                'message' => 'Subject not found.'
-            ], status: 404);
-        }
-
-        try {
-            // Delete subject
-            $subject->delete();
-
-            return response()->json([
-                'message' => 'Subject deleted successfully.'
-            ], 200);
-        } catch (\Exception $e) {
-            return response()->json([
-                'message' => 'Failed to delete subject.'
-            ], 500);
-        }
+    // Only Dean or Associate Dean can archive subjects
+    if (!$user || !in_array($user->roleID, [4, 5])) {
+        return response()->json([
+            'success' => false,
+            'message' => 'Unauthorized. Only the Dean or Associate Dean can archive subjects.'
+        ], 403);
     }
 
-    /**
-     * Archive a subject. Only accessible by the Dean or Associate Dean.
-     */
-    public function archive($subjectID)
-    {
-        $user = Auth::user();
+    $subject = Subject::where('subjectID', $subjectID)->first();
 
-        if (!$user || !in_array($user->roleID, [4, 5])) {
-            return response()->json([
-                'message' => 'Unauthorized.'
-            ], 403);
-        }
-
-        $subject = Subject::where('subjectID', $subjectID)->first();
-
-        if (!$subject) {
-            return response()->json([
-                'message' => 'Subject not found.'
-            ], 404);
-        }
-
-        try {
-            $subject->archived_at = now();
-            $subject->save();
-
-            return response()->json([
-                'success' => true,
-                'message' => 'Subject archived successfully.'
-            ], 200);
-        } catch (\Exception $e) {
-            return response()->json([
-                'success' => false,
-                'message' => 'Failed to archive subject.'
-            ], 500);
-        }
+    if (!$subject) {
+        return response()->json([
+            'success' => false,
+            'message' => 'Subject not found.'
+        ], 404);
     }
+
+    // Check if already archived
+    if ($subject->archived_at !== null) {
+        return response()->json([
+            'success' => false,
+            'message' => 'Subject is already archived.'
+        ], 409);
+    }
+
+    try {
+        // Move subject to archive
+        $subject->archived_at = now();
+        $subject->save();
+
+        return response()->json([
+            'success' => true,
+            'message' => 'Subject moved to archive successfully.'
+        ], 200);
+
+    } catch (\Exception $e) {
+        Log::error('Failed to archive subject', [
+            'subjectID' => $subjectID,
+            'error' => $e->getMessage()
+        ]);
+
+        return response()->json([
+            'success' => false,
+            'message' => 'Failed to archive subject.'
+        ], 500);
+    }
+}
     /**
      * Get subjects for the student's program (including GE subjects) that have practice exam settings.
      * Returns whether each subject is enabled for practice exams and the configured question count.
@@ -659,18 +644,19 @@ class SubjectController extends Controller
                 ], 403);
             }
 
-            $query = DB::table('subjects as s')
-                ->join('programs as p', 's.programID', '=', 'p.programID')
-                ->join('year_levels as yl', 'yl.yearLevelID', '=', 's.yearLevelID')
-                ->select(
-                    's.subjectID',
-                    's.subjectCode',
-                    's.subjectName',
-                    's.programID',
-                    'p.programName',
-                    's.yearLevelID',
-                    'yl.name as yearLevel'
-                );
+          $query = DB::table('subjects as s')
+    ->join('programs as p', 'p.programID', '=', 's.programID')
+    ->join('year_levels as yl', 'yl.yearLevelID', '=', 's.yearLevelID')
+    ->whereNull('s.archived_at')
+    ->select(
+        's.subjectID',
+        's.subjectCode',
+        's.subjectName',
+        's.programID',
+        'p.programName',
+        's.yearLevelID',
+        'yl.name as yearLevel'
+    );
 
             // Faculty (2) and Program Chair (3): only their own program's subjects
             // + General Education (GE) subjects. Dean (4) / Associate Dean (5): all.
@@ -797,39 +783,179 @@ class SubjectController extends Controller
         }
     }
 
-    /**
-     * Get all archived subjects.
-     * Only accessible by the Dean or Associate Dean.
-     */
-    public function archived()
-    {
-        $user = Auth::user();
+     /**
+ * Get all archived subjects.
+ * Only accessible by the Dean or Associate Dean.
+ */
+public function archived()
+{
+    $user = Auth::user();
 
-        if (!$user || !in_array($user->roleID, [4, 5])) {
-            return response()->json([
-                'success' => false,
-                'message' => 'Unauthorized.'
-            ], 403);
-        }
+    if (!$user || !in_array($user->roleID, [4, 5])) {
+        return response()->json([
+            'success' => false,
+            'message' => 'Unauthorized.'
+        ], 403);
+    }
 
-        try {
-            $subjects = Subject::whereNotNull('archived_at')
-                ->orderByDesc('archived_at')
-                ->get();
+    try {
+        $subjects = Subject::whereNotNull('archived_at')
+            ->orderByDesc('archived_at')
+            ->get();
 
-            return response()->json([
-                'success' => true,
-                'subjects' => $subjects
-            ], 200);
+        return response()->json([
+            'success' => true,
+            'subjects' => $subjects
+        ], 200);
 
-        } catch (\Exception $e) {
-            return response()->json([
-                'success' => false,
-                'message' => 'Failed to load archived subjects.'
-            ], 500);
-        }
+    } catch (\Exception $e) {
+        return response()->json([
+            'success' => false,
+            'message' => 'Failed to load archived subjects.'
+        ], 500);
     }
 }
 
+/**
+ * Permanently delete an archived subject.
+ * Only accessible by the Dean or Associate Dean.
+ */
+public function permanentDelete($subjectID)
+{
+    $user = Auth::user();
 
+    if (!$user || !in_array($user->roleID, [4, 5])) {
+        return response()->json([
+            'success' => false,
+            'message' => 'Unauthorized.'
+        ], 403);
+    }
 
+    $subject = Subject::where('subjectID', $subjectID)
+        ->whereNotNull('archived_at')
+        ->first();
+
+    if (!$subject) {
+        return response()->json([
+            'success' => false,
+            'message' => 'Archived subject not found.'
+        ], 404);
+    }
+
+    try {
+        $subject->delete();
+
+        return response()->json([
+            'success' => true,
+            'message' => 'Subject permanently deleted.'
+        ], 200);
+
+    } catch (\Exception $e) {
+        Log::error('Failed to permanently delete subject', [
+            'subjectID' => $subjectID,
+            'error' => $e->getMessage()
+        ]);
+
+        return response()->json([
+            'success' => false,
+            'message' => 'Failed to permanently delete subject.'
+        ], 500);
+    }
+}
+/**
+ * Archive a subject.
+ * Only accessible by the Dean or Associate Dean.
+ */
+public function archive($subjectID)
+{
+    $user = Auth::user();
+
+    if (!$user || !in_array($user->roleID, [4, 5])) {
+        return response()->json([
+            'success' => false,
+            'message' => 'Unauthorized.'
+        ], 403);
+    }
+
+    $subject = Subject::where('subjectID', $subjectID)
+        ->whereNull('archived_at')
+        ->first();
+
+    if (!$subject) {
+        return response()->json([
+            'success' => false,
+            'message' => 'Subject not found.'
+        ], 404);
+    }
+
+    try {
+        $subject->archived_at = now();
+        $subject->save();
+
+        return response()->json([
+            'success' => true,
+            'message' => 'Subject archived successfully.'
+        ], 200);
+
+    } catch (\Exception $e) {
+        Log::error('Failed to archive subject', [
+            'subjectID' => $subjectID,
+            'error' => $e->getMessage()
+        ]);
+
+        return response()->json([
+            'success' => false,
+            'message' => 'Failed to archive subject.'
+        ], 500);
+    }
+}
+
+/**
+ * Restore an archived subject.
+ * Only accessible by the Dean or Associate Dean.
+ */
+public function restore($subjectID)
+{
+    $user = Auth::user();
+
+    if (!$user || !in_array($user->roleID, [4, 5])) {
+        return response()->json([
+            'success' => false,
+            'message' => 'Unauthorized.'
+        ], 403);
+    }
+
+    $subject = Subject::where('subjectID', $subjectID)
+        ->whereNotNull('archived_at')
+        ->first();
+
+    if (!$subject) {
+        return response()->json([
+            'success' => false,
+            'message' => 'Archived subject not found.'
+        ], 404);
+    }
+
+    try {
+        // Restore subject
+        $subject->archived_at = null;
+        $subject->save();
+
+        return response()->json([
+            'success' => true,
+            'message' => 'Subject restored successfully.'
+        ], 200);
+
+    } catch (\Exception $e) {
+        Log::error('Failed to restore subject', [
+            'subjectID' => $subjectID,
+            'error' => $e->getMessage()
+        ]);
+
+        return response()->json([
+            'success' => false,
+            'message' => 'Failed to restore subject.'
+        ], 500);
+    }
+}
+}

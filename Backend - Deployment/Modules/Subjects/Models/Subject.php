@@ -21,16 +21,18 @@ class Subject extends Model
     protected $table = 'subjects';
     protected $primaryKey = 'subjectID'; 
     protected $fillable = [
-        'programID',
-        'subjectCode',
-        'subjectName', 
-        'yearLevelID',
-        'is_enabled_for_exam_questions'
-    ];
+    'programID',
+    'subjectCode',
+    'subjectName', 
+    'yearLevelID',
+    'is_enabled_for_exam_questions',
+    'archived_at',
+];
 
-    protected $casts = [
-        'is_enabled_for_exam_questions' => 'boolean',
-    ];
+protected $casts = [
+    'is_enabled_for_exam_questions' => 'boolean',
+    'archived_at' => 'datetime',
+];
 
     public function faculty()
     {
