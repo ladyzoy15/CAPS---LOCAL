@@ -53,7 +53,7 @@ export default function RegisterModal({ isOpen, onClose, onSwitchToLogin }) {
   const [currentStep, setCurrentStep] = useState(1);
   const [firstName, setFirstName] = useState("");
   const [lastName, setLastName] = useState("");
-  const [userCode, setUserCode] = useState("");
+  const [username, setUsername] = useState("");
   const [email, setEmail] = useState("");
   const [roleID, setRoleID] = useState("");
   const [campusID, setCampusID] = useState("");
@@ -122,7 +122,7 @@ export default function RegisterModal({ isOpen, onClose, onSwitchToLogin }) {
       setCurrentStep(1);
       setFirstName("");
       setLastName("");
-      setUserCode("");
+      setUsername("");
       setEmail("");
       setRoleID("");
       setCampusID("");
@@ -160,7 +160,7 @@ export default function RegisterModal({ isOpen, onClose, onSwitchToLogin }) {
 
   const validateStep2 = () => {
     const e = {};
-    if (!userCode.trim()) e.userCode = "User code is required";
+    if (!username.trim()) e.username = "Username is required";
     const emailErr = validateEmail(email);
     if (emailErr) e.email = emailErr;
     return { isValid: Object.keys(e).length === 0, errors: e };
@@ -224,7 +224,7 @@ export default function RegisterModal({ isOpen, onClose, onSwitchToLogin }) {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
-          userCode,
+          userCode: username,
           firstName,
           lastName,
           email,
@@ -256,7 +256,7 @@ export default function RegisterModal({ isOpen, onClose, onSwitchToLogin }) {
           const stepMapping = {
             firstName: 1,
             lastName: 1,
-            userCode: 2,
+            username: 2,
             email: 2,
             roleID: 3,
             campusID: 3,
@@ -376,7 +376,7 @@ export default function RegisterModal({ isOpen, onClose, onSwitchToLogin }) {
               <div>
                 <div className="mb-1.5 flex items-center gap-2">
                   <label className="outfit-500 mb-1.5 block text-sm text-gray-700">
-                    ID Code
+                    Username
                   </label>
                   <div className="relative" ref={tooltipRef}>
                     <button
@@ -389,27 +389,27 @@ export default function RegisterModal({ isOpen, onClose, onSwitchToLogin }) {
                     </button>
                     {showTooltip && (
                       <div className="outfit-400 absolute top-6 left-0 z-50 w-52 rounded-lg bg-gray-800 px-3 py-2 text-xs text-white shadow-lg">
-                        Format: XX-X-XXXXX (e.g., 23-A-12345)
+                        Use letters, numbers, or dots (e.g., juan.delacruz)
                       </div>
                     )}
                   </div>
                 </div>
                 <input
                   type="text"
-                  value={userCode}
+                  value={username}
                   onChange={(e) => {
-                    setUserCode(e.target.value);
-                    if (errors.userCode) setErrors((prev) => ({ ...prev, userCode: null }));
+                    setUsername(e.target.value);
+                    if (errors.username) setErrors((prev) => ({ ...prev, username: null }));
                   }}
-                  placeholder="e.g. 23-A-12345"
+                  placeholder="e.g. juan.delacruz"
                   className={`outfit-400 w-full rounded-lg border bg-gray-50 px-4 py-2.5 text-sm text-gray-900 transition outline-none placeholder:text-gray-400 hover:border-gray-300 focus:bg-white focus:ring-2 ${
-                    errors.userCode
+                    errors.username
                       ? "border-red-400 focus:border-red-400 focus:ring-red-100"
                       : "border-gray-200 focus:border-orange-400 focus:ring-orange-100"
                   }`}
                 />
-                {errors.userCode && (
-                  <p className="mt-1 text-xs text-red-500">{errors.userCode}</p>
+                {errors.username && (
+                  <p className="mt-1 text-xs text-red-500">{errors.username}</p>
                 )}
               </div>
               <StepInput
@@ -645,8 +645,3 @@ export default function RegisterModal({ isOpen, onClose, onSwitchToLogin }) {
     </>
   );
 }
-
-
-
-
-
