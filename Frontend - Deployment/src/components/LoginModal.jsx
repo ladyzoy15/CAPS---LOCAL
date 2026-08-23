@@ -136,6 +136,18 @@ export default function LoginModal({
         return;
       }
 
+      const roleId = Number(data.user.roleID);
+
+      // ── DUGANG: i-block ang mga roles nga dili allowed pag-login dinhi.
+      // 1 = student, 2 = faculty, 3 = program chair, 4 = dean, 5 = associate dean
+      // Faculty, Dean, ug Associate Dean ra ang tugutan.
+      const ALLOWED_ROLES = [2, 4, 5];
+
+      if (!ALLOWED_ROLES.includes(roleId)) {
+        showToast("YOU ARE NOT ALLOWED TO LOG IN", "error");
+        return;
+      }
+
       setRememberedUserCode(rememberMe ? username.trim() : "");
       setAuth({
         token: data.token,
@@ -166,19 +178,19 @@ export default function LoginModal({
     <>
       {/* Backdrop */}
       <div
-        className="fixed inset-0 z-[200] flex items-center justify-center overflow-hidden bg-black/70 px-4 backdrop-blur-sm"
+        className="fixed inset-0 z-[300] flex items-center justify-center overflow-hidden bg-orange/100 px-50 backdrop-blur-xl"
         onClick={onClose}
       >
         {/* Ambient glow blobs behind the glass card */}
         <div className="pointer-events-none absolute inset-0">
-          <div className="absolute -top-24 -left-20 h-[380px] w-[380px] rounded-full bg-blue-600/30 blur-[120px]" />
-          <div className="absolute -right-24 top-10 h-[340px] w-[340px] rounded-full bg-purple-600/30 blur-[120px]" />
-          <div className="absolute -bottom-28 left-1/3 h-[360px] w-[360px] rounded-full bg-yellow-400/20 blur-[130px]" />
+          <div className="absolute -top-24 -left-20 h-[380px] w-[700px] rounded-full bg-orange-400/60 blur-[120px]" />
+          <div className="absolute -right-24 top-10 h-[340px] w-[700px] rounded-full bg-yellow-800/60 blur-[120px]" />
+          <div className="absolute -bottom-28 left-1/3 h-[360px] w-[400px] rounded-full bg-amber-600/40 blur-[130px]" />
         </div>
 
         {/* Modal card - dark glass */}
         <div
-          className="relative z-10 w-full max-w-[420px] overflow-hidden rounded-3xl border border-white/15 bg-white/5 p-8 shadow-[0_25px_70px_rgba(0,0,0,0.55)] backdrop-blur-2xl"
+          className="relative z-10 w-full max-w-[420px] overflow-hidden rounded-3xl border border-black/60 bg-white/5 p-8 shadow-[0_25px_70px_rgba(0,0,0,0.55)] backdrop-blur-xl"
           onClick={(e) => e.stopPropagation()}
         >
           {/* Top glass shine */}
@@ -188,7 +200,7 @@ export default function LoginModal({
           {/* Close button */}
           <button
             onClick={onClose}
-            className="absolute top-4 right-4 z-10 flex h-8 w-8 cursor-pointer items-center justify-center rounded-full border border-white/10 bg-white/5 text-gray-300 backdrop-blur-md transition hover:bg-white/15 hover:text-white"
+            className="absolute top-4 right-4 z-10 flex h-8 w-8 cursor-pointer items-center justify-center rounded-full border border-black/50 bg-block/10 text-black-300 backdrop-blur-2xl transition hover:bg-white/15 hover:text-white"
             aria-label="Close"
           >
             <svg
@@ -209,10 +221,10 @@ export default function LoginModal({
 
           {/* Logo */}
           <div className="relative z-10 mb-5 flex flex-col items-center">
-            <div className="flex h-14 w-14 items-center justify-center rounded-2xl border border-white/15 bg-white/5 shadow-lg backdrop-blur-xl">
+            <div className="flex h-14 w-14 items-center justify-center rounded-2xl border border-black/60 bg-white/5 shadow-lg backdrop-blur-xl">
               <img
                 src={collegeLogo}
-                alt="REVA logo"
+                alt="CAPS logo"
                 className="size-9 object-contain"
               />
             </div>
@@ -220,10 +232,10 @@ export default function LoginModal({
 
           {/* Heading */}
           <div className="relative z-10 mb-6 text-center">
-            <h2 className="outfit-700 text-[22px] text-white">
-              Welcome back
+            <h2 className="outfit-700 text-[40px] text-pink">
+              Hello, there!
             </h2>
-            <p className="outfit-400 mt-1 text-sm text-gray-400">
+            <p className="outfit-400 mt-1 text-sm text-black-300">
               Please enter your details to login.
             </p>
           </div>
@@ -235,7 +247,7 @@ export default function LoginModal({
             {/* Username field */}
             <div>
               <div className="mb-1.5 flex items-center justify-between">
-                <label className="outfit-500 text-sm text-gray-300">
+                <label className="outfit-500 text-sm text-black-600">
                   Username
                 </label>
                 {/* <button
@@ -255,14 +267,14 @@ export default function LoginModal({
                 placeholder="e.g. juan.delacruz"
                 value={username}
                 onChange={(e) => setUsername(e.target.value)}
-                className="w-full rounded-xl border border-white/10 bg-white/5 px-4 py-2.5 text-sm text-white transition outline-none placeholder:text-gray-500 hover:border-white/20 hover:bg-white/10 focus:border-blue-400/60 focus:bg-white/10 focus:ring-2 focus:ring-blue-400/20"
-              />
+                className="w-full rounded-xl border border-black/70 bg-white/5 px-4 py-2.5 pr-10 text-sm text-black transition outline-none placeholder:text-amber-700 hover:border-white/20 hover:bg-white/10 focus:border-white-400/60 focus:bg-orange/10 focus:ring-2 focus:ring-orange-600/30"
+                />
             </div>
 
             {/* Password field */}
             <div>
               <div className="mb-1.5 flex items-center justify-between">
-                <label className="outfit-500 text-sm text-gray-300">
+                <label className="outfit-500 text-sm text-black-600">
                   Password
                 </label>
                 <button
@@ -271,7 +283,7 @@ export default function LoginModal({
                     onClose();
                     onSwitchToForgotPassword?.();
                   }}
-                  className="outfit-400 text-sm text-yellow-400 hover:underline"
+                  className="outfit-400 text-sm text-red-600 hover:underline"
                 >
                   Forgot password?
                 </button>
@@ -283,27 +295,27 @@ export default function LoginModal({
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
                   autoComplete="current-password"
-                  className="w-full rounded-xl border border-white/10 bg-white/5 px-4 py-2.5 pr-10 text-sm text-white transition outline-none placeholder:text-gray-500 hover:border-white/20 hover:bg-white/10 focus:border-blue-400/60 focus:bg-white/10 focus:ring-2 focus:ring-blue-400/20"
+                  className="w-full rounded-xl border border-black/70 bg-white/5 px-4 py-2.5 pr-10 text-sm text-black transition outline-none placeholder:text-amber-700 hover:border-white/20 hover:bg-white/10 focus:border-white-400/60 focus:bg-orange/10 focus:ring-2 focus:ring-orange-600/30"
                 />
                 <button
                   type="button"
                   onClick={() => setPasswordVisible((v) => !v)}
                   tabIndex={-1}
-                  className="absolute top-1/2 right-3 -translate-y-1/2 text-gray-500 transition hover:text-gray-300"
+                  className="absolute top-1/2 right-3 -translate-y-1/2 text-black-500 transition hover:text-amber-800"
                 >
                   <i
-                    className={`bx ${passwordVisible ? "bx-eye-alt text-yellow-400" : "bx-eye-slash"} text-[20px]`}
+                    className={`bx ${passwordVisible ? "bx-eye-alt text-orange-400" : "bx-eye-slash"} text-[20px]`}
                   ></i>
                 </button>
               </div>
             </div>
 
-            <label className="outfit-400 flex cursor-pointer items-center gap-2 text-sm text-gray-400">
+            <label className="outfit-400 flex cursor-pointer items-center gap-2 text-sm text-black-400">
               <input
                 type="checkbox"
                 checked={rememberMe}
                 onChange={(e) => setRememberMe(e.target.checked)}
-                className="h-4 w-4 cursor-pointer rounded border-white/20 bg-white/5 accent-blue-500"
+                className="h-4 w-4 cursor-pointer rounded border-white/20 bg-white/5 accent-orange-500"
               />
               Remember me
             </label>
@@ -316,7 +328,7 @@ export default function LoginModal({
             <button
               type="submit"
               disabled={isLogIn}
-              className="outfit-400 mt-1 w-full cursor-pointer rounded-xl border border-white/10 bg-gradient-to-r from-blue-600 to-purple-600 py-3 text-sm font-semibold text-white shadow-[0_8px_25px_rgba(99,102,241,0.35)] backdrop-blur-md transition-all duration-300 hover:-translate-y-0.5 hover:shadow-[0_12px_30px_rgba(99,102,241,0.45)] active:scale-[0.98] disabled:opacity-60"
+              className="outfit-400 mt-1 w-full cursor-pointer rounded-xl border border-black/50 bg-gradient-to-r from-orange-500 to-orange-500 py-3 text-sm font-semibold text-black shadow-[0_8px_25px_rgba(99,102,241,0.35)] backdrop-blur-md transition-all duration-300 hover:-translate-y-0.5 hover:shadow-[0_12px_30px_rgba(99,102,241,0.45)] active:scale-[0.98] disabled:opacity-60"
             >
               {isLogIn ? (
                 <div className="flex items-center justify-center">
@@ -328,14 +340,14 @@ export default function LoginModal({
             </button>
 
             {/* Register link */}
-            <p className="outfit-400 text-center text-sm text-gray-400">
+            <p className="outfit-400 text-center text-sm text-black-400">
               Don't have an account?{" "}
               <span
                 onClick={() => {
                   onClose();
                   onSwitchToRegister?.();
                 }}
-                className="cursor-pointer font-medium text-yellow-400 hover:underline"
+                className="cursor-pointer font-medium text-red-500 hover:underline"
               >
                 Register
               </span>
