@@ -252,20 +252,35 @@ const AdminHeader = ({ title, className = "" }) => {
 
       <ProfileModalsHost profile={profile} showToast={showToast} />
 
-      {/* Logout Confirmation Modal */}
+      {/* Glassmorphism Logout Confirmation Modal */}
       {showLogoutModal && (
-        <div className="lightbox-bg fixed inset-0 z-[200] flex items-center justify-center">
+        <div
+          className="fixed inset-0 z-[200] flex items-center justify-center overflow-hidden bg-black/50 px-4 backdrop-blur-md"
+          onClick={() => !isLoggingOut && setShowLogoutModal(false)}
+        >
+          {/* Ambient Glow Blobs */}
+          <div className="pointer-events-none absolute inset-0 overflow-hidden">
+            <div className="absolute -top-24 -left-20 h-[380px] w-[380px] rounded-full bg-orange-500/30 blur-[120px]" />
+            <div className="absolute -right-24 top-10 h-[340px] w-[340px] rounded-full bg-amber-600/30 blur-[120px]" />
+          </div>
+
+          {/* Modal Container */}
           <div
             ref={logoutModalRef}
-            className="animate-fade-in-up flex w-[90vw] max-w-xs flex-col items-center rounded-2xl bg-white p-6 shadow-xl"
+            onClick={(e) => e.stopPropagation()}
+            className="animate-fade-in-up relative z-10 flex w-full max-w-[360px] flex-col items-center rounded-3xl border border-white/20 bg-white/90 p-6 shadow-2xl backdrop-blur-2xl dark:border-gray-700/50 dark:bg-gray-900/90"
           >
-            <div className="mb-4 flex h-16 w-16 items-center justify-center rounded-full bg-orange-50">
+            {/* Top Shine Accent */}
+            <div className="pointer-events-none absolute inset-x-10 top-0 h-px bg-gradient-to-r from-transparent via-white/80 to-transparent" />
+
+            {/* Icon Circle */}
+            <div className="mb-4 flex h-14 w-14 items-center justify-center rounded-full bg-orange-100/80 text-orange-600 shadow-inner dark:bg-orange-950/40 dark:text-orange-400">
               <svg
-                width="36"
-                height="36"
+                width="32"
+                height="32"
                 fill="none"
                 viewBox="0 0 24 24"
-                stroke="orange"
+                stroke="currentColor"
               >
                 <path
                   strokeLinecap="round"
@@ -275,30 +290,39 @@ const AdminHeader = ({ title, className = "" }) => {
                 />
               </svg>
             </div>
-            <div className="mb-1 text-[20px] font-bold">Log out</div>
-            <div className="mb-5 text-center text-[14px] text-gray-500">
-              Are you sure you want to log out?
+
+            {/* Title & Subtitle */}
+            <h3 className="outfit-700 mb-1 text-[22px] font-bold text-gray-900 dark:text-white">
+              Log Out
+            </h3>
+            <p className="outfit-400 mb-6 text-center text-sm text-gray-600 dark:text-gray-300">
+              Are you sure you want to log out of your account?
+            </p>
+
+            {/* Action Buttons */}
+            <div className="flex w-full flex-col gap-2.5">
+              <button
+                className="outfit-500 flex w-full cursor-pointer items-center justify-center rounded-xl bg-gradient-to-r from-orange-500 to-amber-600 py-2.5 text-sm font-semibold text-white shadow-md transition-all duration-200 hover:from-orange-600 hover:to-amber-700 hover:shadow-lg active:scale-[0.98] disabled:opacity-50"
+                onClick={handleLogout}
+                disabled={isLoggingOut}
+              >
+                {isLoggingOut ? (
+                  <span className="flex items-center justify-center">
+                    <span className="loader-white mr-2"></span> Logging out...
+                  </span>
+                ) : (
+                  "Yes, Log out"
+                )}
+              </button>
+
+              <button
+                className="outfit-500 w-full cursor-pointer rounded-xl border border-gray-300/80 bg-gray-100/60 py-2.5 text-sm font-semibold text-gray-700 transition hover:bg-gray-200/80 dark:border-gray-700 dark:bg-gray-800/60 dark:text-gray-200 dark:hover:bg-gray-700/80"
+                onClick={() => setShowLogoutModal(false)}
+                disabled={isLoggingOut}
+              >
+                Cancel
+              </button>
             </div>
-            <button
-              className="mb-2 w-full cursor-pointer rounded-lg bg-orange-500 py-2 text-[16px] font-semibold text-white transition hover:bg-orange-700"
-              onClick={handleLogout}
-              disabled={isLoggingOut}
-            >
-              {isLoggingOut ? (
-                <span className="flex items-center justify-center">
-                  <span className="loader-white mr-2"></span>
-                </span>
-              ) : (
-                "Yes, Log out"
-              )}
-            </button>
-            <button
-              className="border-color w-full cursor-pointer rounded-lg border py-2 text-[16px] font-semibold text-gray-800 transition hover:bg-gray-200"
-              onClick={() => setShowLogoutModal(false)}
-              disabled={isLoggingOut}
-            >
-              Cancel
-            </button>
           </div>
         </div>
       )}
@@ -309,9 +333,3 @@ const AdminHeader = ({ title, className = "" }) => {
 };
 
 export default AdminHeader;
-
-
-
-
-
-

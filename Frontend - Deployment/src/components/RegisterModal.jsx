@@ -477,7 +477,6 @@ export default function RegisterModal({ isOpen, onClose, onSwitchToLogin }) {
                     }}
                     placeholder="Select Position"
                     options={[
-                      { value: "1", label: "Student" },
                       { value: "2", label: "Instructor" },
                       { value: "3", label: "Program Chair" },
                       { value: "5", label: "Associate Dean" },

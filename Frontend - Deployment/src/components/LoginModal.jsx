@@ -68,6 +68,7 @@ export default function LoginModal({
     setIsLogIn(true);
 
     if (!username.trim() || !password.trim()) {
+      setError("Please enter both Username and Password.");
       showToast("Please enter both Username and Password.", "error");
       setIsLogIn(false);
       return;
@@ -86,65 +87,48 @@ export default function LoginModal({
         }),
       });
 
-      // ── ADDED: Guard against non-JSON responses (e.g. HTML error pages,
-      // empty bodies) so JSON.parse itself doesn't throw and get swallowed
-      // by the generic catch block below.
       let data;
       try {
         data = await response.json();
       } catch (parseErr) {
         console.error("LOGIN: failed to parse response as JSON", parseErr);
+        setError("Unexpected server response. Please try again later.");
         showToast("Unexpected server response. Please try again later.", "error");
         return;
       }
 
-      // ── ADDED: Log the raw response so you can inspect the actual shape
-      // the backend returns (open DevTools → Console after attempting login).
       console.log("LOGIN RESPONSE:", data);
 
       if (!response.ok) {
-        if (response.status === 401) {
-          showToast(data?.message || "Incorrect username or password", "error");
-        } else {
-          showToast(
-            data?.message || "Something went wrong. Please try again later.",
-            "error",
-          );
-        }
+        const errMsg = data?.message || "Incorrect username or password";
+        setError(errMsg);
+        showToast(errMsg, "error");
         return;
       }
 
-      // ── ADDED: Defensive checks — if the backend's success response
-      // doesn't actually include `user` / `roleID` in the shape we expect,
-      // show a clear message instead of silently crashing into the catch
-      // block and showing the generic "something went wrong" toast.
       if (!data || !data.user) {
         console.error("LOGIN: response.ok was true but data.user is missing", data);
-        showToast(
-          "Login succeeded but user data was missing from the response.",
-          "error",
-        );
+        setError("Login succeeded but user data was missing.");
+        showToast("Login succeeded but user data was missing.", "error");
         return;
       }
 
       if (data.user.roleID === undefined || data.user.roleID === null) {
         console.error("LOGIN: data.user.roleID is missing", data.user);
-        showToast(
-          "Login succeeded but your account role is missing. Contact support.",
-          "error",
-        );
+        setError("Your account role is missing. Contact support.");
+        showToast("Your account role is missing. Contact support.", "error");
         return;
       }
 
       const roleId = Number(data.user.roleID);
 
-      // ── DUGANG: i-block ang mga roles nga dili allowed pag-login dinhi.
+      // ── ROLE CHECKING ──
       // 1 = student, 2 = faculty, 3 = program chair, 4 = dean, 5 = associate dean
-      // Faculty, Dean, ug Associate Dean ra ang tugutan.
       const ALLOWED_ROLES = [2, 4, 5];
 
-      if (!ALLOWED_ROLES.includes(roleId)) {
-        showToast("YOU ARE NOT ALLOWED TO LOG IN", "error");
+      if (roleId === 1 || !ALLOWED_ROLES.includes(roleId)) {
+        setError("Unauthorized Access");
+        showToast("Unauthorized Access", "error");
         return;
       }
 
@@ -162,10 +146,8 @@ export default function LoginModal({
         setError("Invalid user role.");
       }
     } catch (err) {
-      // ── CHANGED: log the actual error instead of swallowing it silently,
-      // so future issues are visible in the console instead of just showing
-      // a generic toast.
       console.error("LOGIN: unexpected error", err);
+      setError("Something went wrong. Please try again later.");
       showToast("Something went wrong. Please try again later.", "error");
     } finally {
       setIsLogIn(false);
@@ -176,19 +158,24 @@ export default function LoginModal({
 
   return (
     <>
+      {/* Toast inilipat sa ibabaw ug pinalapdan ang z-index container para makita jud sa ibabaw sa modal */}
+      <div className="relative z-[9999]">
+        <Toast message={toast.message} type={toast.type} show={toast.show} />
+      </div>
+
       {/* Backdrop */}
       <div
         className="fixed inset-0 z-[300] flex items-center justify-center overflow-hidden bg-orange/100 px-50 backdrop-blur-xl"
         onClick={onClose}
       >
-        {/* Ambient glow blobs behind the glass card */}
+        {/* Ambient glow blobs */}
         <div className="pointer-events-none absolute inset-0">
           <div className="absolute -top-24 -left-20 h-[380px] w-[700px] rounded-full bg-orange-400/60 blur-[120px]" />
           <div className="absolute -right-24 top-10 h-[340px] w-[700px] rounded-full bg-yellow-800/60 blur-[120px]" />
           <div className="absolute -bottom-28 left-1/3 h-[360px] w-[400px] rounded-full bg-amber-600/40 blur-[130px]" />
         </div>
 
-        {/* Modal card - dark glass */}
+        {/* Modal card */}
         <div
           className="relative z-10 w-full max-w-[420px] overflow-hidden rounded-3xl border border-black/60 bg-white/5 p-8 shadow-[0_25px_70px_rgba(0,0,0,0.55)] backdrop-blur-xl"
           onClick={(e) => e.stopPropagation()}
@@ -250,16 +237,6 @@ export default function LoginModal({
                 <label className="outfit-500 text-sm text-black-600">
                   Username
                 </label>
-                {/* <button
-                  type="button"
-                  onClick={() => {
-                    onClose();
-                    onSwitchToForgotUserCode?.();
-                  }}
-                  className="outfit-400 text-sm text-yellow-400 hover:underline"
-                >
-                  Forgot username?
-                </button> */}
               </div>
               <input
                 type="text"
@@ -268,7 +245,7 @@ export default function LoginModal({
                 value={username}
                 onChange={(e) => setUsername(e.target.value)}
                 className="w-full rounded-xl border border-black/70 bg-white/5 px-4 py-2.5 pr-10 text-sm text-black transition outline-none placeholder:text-amber-700 hover:border-white/20 hover:bg-white/10 focus:border-white-400/60 focus:bg-orange/10 focus:ring-2 focus:ring-orange-600/30"
-                />
+              />
             </div>
 
             {/* Password field */}
@@ -320,11 +297,14 @@ export default function LoginModal({
               Remember me
             </label>
 
+            {/* Direct error text inside modal */}
             {error && (
-              <p className="text-center text-xs text-red-400">{error}</p>
+              <p className="rounded-lg bg-red-500/20 p-2 text-center text-xs font-semibold text-red-600">
+                {error}
+              </p>
             )}
 
-            {/* Login button - blue/purple gradient with yellow-tinted glow */}
+            {/* Login button */}
             <button
               type="submit"
               disabled={isLogIn}
@@ -355,8 +335,6 @@ export default function LoginModal({
           </form>
         </div>
       </div>
-
-      <Toast message={toast.message} type={toast.type} show={toast.show} />
     </>
   );
 }
