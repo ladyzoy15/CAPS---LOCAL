@@ -18,7 +18,7 @@ export default function LoginModal({
   onSwitchToForgotPassword,
   onSwitchToForgotUserCode,
 }) {
-  const [idCode, setIdCode] = useState("");
+  const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
   const [error, setError] = useState("");
   const [passwordVisible, setPasswordVisible] = useState(false);
@@ -48,12 +48,12 @@ export default function LoginModal({
 
   useEffect(() => {
     if (isOpen) {
-      setIdCode(getRememberedUserCode());
+      setUsername(getRememberedUserCode());
       setRememberMe(isRememberMeEnabled());
       setPassword("");
       setError("");
     } else {
-      setIdCode("");
+      setUsername("");
       setPassword("");
       setRememberMe(false);
       setError("");
@@ -67,8 +67,8 @@ export default function LoginModal({
     setError("");
     setIsLogIn(true);
 
-    if (!idCode.trim() || !password.trim()) {
-      showToast("Please enter both ID Code and Password.", "error");
+    if (!username.trim() || !password.trim()) {
+      showToast("Please enter both Username and Password.", "error");
       setIsLogIn(false);
       return;
     }
@@ -81,7 +81,7 @@ export default function LoginModal({
           Accept: "application/json",
         },
         body: JSON.stringify({
-          userCode: idCode,
+          userCode: username,
           password: password,
         }),
       });
@@ -104,7 +104,7 @@ export default function LoginModal({
 
       if (!response.ok) {
         if (response.status === 401) {
-          showToast(data?.message || "Incorrect user code or password", "error");
+          showToast(data?.message || "Incorrect username or password", "error");
         } else {
           showToast(
             data?.message || "Something went wrong. Please try again later.",
@@ -136,7 +136,7 @@ export default function LoginModal({
         return;
       }
 
-      setRememberedUserCode(rememberMe ? idCode.trim() : "");
+      setRememberedUserCode(rememberMe ? username.trim() : "");
       setAuth({
         token: data.token,
         user: data.user,
@@ -232,11 +232,11 @@ export default function LoginModal({
             onSubmit={handleLogin}
             className="relative z-10 flex flex-col gap-4"
           >
-            {/* ID Code field */}
+            {/* Username field */}
             <div>
               <div className="mb-1.5 flex items-center justify-between">
                 <label className="outfit-500 text-sm text-gray-300">
-                  ID Code
+                  Username
                 </label>
                 {/* <button
                   type="button"
@@ -246,15 +246,15 @@ export default function LoginModal({
                   }}
                   className="outfit-400 text-sm text-yellow-400 hover:underline"
                 >
-                  Forgot ID code?
+                  Forgot username?
                 </button> */}
               </div>
               <input
                 type="text"
-                id="modal-userCode"
-                placeholder="e.g. 23-A-12345"
-                value={idCode}
-                onChange={(e) => setIdCode(e.target.value)}
+                id="modal-username"
+                placeholder="e.g. juan.delacruz"
+                value={username}
+                onChange={(e) => setUsername(e.target.value)}
                 className="w-full rounded-xl border border-white/10 bg-white/5 px-4 py-2.5 text-sm text-white transition outline-none placeholder:text-gray-500 hover:border-white/20 hover:bg-white/10 focus:border-blue-400/60 focus:bg-white/10 focus:ring-2 focus:ring-blue-400/20"
               />
             </div>
@@ -348,7 +348,3 @@ export default function LoginModal({
     </>
   );
 }
-
-
-
-

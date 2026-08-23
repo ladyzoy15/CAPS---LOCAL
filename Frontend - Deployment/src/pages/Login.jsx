@@ -13,7 +13,7 @@ import {
 } from "../utils/authStorage";
 
 export default function LoginPage() {
-  const [idCode, setIdCode] = useState("");
+  const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
   const [error, setError] = useState("");
   const navigate = useNavigate();
@@ -29,9 +29,9 @@ export default function LoginPage() {
 
   useEffect(() => {
     if (isRememberMeEnabled()) {
-      setIdCode(getRememberedUserCode());
+      setUsername(getRememberedUserCode());
     } else {
-      setIdCode("");
+      setUsername("");
       setRememberMe(false);
     }
   }, []);
@@ -41,8 +41,8 @@ export default function LoginPage() {
     setError("");
     setIsLogIn(true);
 
-    if (!idCode.trim() || !password.trim()) {
-      showToast("Please enter both ID Code and Password.", "error");
+    if (!username.trim() || !password.trim()) {
+      showToast("Please enter both Username and Password.", "error");
       setIsLogIn(false);
       return;
     }
@@ -55,7 +55,7 @@ export default function LoginPage() {
           Accept: "application/json",
         },
         body: JSON.stringify({
-          userCode: idCode,
+          userCode: username,
           password: password,
         }),
       });
@@ -65,7 +65,7 @@ export default function LoginPage() {
       if (!response.ok) {
         if (response.status === 401) {
           showToast(
-            data.message || "Incorrect user code or password",
+            data.message || "Incorrect username or password",
             "error",
           );
         } else {
@@ -77,7 +77,7 @@ export default function LoginPage() {
         return;
       }
 
-      setRememberedUserCode(rememberMe ? idCode.trim() : "");
+      setRememberedUserCode(rememberMe ? username.trim() : "");
 
       setAuth({
         token: data.token,
@@ -443,13 +443,13 @@ export default function LoginPage() {
                   onSubmit={handleLogin}
                 >
                   {/* =================================================
-                      USER CODE
+                      USERNAME
                   ================================================= */}
                   <div className="relative mb-5">
                     <div className="relative">
                       <input
                         type="text"
-                        id="userCode"
+                        id="username"
                         className="
                           peer
                           mt-2
@@ -475,13 +475,13 @@ export default function LoginPage() {
                           focus:ring-4
                           focus:ring-orange-400/10
                         "
-                        placeholder="ID Code"
-                        value={idCode}
-                        onChange={(e) => setIdCode(e.target.value)}
+                        placeholder="Username"
+                        value={username}
+                        onChange={(e) => setUsername(e.target.value)}
                       />
 
                       <label
-                        htmlFor="userCode"
+                        htmlFor="username"
                         className="
                           pointer-events-none
                           absolute
@@ -510,7 +510,7 @@ export default function LoginPage() {
                           peer-[&:not(:placeholder-shown)]:text-xs
                         "
                       >
-                        ID Code
+                        Username
                       </label>
                     </div>
                   </div>
@@ -1062,12 +1062,12 @@ export default function LoginPage() {
             "
             onSubmit={handleLogin}
           >
-            {/* User Code */}
+            {/* Username */}
             <div className="relative w-full">
               <div className="relative">
                 <input
                   type="text"
-                  id="mobileUserCode"
+                  id="mobileUsername"
                   className="
                     peer
                     mt-2
@@ -1091,13 +1091,13 @@ export default function LoginPage() {
                     focus:ring-4
                     focus:ring-orange-400/10
                   "
-                  placeholder="ID Code"
-                  value={idCode}
-                  onChange={(e) => setIdCode(e.target.value)}
+                  placeholder="Username"
+                  value={username}
+                  onChange={(e) => setUsername(e.target.value)}
                 />
 
                 <label
-                  htmlFor="mobileUserCode"
+                  htmlFor="mobileUsername"
                   className="
                     pointer-events-none
                     absolute
@@ -1126,7 +1126,7 @@ export default function LoginPage() {
                     peer-[&:not(:placeholder-shown)]:text-xs
                   "
                 >
-                  ID Code
+                  Username
                 </label>
               </div>
             </div>
@@ -1390,10 +1390,3 @@ export default function LoginPage() {
     </>
   );
 }
-
-
-
-
-
-
-

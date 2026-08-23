@@ -7,7 +7,7 @@ import AppVersion from "../components/appVersion.jsx";
 import RegisterDropDownSmall from "../components/registerDropDownSmall.jsx";
 
 export default function Register() {
-  const [userCode, setUserCode] = useState("");
+  const [username, setUsername] = useState("");
   const [firstName, setFirstName] = useState("");
   const [lastName, setLastName] = useState("");
   const [email, setEmail] = useState("");
@@ -125,8 +125,8 @@ export default function Register() {
   const validateStep2 = () => {
     const errors = {};
 
-    if (!userCode.trim()) {
-      errors.userCode = "User code is required";
+    if (!username.trim()) {
+      errors.username = "Username is required";
     }
 
     const emailValidation = validateEmail(email);
@@ -258,7 +258,7 @@ export default function Register() {
           "Content-Type": "application/json",
         },
         body: JSON.stringify({
-          userCode,
+          userCode: username,
           firstName,
           lastName,
           email,
@@ -569,20 +569,20 @@ export default function Register() {
 
                               <input
                                 type="text"
-                                id="userCode"
+                                id="username"
                                 className="peer mt-2 w-full rounded-xl border border-gray-300 px-4 py-[8px] text-base text-gray-900 placeholder-transparent transition-all duration-200 hover:border-gray-500 focus:border-[#FE6902] focus:outline-none"
-                                placeholder="User Code"
-                                value={userCode}
+                                placeholder="Username"
+                                value={username}
                                 onChange={(e) =>
-                                  setUserCode(e.target.value)
+                                  setUsername(e.target.value)
                                 }
                               />
 
                               <label
-                                htmlFor="User Code"
+                                htmlFor="username"
                                 className="pointer-events-none absolute top-1/2 left-4 z-10 -translate-y-1/2 bg-white px-1 text-base text-gray-500 transition-all duration-200 peer-placeholder-shown:top-1/2 peer-placeholder-shown:mt-1 peer-placeholder-shown:text-base peer-focus:top-2 peer-focus:mt-0 peer-focus:text-xs peer-focus:text-[#FE6902] peer-[&:not(:placeholder-shown)]:top-2 peer-[&:not(:placeholder-shown)]:text-xs"
                               >
-                                Instructor Code/Student ID Number
+                                Username
                               </label>
 
                               <div
@@ -602,16 +602,16 @@ export default function Register() {
 
                                 {showTooltip && (
                                   <div className="absolute top-[-70px] -right-40 z-50 -translate-y-1/2 rounded-lg bg-gray-800 px-3 py-2 text-sm text-white">
-                                    Format: XX-X-XXXXX
-                                    (e.g., 23-A-12345)
+                                    Use letters, numbers, or dots
+                                    (e.g., juan.delacruz)
                                   </div>
                                 )}
                               </div>
                             </div>
 
-                            {errors.userCode && (
+                            {errors.username && (
                               <p className="mt-1 ml-3 text-xs text-red-500">
-                                {errors.userCode}
+                                {errors.username}
                               </p>
                             )}
                           </div>
@@ -1207,7 +1207,7 @@ export default function Register() {
                           type="text"
                           id="firstName"
                           className="peer mt-2 w-full rounded-xl border border-gray-300 px-4 py-[12px] text-base text-gray-900 placeholder-transparent transition-all duration-200 hover:border-gray-500 focus:border-[#FE6902] focus:outline-none"
-                          placeholder="User Code"
+                          placeholder="First Name"
                           value={firstName}
                           onChange={(e) =>
                             setFirstName(e.target.value)
@@ -1239,7 +1239,7 @@ export default function Register() {
                           type="text"
                           id="lastName"
                           className="peer mt-2 w-full rounded-xl border border-gray-300 px-4 py-[12px] text-base text-gray-900 placeholder-transparent transition-all duration-200 hover:border-gray-500 focus:border-[#FE6902] focus:outline-none"
-                          placeholder="User Code"
+                          placeholder="Last Name"
                           value={lastName}
                           onChange={(e) =>
                             setLastName(e.target.value)
@@ -1304,20 +1304,20 @@ export default function Register() {
 
                         <input
                           type="text"
-                          id="userCode"
+                          id="mobileUsername"
                           className="peer mt-2 w-full rounded-xl border border-gray-300 px-4 py-[12px] text-base text-gray-900 placeholder-transparent transition-all duration-200 hover:border-gray-500 focus:border-[#FE6902] focus:outline-none"
-                          placeholder="User Code"
-                          value={userCode}
+                          placeholder="Username"
+                          value={username}
                           onChange={(e) =>
-                            setUserCode(e.target.value)
+                            setUsername(e.target.value)
                           }
                         />
 
                         <label
-                          htmlFor="User Code"
+                          htmlFor="mobileUsername"
                           className="pointer-events-none absolute top-1/2 left-4 z-10 -translate-y-1/2 bg-white px-1 text-base text-gray-500 transition-all duration-200 peer-placeholder-shown:top-1/2 peer-placeholder-shown:mt-1 peer-focus:top-2 peer-focus:mt-0 peer-focus:text-xs peer-focus:text-[#FE6902] peer-[&:not(:placeholder-shown)]:top-2 peer-[&:not(:placeholder-shown)]:text-xs"
                         >
-                          Instructor Code/Student ID Number
+                          Username
                         </label>
 
                         <div
@@ -1338,16 +1338,17 @@ export default function Register() {
 
                           {showTooltip && (
                             <div className="absolute top-[-70px] -right-10 z-50 -translate-y-1/2 rounded-lg bg-gray-800 px-3 py-2 text-sm text-white">
-                              For Students (e.g., 23-A-12345)
+                              Use letters, numbers, or dots
+                              (e.g., juan.delacruz)
                             </div>
                           )}
 
                         </div>
                       </div>
 
-                      {errors.userCode && (
+                      {errors.username && (
                         <p className="mt-1 ml-3 text-xs text-red-500">
-                          {errors.userCode}
+                          {errors.username}
                         </p>
                       )}
 
@@ -1808,10 +1809,3 @@ export default function Register() {
     </>
   );
 }
-
-
-
-
-
-
-
