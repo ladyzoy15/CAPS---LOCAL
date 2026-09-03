@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from "react";
+import { useState, useEffect, useRef } from "react";
 import { useNavigate } from "react-router-dom";
 import * as XLSX from "xlsx";
 import mammoth from "mammoth/mammoth.browser";
@@ -12,13 +12,11 @@ import Toast from "../components/Toast";
 pdfjsLib.GlobalWorkerOptions.workerSrc = pdfjsWorkerUrl;
 
 // =========================================================
-// DEFAULTS (Coverage / Purpose no longer shown in the UI —
-// every import goes in as Midterm / Practice by default and
-// can be reclassified later from the subject's question bank)
+// DEFAULTS
 // =========================================================
 
-const DEFAULT_COVERAGE_ID = "1"; // Midterm
-const DEFAULT_PURPOSE_ID = "2"; // Practice
+const DEFAULT_COVERAGE_ID = "1";
+const DEFAULT_PURPOSE_ID = "2";
 
 // =========================================================
 // FILE PARSING HELPERS
@@ -38,8 +36,12 @@ const parseSpreadsheet = (file) =>
 
     reader.onload = (e) => {
       try {
-        const workbook = XLSX.read(e.target.result, { type: "binary" });
+        const workbook = XLSX.read(e.target.result, {
+          type: "binary",
+        });
+
         const sheet = workbook.Sheets[workbook.SheetNames[0]];
+
         const rows = XLSX.utils.sheet_to_json(sheet, {
           header: 1,
           defval: "",
@@ -48,8 +50,13 @@ const parseSpreadsheet = (file) =>
         let qColIdx = 0;
 
         if (rows.length) {
-          const header = rows[0].map((h) => String(h).toLowerCase());
-          const found = header.findIndex((h) => h.includes("question"));
+          const header = rows[0].map((h) =>
+            String(h).toLowerCase()
+          );
+
+          const found = header.findIndex((h) =>
+            h.includes("question")
+          );
 
           if (found !== -1) {
             qColIdx = found;
@@ -57,7 +64,13 @@ const parseSpreadsheet = (file) =>
           }
         }
 
-        resolve(rows.map((r) => String(r[qColIdx] ?? "").trim()).filter(Boolean));
+        resolve(
+          rows
+            .map((r) =>
+              String(r[qColIdx] ?? "").trim()
+            )
+            .filter(Boolean)
+        );
       } catch (err) {
         reject(err);
       }
@@ -92,15 +105,21 @@ const parseDocx = (file) =>
     reader.readAsArrayBuffer(file);
   });
 
-// Proper line reconstruction using Y position + hasEOL, and throws a clear
-// error when the PDF has no text layer (scanned/image PDF).
 const parsePdf = async (file) => {
   const buffer = await file.arrayBuffer();
-  const pdf = await pdfjsLib.getDocument({ data: buffer }).promise;
+
+  const pdf = await pdfjsLib.getDocument({
+    data: buffer,
+  }).promise;
+
   const allLines = [];
   let totalChars = 0;
 
-  for (let pageNum = 1; pageNum <= pdf.numPages; pageNum++) {
+  for (
+    let pageNum = 1;
+    pageNum <= pdf.numPages;
+    pageNum++
+  ) {
     const page = await pdf.getPage(pageNum);
     const content = await page.getTextContent();
 
@@ -109,31 +128,46 @@ const parsePdf = async (file) => {
 
     content.items.forEach((item) => {
       totalChars += item.str.length;
+
       const y = item.transform[5];
 
-      if (lastY !== null && Math.abs(y - lastY) > 2) {
-        if (currentLine.trim()) allLines.push(currentLine.trim());
+      if (
+        lastY !== null &&
+        Math.abs(y - lastY) > 2
+      ) {
+        if (currentLine.trim()) {
+          allLines.push(currentLine.trim());
+        }
+
         currentLine = item.str;
       } else {
-        currentLine += (currentLine ? " " : "") + item.str;
+        currentLine +=
+          (currentLine ? " " : "") + item.str;
       }
 
       lastY = y;
 
       if (item.hasEOL) {
-        if (currentLine.trim()) allLines.push(currentLine.trim());
+        if (currentLine.trim()) {
+          allLines.push(currentLine.trim());
+        }
+
         currentLine = "";
       }
     });
 
-    if (currentLine.trim()) allLines.push(currentLine.trim());
+    if (currentLine.trim()) {
+      allLines.push(currentLine.trim());
+    }
   }
 
   if (totalChars === 0) {
     const err = new Error(
       "This PDF has no selectable text (it looks like a scanned image). Try a text-based PDF, or use OCR first."
     );
+
     err.isNoTextLayer = true;
+
     throw err;
   }
 
@@ -143,20 +177,27 @@ const parsePdf = async (file) => {
 const parseText = (file) =>
   new Promise((resolve, reject) => {
     const reader = new FileReader();
-    reader.onload = (e) => resolve(e.target.result.split("\n"));
+
+    reader.onload = (e) =>
+      resolve(e.target.result.split("\n"));
+
     reader.onerror = reject;
+
     reader.readAsText(file);
   });
 
-// OCR for photos / scanned images (jpg, png, webp, etc.) using Tesseract.js,
-// entirely in the browser — no server round-trip needed.
 const parseImage = async (file, onProgress) => {
   const {
     data: { text },
   } = await Tesseract.recognize(file, "eng", {
     logger: (m) => {
-      if (m.status === "recognizing text" && onProgress) {
-        onProgress(Math.round((m.progress || 0) * 100));
+      if (
+        m.status === "recognizing text" &&
+        onProgress
+      ) {
+        onProgress(
+          Math.round((m.progress || 0) * 100)
+        );
       }
     },
   });
@@ -165,16 +206,31 @@ const parseImage = async (file, onProgress) => {
     const err = new Error(
       "Could not detect any readable text in that image. Try a clearer, higher-resolution photo."
     );
+
     err.isNoTextLayer = true;
+
     throw err;
   }
 
   return text.split("\n");
 };
 
-const SUPPORTED_FORMATS = ["XLSX", "CSV", "DOCX", "PDF", "TXT", "IMAGE"];
+const SUPPORTED_FORMATS = [
+  "XLSX",
+  "CSV",
+  "DOCX",
+  "PDF",
+  "TXT",
+  "IMAGE",
+];
 
-const IMAGE_EXTENSIONS = ["jpg", "jpeg", "png", "webp", "bmp"];
+const IMAGE_EXTENSIONS = [
+  "jpg",
+  "jpeg",
+  "png",
+  "webp",
+  "bmp",
+];
 
 // =========================================================
 // COMPONENT
@@ -182,111 +238,392 @@ const IMAGE_EXTENSIONS = ["jpg", "jpeg", "png", "webp", "bmp"];
 
 const ImportQuestions = () => {
   const [isDragging, setIsDragging] = useState(false);
-  const [status, setStatus] = useState({ message: "", isError: false });
+
+  const [status, setStatus] = useState({
+    message: "",
+    isError: false,
+  });
+
   const [fileName, setFileName] = useState("");
   const [isParsing, setIsParsing] = useState(false);
   const [isImporting, setIsImporting] = useState(false);
   const [ocrProgress, setOcrProgress] = useState(null);
 
-  // Destination selection
+  // Destination subjects
   const [subjects, setSubjects] = useState([]);
-  const [isSubjectsLoading, setisSubjectsLoading] = useState(false);
-  const [selectedSubjectId, setSelectedSubjectId] = useState("");
+  const [isSubjectsLoading, setIsSubjectsLoading] =
+    useState(false);
+  const [selectedSubjectId, setSelectedSubjectId] =
+    useState("");
 
+  // Database import
+  const [sourceMode, setSourceMode] =
+    useState("file");
+
+  const [sourceSubjects, setSourceSubjects] =
+    useState([]);
+
+  const [sourceSubjectId, setSourceSubjectId] =
+    useState("");
+
+  const [sourceQuestions, setSourceQuestions] =
+    useState([]);
+
+  const [selectedQuestionIds, setSelectedQuestionIds] =
+    useState([]);
+
+  const [
+    isSourceSubjectsLoading,
+    setIsSourceSubjectsLoading,
+  ] = useState(false);
+
+  const [
+    isQuestionsLoading,
+    setIsQuestionsLoading,
+  ] = useState(false);
+
+  const [
+    isDatabaseImporting,
+    setIsDatabaseImporting,
+  ] = useState(false);
+
+  // IMPORTANT:
+  // useRef is now correctly imported above.
   const fileInputRef = useRef(null);
-  const navigate = useNavigate();
-  const { toast, showToast } = useToast();
-  const apiUrl = import.meta.env.VITE_API_BASE_URL;
 
-  // Fetch subjects so the user can pick the destination subject before importing
+  const navigate = useNavigate();
+
+  const { toast, showToast } = useToast();
+
+  const apiUrl =
+    import.meta.env.VITE_API_BASE_URL;
+
+  // =========================================================
+  // LOAD DESTINATION SUBJECTS
+  // =========================================================
+
   useEffect(() => {
     const fetchSubjects = async () => {
-      setisSubjectsLoading(true);
+      setIsSubjectsLoading(true);
+
       try {
-        const token = sessionStorage.getItem("token");
+        const token =
+          sessionStorage.getItem("token");
+
         const response = await fetch(
           `${apiUrl}/personal-quizzes/subject-options`,
           {
             method: "GET",
             headers: {
-              "Content-Type": "application/json",
+              "Content-Type":
+                "application/json",
               Authorization: `Bearer ${token}`,
             },
             credentials: "include",
-          },
+          }
         );
 
-        if (!response.ok) return;
+        if (!response.ok) {
+          console.error(
+            "Failed to load destination subjects:",
+            response.status
+          );
+
+          return;
+        }
 
         const data = await response.json();
-        if (data.success && Array.isArray(data.subjects)) {
-          const sorted = [...data.subjects].sort((a, b) => {
-            const programCompare = (a.programName || "").localeCompare(
-              b.programName || "",
-            );
-            if (programCompare !== 0) return programCompare;
-            return (a.subjectCode || "").localeCompare(b.subjectCode || "");
-          });
+
+        if (
+          data.success &&
+          Array.isArray(data.subjects)
+        ) {
+          const sorted = [...data.subjects].sort(
+            (a, b) => {
+              const programCompare =
+                (a.programName || "").localeCompare(
+                  b.programName || ""
+                );
+
+              if (programCompare !== 0) {
+                return programCompare;
+              }
+
+              return (
+                a.subjectCode || ""
+              ).localeCompare(
+                b.subjectCode || ""
+              );
+            }
+          );
+
           setSubjects(sorted);
         }
       } catch (err) {
-        console.error("Error loading subjects:", err);
+        console.error(
+          "Error loading subjects:",
+          err
+        );
       } finally {
-        setisSubjectsLoading(false);
+        setIsSubjectsLoading(false);
       }
     };
 
     fetchSubjects();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
+  }, [apiUrl]);
 
-  // Parses the file, then imports every detected line straight away —
-  // no checkbox review step.
-  const handleFile = async (file) => {
-    if (!selectedSubjectId) {
-      setStatus({
-        message: "Please select which subject to import these questions into first.",
-        isError: true,
-      });
+  // =========================================================
+  // LOAD SOURCE SUBJECTS FROM CAPS DATABASE
+  // =========================================================
+
+  useEffect(() => {
+    if (sourceMode !== "database") {
       return;
     }
 
-    const ext = file.name.split(".").pop().toLowerCase();
+    const fetchSourceSubjects = async () => {
+      setIsSourceSubjectsLoading(true);
+
+      try {
+        const token =
+          sessionStorage.getItem("token");
+
+        const response = await fetch(
+          `${apiUrl}/database-import/subjects`,
+          {
+            method: "GET",
+            headers: {
+              Accept: "application/json",
+              Authorization: `Bearer ${token}`,
+            },
+            credentials: "include",
+          }
+        );
+
+        const data = await response.json();
+
+        if (!response.ok) {
+          throw new Error(
+            data.message ||
+              "Could not load source subjects."
+          );
+        }
+
+        const sourceData = Array.isArray(
+          data.data
+        )
+          ? data.data
+          : [];
+
+        setSourceSubjects(sourceData);
+
+        if (sourceData.length === 0) {
+          setStatus({
+            message:
+              "No subjects were found in the source database.",
+            isError: true,
+          });
+        } else {
+          setStatus({
+            message: "",
+            isError: false,
+          });
+        }
+      } catch (err) {
+        console.error(
+          "Error loading source subjects:",
+          err
+        );
+
+        setSourceSubjects([]);
+
+        setStatus({
+          message:
+            err.message ||
+            "Could not load source database subjects.",
+          isError: true,
+        });
+      } finally {
+        setIsSourceSubjectsLoading(false);
+      }
+    };
+
+    fetchSourceSubjects();
+  }, [apiUrl, sourceMode]);
+
+  // =========================================================
+  // LOAD QUESTIONS FOR SELECTED SOURCE SUBJECT
+  // =========================================================
+
+  useEffect(() => {
+    if (
+      sourceMode !== "database" ||
+      !sourceSubjectId
+    ) {
+      setSourceQuestions([]);
+      setSelectedQuestionIds([]);
+      return;
+    }
+
+    const fetchSourceQuestions = async () => {
+      setIsQuestionsLoading(true);
+
+      try {
+        const token =
+          sessionStorage.getItem("token");
+
+        const response = await fetch(
+          `${apiUrl}/database-import/questions/${sourceSubjectId}`,
+          {
+            method: "GET",
+            headers: {
+              Accept: "application/json",
+              Authorization: `Bearer ${token}`,
+            },
+            credentials: "include",
+          }
+        );
+
+        const data = await response.json();
+
+        if (!response.ok) {
+          throw new Error(
+            data.message ||
+              "Could not load source questions."
+          );
+        }
+
+        const questions = Array.isArray(
+          data.data
+        )
+          ? data.data
+          : [];
+
+        setSourceQuestions(questions);
+        setSelectedQuestionIds([]);
+
+        if (questions.length === 0) {
+          setStatus({
+            message:
+              "No questions found for this source subject.",
+            isError: true,
+          });
+        } else {
+          setStatus({
+            message: `${questions.length} question${
+              questions.length === 1
+                ? ""
+                : "s"
+            } found.`,
+            isError: false,
+          });
+        }
+      } catch (err) {
+        console.error(
+          "Error loading source questions:",
+          err
+        );
+
+        setSourceQuestions([]);
+        setSelectedQuestionIds([]);
+
+        setStatus({
+          message:
+            err.message ||
+            "Could not load source questions.",
+          isError: true,
+        });
+      } finally {
+        setIsQuestionsLoading(false);
+      }
+    };
+
+    fetchSourceQuestions();
+  }, [
+    apiUrl,
+    sourceMode,
+    sourceSubjectId,
+  ]);
+
+  // =========================================================
+  // FILE IMPORT
+  // =========================================================
+
+  const handleFile = async (file) => {
+    if (!selectedSubjectId) {
+      setStatus({
+        message:
+          "Please select which subject to import these questions into first.",
+        isError: true,
+      });
+
+      return;
+    }
+
+    const ext = file.name
+      .split(".")
+      .pop()
+      .toLowerCase();
+
     setFileName(file.name);
     setIsParsing(true);
     setOcrProgress(null);
-    setStatus({ message: `Reading ${file.name}...`, isError: false });
+
+    setStatus({
+      message: `Reading ${file.name}...`,
+      isError: false,
+    });
 
     try {
       let parsedLines = [];
 
-      if (["xlsx", "xls", "csv"].includes(ext)) {
-        parsedLines = await parseSpreadsheet(file);
+      if (
+        ["xlsx", "xls", "csv"].includes(ext)
+      ) {
+        parsedLines =
+          await parseSpreadsheet(file);
       } else if (ext === "docx") {
-        parsedLines = await parseDocx(file);
+        parsedLines =
+          await parseDocx(file);
       } else if (ext === "pdf") {
-        parsedLines = await parsePdf(file);
+        parsedLines =
+          await parsePdf(file);
       } else if (ext === "txt") {
-        parsedLines = await parseText(file);
-      } else if (IMAGE_EXTENSIONS.includes(ext)) {
-        setStatus({ message: `Reading text from ${file.name}...`, isError: false });
-        parsedLines = await parseImage(file, (pct) => {
-          setOcrProgress(pct);
-          setStatus({
-            message: `Reading text from image... ${pct}%`,
-            isError: false,
-          });
+        parsedLines =
+          await parseText(file);
+      } else if (
+        IMAGE_EXTENSIONS.includes(ext)
+      ) {
+        setStatus({
+          message: `Reading text from ${file.name}...`,
+          isError: false,
         });
+
+        parsedLines =
+          await parseImage(
+            file,
+            (pct) => {
+              setOcrProgress(pct);
+
+              setStatus({
+                message: `Reading text from image... ${pct}%`,
+                isError: false,
+              });
+            }
+          );
       } else {
         setStatus({
           message: `Unsupported file type: .${ext}. Use Excel, CSV, Word, PDF, TXT, or an image.`,
           isError: true,
         });
+
         setIsParsing(false);
+
         return;
       }
 
-      const cleaned = cleanLines(parsedLines);
+      const cleaned =
+        cleanLines(parsedLines);
 
       if (cleaned.length === 0) {
         setStatus({
@@ -294,53 +631,95 @@ const ImportQuestions = () => {
             "No usable text found in that file. Try a different file, or add questions manually instead.",
           isError: true,
         });
+
         setIsParsing(false);
+
         return;
       }
 
       setIsParsing(false);
       setOcrProgress(null);
+
       await handleImport(cleaned);
     } catch (err) {
       console.error(err);
+
       setIsParsing(false);
       setOcrProgress(null);
+
       setStatus({
         message: err.isNoTextLayer
           ? err.message
-          : `Could not read that file (${err.message || "unknown error"}).`,
+          : `Could not read that file (${
+              err.message ||
+              "unknown error"
+            }).`,
         isError: true,
       });
     }
   };
 
+  // =========================================================
+  // DROP FILE
+  // =========================================================
+
   const onDrop = (e) => {
     e.preventDefault();
+
     setIsDragging(false);
-    const file = e.dataTransfer.files?.[0];
-    if (file) handleFile(file);
+
+    const file =
+      e.dataTransfer.files?.[0];
+
+    if (file) {
+      handleFile(file);
+    }
   };
 
+  // =========================================================
+  // BROWSE FILE
+  // =========================================================
+
   const onBrowseSelect = (e) => {
-    const file = e.target.files?.[0];
-    if (file) handleFile(file);
+    const file =
+      e.target.files?.[0];
+
+    if (file) {
+      handleFile(file);
+    }
+
     e.target.value = "";
   };
 
-  // Saves every detected line straight to the Qualifying Exam Question bank
-  // (mirrors the "Subject-based" path used by AddQuestionForm), then jumps
-  // into that subject's page to show the result.
-  const handleImport = async (linesToImport) => {
-    const selected = linesToImport.filter((l) => l.trim());
+  // =========================================================
+  // EXISTING FILE IMPORT API
+  // =========================================================
 
-    if (selected.length === 0) return;
+  const handleImport = async (
+    linesToImport
+  ) => {
+    const selected =
+      linesToImport.filter(
+        (l) => l.trim()
+      );
+
+    if (selected.length === 0) {
+      return;
+    }
 
     setIsImporting(true);
+
     setStatus({
-      message: `Importing ${selected.length} question${selected.length === 1 ? "" : "s"}...`,
+      message: `Importing ${selected.length} question${
+        selected.length === 1
+          ? ""
+          : "s"
+      }...`,
       isError: false,
     });
-    const token = sessionStorage.getItem("token");
+
+    const token =
+      sessionStorage.getItem("token");
 
     let successCount = 0;
     let failCount = 0;
@@ -348,27 +727,74 @@ const ImportQuestions = () => {
     for (const line of selected) {
       try {
         const fd = new FormData();
-        fd.append("subjectID", selectedSubjectId);
-        fd.append("coverage_id", DEFAULT_COVERAGE_ID);
-        fd.append("questionText", line);
-        fd.append("score", 1);
-        fd.append("difficulty_id", 1); // Easy by default; editable later
-        fd.append("status_id", 1); // Pending
-        fd.append("purpose_id", DEFAULT_PURPOSE_ID);
 
-        const res = await fetch(`${apiUrl}/questions/add`, {
-          method: "POST",
-          headers: { Authorization: `Bearer ${token}` },
-          body: fd,
-        });
+        fd.append(
+          "subjectID",
+          selectedSubjectId
+        );
+
+        fd.append(
+          "coverage_id",
+          DEFAULT_COVERAGE_ID
+        );
+
+        fd.append(
+          "questionText",
+          line
+        );
+
+        fd.append(
+          "score",
+          1
+        );
+
+        fd.append(
+          "difficulty_id",
+          1
+        );
+
+        fd.append(
+          "status_id",
+          1
+        );
+
+        fd.append(
+          "purpose_id",
+          DEFAULT_PURPOSE_ID
+        );
+
+        const res = await fetch(
+          `${apiUrl}/questions/add`,
+          {
+            method: "POST",
+            headers: {
+              Authorization: `Bearer ${token}`,
+            },
+            credentials: "include",
+            body: fd,
+          }
+        );
 
         if (res.ok) {
           successCount += 1;
         } else {
           failCount += 1;
+
+          const errorText =
+            await res.text();
+
+          console.error(
+            "File import failed:",
+            errorText
+          );
         }
       } catch (err) {
-        console.error("Error importing line:", line, err);
+        console.error(
+          "Error importing line:",
+          line,
+          err
+        );
+
         failCount += 1;
       }
     }
@@ -377,131 +803,827 @@ const ImportQuestions = () => {
 
     if (successCount > 0) {
       showToast(
-        `${successCount} question${successCount === 1 ? "" : "s"} imported${
-          failCount ? `, ${failCount} failed` : ""
+        `${successCount} question${
+          successCount === 1
+            ? ""
+            : "s"
+        } imported${
+          failCount
+            ? `, ${failCount} failed`
+            : ""
         }`,
-        failCount ? "error" : "success",
+        failCount
+          ? "error"
+          : "success"
       );
 
-      const subject = subjects.find(
-        (s) => String(s.subjectID) === String(selectedSubjectId),
+      const subject =
+        subjects.find(
+          (s) =>
+            String(s.subjectID) ===
+            String(selectedSubjectId)
+        );
+
+      const user = JSON.parse(
+        sessionStorage.getItem(
+          "user"
+        ) || "{}"
       );
 
-      const user = JSON.parse(sessionStorage.getItem("user") || "{}");
-      const roleID = user?.roleID ?? user?.roleId;
-      let path = "/dean/subjects?subject_id=" + selectedSubjectId;
-      if (roleID === 2) path = "/faculty/subjects?subject_id=" + selectedSubjectId;
-      else if (roleID === 3)
-        path = "/program-chair/subjects?subject_id=" + selectedSubjectId;
+      const roleID =
+        user?.roleID ??
+        user?.roleId;
 
-      navigate(path, { state: { subject } });
+      let path =
+        "/dean/subjects?subject_id=" +
+        selectedSubjectId;
+
+      if (roleID === 2) {
+        path =
+          "/faculty/subjects?subject_id=" +
+          selectedSubjectId;
+      } else if (roleID === 3) {
+        path =
+          "/program-chair/subjects?subject_id=" +
+          selectedSubjectId;
+      }
+
+      navigate(path, {
+        state: { subject },
+      });
     } else {
       setStatus({
-        message: "Could not import any questions. Please try again.",
+        message:
+          "Could not import any questions. Please try again.",
         isError: true,
       });
     }
   };
 
+  // =========================================================
+  // SELECT / UNSELECT QUESTIONS
+  // =========================================================
+
+  const allSelected =
+    sourceQuestions.length > 0 &&
+    selectedQuestionIds.length ===
+      sourceQuestions.length;
+
+  const toggleQuestion = (id) => {
+    setSelectedQuestionIds(
+      (current) =>
+        current.includes(id)
+          ? current.filter(
+              (item) => item !== id
+            )
+          : [...current, id]
+    );
+  };
+
+  const toggleSelectAll = () => {
+    setSelectedQuestionIds(
+      allSelected
+        ? []
+        : sourceQuestions.map(
+            (question) =>
+              question.questionID
+          )
+    );
+  };
+
+  // =========================================================
+  // DATABASE IMPORT
+  // =========================================================
+
+  const handleDatabaseImport =
+    async () => {
+      if (!selectedSubjectId) {
+        showToast(
+          "Please select a destination subject.",
+          "error"
+        );
+
+        return;
+      }
+
+      if (!sourceSubjectId) {
+        showToast(
+          "Please select a source subject.",
+          "error"
+        );
+
+        return;
+      }
+
+      if (
+        selectedQuestionIds.length ===
+        0
+      ) {
+        showToast(
+          "Please select at least one question.",
+          "error"
+        );
+
+        return;
+      }
+
+      setIsDatabaseImporting(true);
+
+      setStatus({
+        message: `Importing ${selectedQuestionIds.length} selected question${
+          selectedQuestionIds.length ===
+          1
+            ? ""
+            : "s"
+        }...`,
+        isError: false,
+      });
+
+      try {
+        const token =
+          sessionStorage.getItem(
+            "token"
+          );
+
+        const response = await fetch(
+          `${apiUrl}/database-import/questions`,
+          {
+            method: "POST",
+            headers: {
+              Accept:
+                "application/json",
+              "Content-Type":
+                "application/json",
+              Authorization: `Bearer ${token}`,
+            },
+            credentials: "include",
+            body: JSON.stringify({
+              destinationSubjectID:
+                selectedSubjectId,
+
+              questionIDs:
+                selectedQuestionIds,
+            }),
+          }
+        );
+
+        const data =
+          await response.json();
+
+        if (!response.ok) {
+          throw new Error(
+            data.message ||
+              "Database import failed."
+          );
+        }
+
+        const imported =
+          Number(
+            data.importedCount || 0
+          );
+
+        const failed =
+          Number(
+            data.failedCount || 0
+          );
+
+        if (imported <= 0) {
+          throw new Error(
+            "No questions were imported."
+          );
+        }
+
+        showToast(
+          `${imported} question${
+            imported === 1
+              ? ""
+              : "s"
+          } imported${
+            failed
+              ? `, ${failed} failed`
+              : ""
+          }`,
+          failed
+            ? "error"
+            : "success"
+        );
+
+        const subject =
+          subjects.find(
+            (s) =>
+              String(s.subjectID) ===
+              String(
+                selectedSubjectId
+              )
+          );
+
+        const user = JSON.parse(
+          sessionStorage.getItem(
+            "user"
+          ) || "{}"
+        );
+
+        const roleID =
+          user?.roleID ??
+          user?.roleId;
+
+        let path =
+          "/dean/subjects?subject_id=" +
+          selectedSubjectId;
+
+        if (roleID === 2) {
+          path =
+            "/faculty/subjects?subject_id=" +
+            selectedSubjectId;
+        } else if (roleID === 3) {
+          path =
+            "/program-chair/subjects?subject_id=" +
+            selectedSubjectId;
+        }
+
+        navigate(path, {
+          state: { subject },
+        });
+      } catch (err) {
+        console.error(
+          "Database import error:",
+          err
+        );
+
+        setStatus({
+          message:
+            err.message ||
+            "Database import failed.",
+          isError: true,
+        });
+
+        showToast(
+          err.message ||
+            "Database import failed.",
+          "error"
+        );
+      } finally {
+        setIsDatabaseImporting(
+          false
+        );
+      }
+    };
+
+  // =========================================================
+  // SELECTED SOURCE SUBJECT
+  // =========================================================
+
+  const selectedSourceSubject =
+    sourceSubjects.find(
+      (s) =>
+        String(s.subjectID) ===
+        String(sourceSubjectId)
+    );
+
+  // =========================================================
+  // RENDER
+  // =========================================================
+
   return (
     <>
       <div className="min-h-screen bg-[#fff1dc] px-6 py-8 dark:bg-[#11161d] sm:px-10 lg:px-14">
-        <div className="mx-auto max-w-3xl">
+        <div className="mx-auto max-w-4xl">
+
           {/* HEADER */}
           <div className="mb-6">
             <div className="outfit-700 text-[26px] text-amber-950 dark:text-gray-100">
               Import questions
             </div>
+
             <div className="outfit-400 mt-1 text-[14px] text-gray-500 dark:text-gray-400">
-              Bring in questions from Excel, Word, PDF, CSV, plain text, or a photo.
+              Bring in questions from Excel,
+              Word, PDF, CSV, plain text, a
+              photo, or the CAPS database.
             </div>
           </div>
 
-          {/* BODY */}
           <div className="rounded-2xl border border-amber-200 bg-white p-6 shadow-sm dark:border-gray-700 dark:bg-[#171d25]">
-            {/* DESTINATION SELECTOR */}
+
+            {/* =================================================
+                DESTINATION SUBJECT
+            ================================================= */}
+
             <div className="mb-5">
               <label className="outfit-700 mb-1.5 block text-[13px] text-amber-950 dark:text-gray-100">
-                Import into <span className="text-red-500">*</span>
+                Import into{" "}
+                <span className="text-red-500">
+                  *
+                </span>
               </label>
 
               {isSubjectsLoading ? (
-                <div className="outfit-400 text-[13px] text-gray-500 dark:text-gray-400">
+                <div className="outfit-400 text-[13px] text-gray-500">
                   Loading subjects...
-                </div>
-              ) : subjects.length === 0 ? (
-                <div className="outfit-400 rounded-lg border border-amber-200 bg-amber-50/40 px-3 py-2.5 text-[13px] text-amber-800 dark:border-gray-700 dark:bg-gray-800 dark:text-gray-300">
-                  No subjects found.
                 </div>
               ) : (
                 <select
-                  value={selectedSubjectId}
-                  onChange={(e) => setSelectedSubjectId(e.target.value)}
-                  className="outfit-400 w-full rounded-xl border border-gray-200 py-2.5 px-3 text-sm text-gray-900 transition focus:border-orange-400 focus:ring-2 focus:ring-orange-100 focus:outline-none dark:border-gray-700 dark:bg-[#11161d] dark:text-gray-100"
+                  value={
+                    selectedSubjectId
+                  }
+                  onChange={(e) =>
+                    setSelectedSubjectId(
+                      e.target.value
+                    )
+                  }
+                  disabled={
+                    isImporting ||
+                    isDatabaseImporting
+                  }
+                  className="outfit-400 w-full rounded-xl border border-gray-200 px-3 py-2.5 text-sm text-gray-900 focus:border-orange-400 focus:ring-2 focus:ring-orange-100 focus:outline-none disabled:opacity-60 dark:border-gray-700 dark:bg-[#11161d] dark:text-gray-100"
                 >
-                  <option value="">Select a subject...</option>
+                  <option value="">
+                    Select a subject...
+                  </option>
+
                   {subjects.map((s) => (
-                    <option key={s.subjectID} value={s.subjectID}>
-                      {s.subjectCode} - {s.subjectName}
+                    <option
+                      key={s.subjectID}
+                      value={s.subjectID}
+                    >
+                      {s.subjectCode} -{" "}
+                      {s.subjectName}
                     </option>
                   ))}
                 </select>
               )}
             </div>
 
-            <div
-              onDragOver={(e) => {
-                e.preventDefault();
-                setIsDragging(true);
-              }}
-              onDragLeave={() => setIsDragging(false)}
-              onDrop={onDrop}
-              onClick={() => fileInputRef.current?.click()}
-              className={`cursor-pointer rounded-xl border-2 border-dashed px-6 py-10 text-center transition-colors ${
-                isDragging
-                  ? "border-orange-500 bg-orange-50 dark:bg-orange-500/10"
-                  : "border-amber-300 bg-amber-50/40 hover:bg-amber-50 dark:border-gray-600 dark:bg-gray-800/40 dark:hover:bg-gray-800"
-              } ${isParsing || isImporting ? "pointer-events-none opacity-60" : ""}`}
-            >
-              <div className="mx-auto mb-3 flex h-12 w-12 items-center justify-center rounded-full border-2 border-orange-400 text-orange-500">
-                <i className="bx bx-cloud-upload text-[24px]" />
-              </div>
+            {/* =================================================
+                SOURCE TABS
+            ================================================= */}
 
-              <div className="outfit-700 text-[15px] text-amber-950 dark:text-gray-100">
-                {isParsing
-                  ? ocrProgress !== null
-                    ? `Reading image... ${ocrProgress}%`
-                    : "Reading file..."
-                  : isImporting
-                    ? "Importing..."
-                    : "Drag a file here, or click to browse"}
-              </div>
+            <div className="mb-5 grid grid-cols-2 gap-2 rounded-xl bg-amber-50 p-1 dark:bg-gray-800">
 
-              <div className="outfit-400 mt-1 text-[12px] text-gray-500 dark:text-gray-400">
-                One question per line works best for text-based files. Photos
-                are read automatically with OCR. Detected questions are
-                imported right away — no review step.
-              </div>
+              {/* FILE */}
+              <button
+                type="button"
+                onClick={() => {
+                  setSourceMode(
+                    "file"
+                  );
 
-              <div className="mt-4 flex flex-wrap justify-center gap-1.5">
-                {SUPPORTED_FORMATS.map((fmt) => (
-                  <span
-                    key={fmt}
-                    className="rounded-full bg-white px-2.5 py-0.5 text-[10px] font-semibold tracking-wide text-amber-700 shadow-sm dark:bg-gray-900 dark:text-gray-300"
-                  >
-                    {fmt}
-                  </span>
-                ))}
-              </div>
+                  setStatus({
+                    message: "",
+                    isError: false,
+                  });
+                }}
+                disabled={
+                  isImporting ||
+                  isDatabaseImporting
+                }
+                className={`outfit-700 rounded-lg px-4 py-2.5 text-sm transition ${
+                  sourceMode === "file"
+                    ? "bg-white text-orange-600 shadow-sm dark:bg-[#171d25]"
+                    : "text-gray-500 hover:text-gray-700 dark:text-gray-400"
+                }`}
+              >
+                <i className="bx bx-file mr-1" />
+                From File
+              </button>
+
+              {/* DATABASE */}
+              <button
+                type="button"
+                onClick={() => {
+                  setSourceMode(
+                    "database"
+                  );
+
+                  setStatus({
+                    message: "",
+                    isError: false,
+                  });
+                }}
+                disabled={
+                  isImporting ||
+                  isDatabaseImporting
+                }
+                className={`outfit-700 rounded-lg px-4 py-2.5 text-sm transition ${
+                  sourceMode ===
+                  "database"
+                    ? "bg-white text-orange-600 shadow-sm dark:bg-[#171d25]"
+                    : "text-gray-500 hover:text-gray-700 dark:text-gray-400"
+                }`}
+              >
+                <i className="bx bx-data mr-1" />
+                From Database
+              </button>
             </div>
 
-            <input
-              ref={fileInputRef}
-              type="file"
-              className="hidden"
-              accept=".xlsx,.xls,.csv,.docx,.pdf,.txt,.jpg,.jpeg,.png,.webp,.bmp"
-              onChange={onBrowseSelect}
-            />
+            {/* =================================================
+                FILE MODE
+            ================================================= */}
+
+            {sourceMode === "file" && (
+              <>
+                <div
+                  onDragOver={(e) => {
+                    e.preventDefault();
+                    setIsDragging(
+                      true
+                    );
+                  }}
+                  onDragLeave={() =>
+                    setIsDragging(
+                      false
+                    )
+                  }
+                  onDrop={onDrop}
+                  onClick={() =>
+                    fileInputRef.current?.click()
+                  }
+                  className={`cursor-pointer rounded-xl border-2 border-dashed px-6 py-10 text-center transition-colors ${
+                    isDragging
+                      ? "border-orange-500 bg-orange-50 dark:bg-orange-500/10"
+                      : "border-amber-300 bg-amber-50/40 hover:bg-amber-50 dark:border-gray-600 dark:bg-gray-800/40"
+                  } ${
+                    isParsing ||
+                    isImporting
+                      ? "pointer-events-none opacity-60"
+                      : ""
+                  }`}
+                >
+                  <div className="mx-auto mb-3 flex h-12 w-12 items-center justify-center rounded-full border-2 border-orange-400 text-orange-500">
+                    <i className="bx bx-cloud-upload text-[24px]" />
+                  </div>
+
+                  <div className="outfit-700 text-[15px] text-amber-950 dark:text-gray-100">
+                    {isParsing
+                      ? ocrProgress !==
+                        null
+                        ? `Reading image... ${ocrProgress}%`
+                        : "Reading file..."
+                      : isImporting
+                      ? "Importing..."
+                      : "Drag a file here, or click to browse"}
+                  </div>
+
+                  <div className="outfit-400 mt-1 text-[12px] text-gray-500 dark:text-gray-400">
+                    One question per
+                    line works best.
+                    Photos are read
+                    automatically with
+                    OCR.
+                  </div>
+
+                  <div className="mt-4 flex flex-wrap justify-center gap-1.5">
+                    {SUPPORTED_FORMATS.map(
+                      (fmt) => (
+                        <span
+                          key={fmt}
+                          className="rounded-full bg-white px-2.5 py-0.5 text-[10px] font-semibold tracking-wide text-amber-700 shadow-sm dark:bg-gray-900 dark:text-gray-300"
+                        >
+                          {fmt}
+                        </span>
+                      )
+                    )}
+                  </div>
+                </div>
+
+                <input
+                  ref={fileInputRef}
+                  type="file"
+                  className="hidden"
+                  accept=".xlsx,.xls,.csv,.docx,.pdf,.txt,.jpg,.jpeg,.png,.webp,.bmp"
+                  onChange={
+                    onBrowseSelect
+                  }
+                />
+
+                {fileName &&
+                  (isParsing ||
+                    isImporting) && (
+                    <div className="outfit-400 mt-3 text-[11px] tracking-wide text-amber-800/80 uppercase dark:text-gray-400">
+                      {fileName}
+                    </div>
+                  )}
+              </>
+            )}
+
+            {/* =================================================
+                DATABASE MODE
+            ================================================= */}
+
+            {sourceMode ===
+              "database" && (
+              <div className="space-y-4">
+
+                {/* SOURCE DATABASE */}
+                <div className="rounded-xl border border-orange-200 bg-orange-50/50 p-4 dark:border-gray-700 dark:bg-gray-800/50">
+                  <div className="flex items-center gap-3">
+                    <i className="bx bx-data text-2xl text-orange-500" />
+
+                    <div>
+                      <div className="outfit-700 text-sm text-gray-800 dark:text-gray-100">
+                        Source Database
+                      </div>
+
+                      <div className="outfit-400 text-xs text-gray-500 dark:text-gray-400">
+                        MySQL •{" "}
+                        <span className="font-semibold">
+                          caps
+                        </span>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+
+                {/* SOURCE SUBJECT */}
+                <div>
+                  <label className="outfit-700 mb-1.5 block text-[13px] text-amber-950 dark:text-gray-100">
+                    Source Subject{" "}
+                    <span className="text-red-500">
+                      *
+                    </span>
+                  </label>
+
+                  <select
+                    value={
+                      sourceSubjectId
+                    }
+                    onChange={(e) => {
+                      setSourceSubjectId(
+                        e.target.value
+                      );
+
+                      setSelectedQuestionIds(
+                        []
+                      );
+                    }}
+                    disabled={
+                      isSourceSubjectsLoading ||
+                      isDatabaseImporting
+                    }
+                    className="outfit-400 w-full rounded-xl border border-gray-200 px-3 py-2.5 text-sm text-gray-900 focus:border-orange-400 focus:ring-2 focus:ring-orange-100 focus:outline-none disabled:opacity-60 dark:border-gray-700 dark:bg-[#11161d] dark:text-gray-100"
+                  >
+                    <option value="">
+                      {isSourceSubjectsLoading
+                        ? "Loading source subjects..."
+                        : "Select a source subject..."}
+                    </option>
+
+                    {sourceSubjects.map(
+                      (s) => (
+                        <option
+                          key={
+                            s.subjectID
+                          }
+                          value={
+                            s.subjectID
+                          }
+                        >
+                          {s.subjectCode} -{" "}
+                          {s.subjectName}
+                        </option>
+                      )
+                    )}
+                  </select>
+                </div>
+
+                {/* QUESTIONS */}
+                {sourceSubjectId && (
+                  <div className="overflow-hidden rounded-xl border border-gray-200 dark:border-gray-700">
+
+                    {/* QUESTION HEADER */}
+                    <div className="flex items-center justify-between border-b border-gray-200 bg-gray-50 px-4 py-3 dark:border-gray-700 dark:bg-gray-800">
+                      <div>
+                        <div className="outfit-700 text-sm text-gray-800 dark:text-gray-100">
+                          {selectedSourceSubject?.subjectName ||
+                            "Selected Subject"}
+                        </div>
+
+                        <div className="outfit-400 text-xs text-gray-500 dark:text-gray-400">
+                          {isQuestionsLoading
+                            ? "Loading..."
+                            : `${sourceQuestions.length} question${
+                                sourceQuestions.length ===
+                                1
+                                  ? ""
+                                  : "s"
+                              } found`}
+                        </div>
+                      </div>
+
+                      {sourceQuestions.length >
+                        0 && (
+                        <button
+                          type="button"
+                          onClick={
+                            toggleSelectAll
+                          }
+                          disabled={
+                            isDatabaseImporting
+                          }
+                          className="outfit-700 rounded-lg border border-orange-300 px-3 py-2 text-xs text-orange-600 hover:bg-orange-50 disabled:opacity-50"
+                        >
+                          {allSelected
+                            ? "Unselect All"
+                            : "Select All"}
+                        </button>
+                      )}
+                    </div>
+
+                    {/* LOADING */}
+                    {isQuestionsLoading ? (
+                      <div className="p-8 text-center text-sm text-gray-500">
+                        <i className="bx bx-loader-alt mr-2 animate-spin text-xl text-orange-500" />
+                        Loading questions...
+                      </div>
+                    ) : sourceQuestions.length ===
+                      0 ? (
+                      <div className="p-8 text-center text-sm text-gray-500 dark:text-gray-400">
+                        No questions found for this subject.
+                      </div>
+                    ) : (
+                      <div className="max-h-[560px] divide-y divide-gray-100 overflow-y-auto dark:divide-gray-700">
+
+                        {sourceQuestions.map(
+                          (
+                            question,
+                            index
+                          ) => {
+                            const selected =
+                              selectedQuestionIds.includes(
+                                question.questionID
+                              );
+
+                            return (
+                              <div
+                                key={
+                                  question.questionID
+                                }
+                                onClick={() =>
+                                  toggleQuestion(
+                                    question.questionID
+                                  )
+                                }
+                                className={`cursor-pointer p-4 transition ${
+                                  selected
+                                    ? "bg-orange-50 dark:bg-orange-500/10"
+                                    : "hover:bg-gray-50 dark:hover:bg-gray-800/40"
+                                }`}
+                              >
+                                <div className="flex gap-3">
+
+                                  {/* CHECKBOX */}
+                                  <input
+                                    type="checkbox"
+                                    checked={
+                                      selected
+                                    }
+                                    onChange={() =>
+                                      toggleQuestion(
+                                        question.questionID
+                                      )
+                                    }
+                                    onClick={(
+                                      e
+                                    ) =>
+                                      e.stopPropagation()
+                                    }
+                                    className="mt-1 h-5 w-5 rounded text-orange-500 focus:ring-orange-500"
+                                  />
+
+                                  <div className="min-w-0 flex-1">
+
+                                    {/* QUESTION LABEL */}
+                                    <div className="mb-2 flex items-center justify-between gap-2">
+                                      <span className="outfit-700 text-xs text-orange-600">
+                                        Question{" "}
+                                        {index +
+                                          1}
+                                      </span>
+
+                                      <span className="text-[11px] text-gray-400">
+                                        ID:{" "}
+                                        {
+                                          question.questionID
+                                        }
+                                      </span>
+                                    </div>
+
+                                    {/* QUESTION TEXT */}
+                                    <div className="outfit-500 whitespace-pre-wrap text-sm leading-6 text-gray-800 dark:text-gray-100">
+                                      {
+                                        question.questionText
+                                      }
+                                    </div>
+
+                                    {/* CHOICES */}
+                                    {Array.isArray(
+                                      question.choices
+                                    ) &&
+                                      question
+                                        .choices
+                                        .length >
+                                        0 && (
+                                        <div className="mt-3 space-y-1.5">
+                                          {question.choices.map(
+                                            (
+                                              choice
+                                            ) => (
+                                              <div
+                                                key={
+                                                  choice.choiceID
+                                                }
+                                                className={`rounded-lg border px-3 py-2 text-sm ${
+                                                  choice.isCorrect
+                                                    ? "border-green-300 bg-green-50 text-green-700 dark:border-green-500/30 dark:bg-green-500/10 dark:text-green-400"
+                                                    : "border-gray-200 bg-gray-50 text-gray-600 dark:border-gray-700 dark:bg-[#11161d] dark:text-gray-300"
+                                                }`}
+                                              >
+                                                <span className="mr-2 font-semibold">
+                                                  {String.fromCharCode(
+                                                    64 +
+                                                      Number(
+                                                        choice.position ||
+                                                          0
+                                                      )
+                                                  )}
+                                                  .
+                                                </span>
+
+                                                {
+                                                  choice.choiceText
+                                                }
+
+                                                {choice.isCorrect && (
+                                                  <span className="ml-2 text-xs font-semibold">
+                                                    ✓ Correct
+                                                  </span>
+                                                )}
+                                              </div>
+                                            )
+                                          )}
+                                        </div>
+                                      )}
+                                  </div>
+                                </div>
+                              </div>
+                            );
+                          }
+                        )}
+                      </div>
+                    )}
+
+                    {/* IMPORT BUTTON */}
+                    {sourceQuestions.length >
+                      0 && (
+                      <div className="flex flex-col gap-3 border-t border-gray-200 bg-white p-4 dark:border-gray-700 dark:bg-[#171d25] sm:flex-row sm:items-center sm:justify-between">
+
+                        <div className="outfit-400 text-sm text-gray-500 dark:text-gray-400">
+                          <span className="font-semibold text-orange-600">
+                            {
+                              selectedQuestionIds.length
+                            }
+                          </span>{" "}
+                          selected
+                        </div>
+
+                        <button
+                          type="button"
+                          onClick={
+                            handleDatabaseImport
+                          }
+                          disabled={
+                            isDatabaseImporting ||
+                            selectedQuestionIds.length ===
+                              0 ||
+                            !selectedSubjectId
+                          }
+                          className="outfit-700 rounded-xl bg-orange-500 px-5 py-2.5 text-sm text-white hover:bg-orange-600 disabled:cursor-not-allowed disabled:opacity-50"
+                        >
+                          {isDatabaseImporting ? (
+                            <>
+                              <i className="bx bx-loader-alt mr-1 animate-spin" />
+                              Importing...
+                            </>
+                          ) : (
+                            <>
+                              <i className="bx bx-import mr-1" />
+                              Import Selected (
+                              {
+                                selectedQuestionIds.length
+                              }
+                              )
+                            </>
+                          )}
+                        </button>
+                      </div>
+                    )}
+                  </div>
+                )}
+              </div>
+            )}
+
+            {/* =================================================
+                STATUS
+            ================================================= */}
 
             {status.message && (
               <div
@@ -514,19 +1636,22 @@ const ImportQuestions = () => {
                 {status.message}
               </div>
             )}
-
-            {fileName && (isParsing || isImporting) && (
-              <div className="outfit-400 mt-3 text-[11px] tracking-wide text-amber-800/80 uppercase dark:text-gray-400">
-                {fileName}
-              </div>
-            )}
           </div>
 
-          {/* FOOTER */}
+          {/* =================================================
+              CANCEL
+          ================================================= */}
+
           <div className="mt-4 flex items-center justify-end">
             <button
-              onClick={() => navigate(-1)}
-              disabled={isImporting}
+              onClick={() =>
+                navigate(-1)
+              }
+              disabled={
+                isImporting ||
+                isParsing ||
+                isDatabaseImporting
+              }
               className="border-color outfit-400 cursor-pointer rounded-lg border px-4 py-2 text-[14px] font-semibold text-gray-700 transition hover:bg-gray-100 disabled:cursor-not-allowed disabled:opacity-40 dark:border-gray-600 dark:text-gray-200 dark:hover:bg-gray-800"
             >
               Cancel
@@ -535,14 +1660,14 @@ const ImportQuestions = () => {
         </div>
       </div>
 
-      <Toast message={toast.message} type={toast.type} show={toast.show} />
+      {/* TOAST */}
+      <Toast
+        message={toast.message}
+        type={toast.type}
+        show={toast.show}
+      />
     </>
   );
 };
 
 export default ImportQuestions;
-
-
-
-
-

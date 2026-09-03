@@ -1,4 +1,4 @@
-import { useState, useEffect, useRef } from "react";
+import { useEffect, useState, useRef } from "react";
 import { Link, useLocation, useNavigate } from "react-router-dom";
 
 import AllSubjectsDropDownProgramChair from "./SubjectsProgramChair";
@@ -532,9 +532,9 @@ const Sidebar = ({
 
       return (
         location.pathname === "/import" ||
-        location.pathname.startsWith("/import/") ||
-        location.pathname === "/import-questions" ||
-        location.pathname.startsWith("/import-questions/")
+        location.pathname.startsWith(
+          "/import/"
+        )
       );
 
     }
@@ -587,10 +587,6 @@ const Sidebar = ({
   // =========================================================
   // IMPORT QUESTIONS PATH
   // =========================================================
-  //
-  // Preserve the current quiz/subject context when opening
-  // Import Questions. No fake/default IDs are created.
-  // =========================================================
 
   const getImportQuestionsPath = () => {
     const params = new URLSearchParams(location.search);
@@ -601,78 +597,33 @@ const Sidebar = ({
 
     let personalQuizID =
       params.get("personalQuizID") ||
-      params.get("personal_quiz_id") ||
-      params.get("quizID") ||
-      params.get("quiz_id");
+      params.get("personal_quiz_id");
 
-    // Current selected subject/quiz
+    // Use the currently selected subject/quiz when the IDs
+    // are not already present in the URL.
     if (!subjectID && selectedSubject?.subjectID != null) {
       subjectID = String(selectedSubject.subjectID);
     }
 
-    if (!personalQuizID) {
-      const selectedQuizID =
-        selectedSubject?.personalQuizID ??
-        selectedSubject?.personal_quiz_id ??
-        selectedSubject?.quizID ??
-        selectedSubject?.quiz_id;
-
-      if (selectedQuizID != null) {
-        personalQuizID = String(selectedQuizID);
-      }
-    }
-
-    // Previously saved valid context
-    if (!subjectID) {
-      const savedSubjectID =
-        sessionStorage.getItem("import_subjectID") ||
-        sessionStorage.getItem("import_subject_id");
-
-      if (savedSubjectID) {
-        subjectID = savedSubjectID;
-      }
-    }
-
-    if (!personalQuizID) {
-      const savedQuizID =
-        sessionStorage.getItem("import_personalQuizID") ||
-        sessionStorage.getItem("import_personal_quiz_id") ||
-        sessionStorage.getItem("import_quizID") ||
-        sessionStorage.getItem("import_quiz_id");
-
-      if (savedQuizID) {
-        personalQuizID = savedQuizID;
-      }
-    }
-
-    // Save valid context for later navigation
-    if (subjectID) {
-      sessionStorage.setItem(
-        "import_subjectID",
-        String(subjectID)
-      );
-    }
-
-    if (personalQuizID) {
-      sessionStorage.setItem(
-        "import_personalQuizID",
-        String(personalQuizID)
+    if (
+      !personalQuizID &&
+      selectedSubject?.personalQuizID != null
+    ) {
+      personalQuizID = String(
+        selectedSubject.personalQuizID
       );
     }
 
     const importParams = new URLSearchParams();
 
     if (subjectID) {
-      importParams.set(
-        "subjectID",
-        String(subjectID)
-      );
+      importParams.set("subjectID", subjectID);
     }
 
     if (personalQuizID) {
       importParams.set(
         "personalQuizID",
-        String(personalQuizID)
+        personalQuizID
       );
     }
 

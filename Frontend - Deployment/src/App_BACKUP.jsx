@@ -2,7 +2,10 @@ import {
   BrowserRouter as Router,
   Routes,
   Route,
+  useNavigate,
+  useSearchParams,
 } from "react-router-dom";
+
 
 import Register from "./pages/Register";
 import Layout from "./components/layout";
@@ -58,7 +61,77 @@ import QuizInfo from "./pages/QuizInfo";
 import StudentQuiz from "./pages/StudentQuiz";
 import StudentQuizResults from "./pages/StudentQuizResults";
 
-import ImportQuestions from "./pages/ImportQuestions";
+import ImportQuestionModal from "./components/ImportQuestionModal";
+
+
+/* =========================================================
+   IMPORT QUESTIONS PAGE
+========================================================= */
+
+function ImportQuestionsPage() {
+  const navigate = useNavigate();
+  const [searchParams] = useSearchParams();
+
+  const personalQuizID =
+    searchParams.get("personalQuizID") ||
+    searchParams.get("personal_quiz_id");
+
+  const subjectID =
+    searchParams.get("subjectID") ||
+    searchParams.get("subject_id");
+
+  const handleImportComplete = () => {
+    navigate(-1);
+  };
+
+  /*
+    If opened directly without the quiz/subject IDs,
+    show a safe page instead of a blank screen.
+  */
+  if (!personalQuizID || !subjectID) {
+    return (
+      <div className="flex min-h-screen items-center justify-center bg-gray-50 px-6 dark:bg-[#0f141a]">
+        <div className="w-full max-w-lg rounded-2xl border border-gray-200 bg-white p-8 text-center shadow-lg dark:border-gray-700 dark:bg-[#171d25]">
+
+          <div className="mx-auto mb-4 flex h-14 w-14 items-center justify-center rounded-full bg-orange-100 text-orange-600 dark:bg-orange-500/10 dark:text-orange-400">
+            <i className="bx bx-import text-3xl" />
+          </div>
+
+          <h1 className="outfit-700 text-xl text-gray-900 dark:text-gray-100">
+            Import Questions
+          </h1>
+
+          <p className="outfit-400 mt-2 text-sm leading-6 text-gray-500 dark:text-gray-400">
+            Please open the quiz you want to add questions to,
+            then use Import Questions from that quiz.
+          </p>
+
+          <button
+            type="button"
+            onClick={() => navigate(-1)}
+            className="outfit-500 mt-6 rounded-lg bg-orange-500 px-5 py-2.5 text-sm font-semibold text-white transition hover:bg-orange-600"
+          >
+            Go Back
+          </button>
+
+        </div>
+      </div>
+    );
+  }
+
+  return (
+    <div className="min-h-screen bg-gray-50 dark:bg-[#0f141a]">
+      <ImportQuestionModal
+        isOpen={true}
+        personalQuizID={personalQuizID}
+        subjectID={subjectID}
+        existingQuestionIds={[]}
+        onClose={() => navigate(-1)}
+        onImport={handleImportComplete}
+      />
+    </div>
+  );
+}
 
 
 /* =========================================================
@@ -361,7 +434,7 @@ function App() {
 
 
         {/* =================================================
-            FACULTY SUBJECTS
+            FACULTY ROUTES
         ================================================= */}
 
         <Route
@@ -380,10 +453,6 @@ function App() {
         </Route>
 
 
-        {/* =================================================
-            FACULTY DASHBOARD
-        ================================================= */}
-
         <Route
           path="/faculty-dashboard"
           element={<ProtectedRoute element={<Layout />} />}
@@ -401,7 +470,7 @@ function App() {
 
 
         {/* =================================================
-            PROGRAM CHAIR SUBJECTS
+            PROGRAM CHAIR ROUTES
         ================================================= */}
 
         <Route
@@ -420,10 +489,6 @@ function App() {
         </Route>
 
 
-        {/* =================================================
-            PROGRAM CHAIR DASHBOARD
-        ================================================= */}
-
         <Route
           path="/program-chair-dashboard"
           element={<ProtectedRoute element={<Layout />} />}
@@ -441,7 +506,7 @@ function App() {
 
 
         {/* =================================================
-            ASSOCIATE DEAN SUBJECTS
+            ASSOCIATE DEAN ROUTES
         ================================================= */}
 
         <Route
@@ -465,10 +530,6 @@ function App() {
         </Route>
 
 
-        {/* =================================================
-            ASSOCIATE DEAN DASHBOARD
-        ================================================= */}
-
         <Route
           path="/asso-dean-dashboard"
           element={<ProtectedRoute element={<Layout />} />}
@@ -486,7 +547,7 @@ function App() {
 
 
         {/* =================================================
-            DEAN SUBJECTS
+            DEAN ROUTES
         ================================================= */}
 
         <Route
@@ -509,10 +570,6 @@ function App() {
           />
         </Route>
 
-
-        {/* =================================================
-            DEAN DASHBOARD
-        ================================================= */}
 
         <Route
           path="/dean-dashboard"
@@ -622,8 +679,6 @@ function App() {
 
         {/* =================================================
             IMPORT QUESTIONS
-            (goes straight to the import page — no need
-            to have a quiz open first)
         ================================================= */}
 
         <Route
@@ -632,7 +687,7 @@ function App() {
         >
           <Route
             index
-            element={<ImportQuestions />}
+            element={<ImportQuestionsPage />}
           />
         </Route>
 
@@ -647,7 +702,7 @@ function App() {
         >
           <Route
             index
-            element={<ImportQuestions />}
+            element={<ImportQuestionsPage />}
           />
         </Route>
 

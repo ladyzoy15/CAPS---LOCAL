@@ -612,7 +612,6 @@ const ProgramChairContent = () => {
                 pendingCount={questions.filter((q) => q.status_id === 1).length}
               />
 
-                )}
             </div>
 
             {/* Question management section */}
@@ -1184,7 +1183,7 @@ const ProgramChairContent = () => {
                                           alt="Question"
                                           className="ml-auto h-10 w-10 rounded object-cover"
                                         />
-                                      )}
+                                    )}
                                     </div>
                                   )
                                 ) : (
