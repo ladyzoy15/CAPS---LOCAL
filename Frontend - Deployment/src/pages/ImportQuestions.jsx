@@ -260,6 +260,36 @@ const ImportQuestions = () => {
   const [sourceMode, setSourceMode] =
     useState("file");
 
+  // Source databases
+  const [databaseSources, setDatabaseSources] =
+    useState([]);
+
+  const [selectedSourceDatabaseId, setSelectedSourceDatabaseId] =
+    useState("");
+
+  const [isDatabaseSourcesLoading, setIsDatabaseSourcesLoading] =
+    useState(false);
+
+  const [showAddDatabase, setShowAddDatabase] =
+    useState(false);
+
+  const [isSavingDatabase, setIsSavingDatabase] =
+    useState(false);
+
+  const [isTestingDatabase, setIsTestingDatabase] =
+    useState(false);
+
+  const [databaseForm, setDatabaseForm] =
+    useState({
+      name: "",
+      driver: "mysql",
+      host: "127.0.0.1",
+      port: "3306",
+      database: "",
+      username: "root",
+      password: "",
+    });
+
   const [sourceSubjects, setSourceSubjects] =
     useState([]);
 
@@ -373,7 +403,92 @@ const ImportQuestions = () => {
   }, [apiUrl]);
 
   // =========================================================
-  // LOAD SOURCE SUBJECTS FROM CAPS DATABASE
+  // LOAD DATABASE SOURCES
+  // =========================================================
+
+  useEffect(() => {
+    if (sourceMode !== "database") {
+      return;
+    }
+
+    const fetchDatabaseSources = async () => {
+      setIsDatabaseSourcesLoading(true);
+
+      try {
+        const token =
+          sessionStorage.getItem("token");
+
+        const response = await fetch(
+          `${apiUrl}/database-import/sources`,
+          {
+            method: "GET",
+            headers: {
+              Accept: "application/json",
+              Authorization: `Bearer ${token}`,
+            },
+            credentials: "include",
+          }
+        );
+
+        const data = await response.json();
+
+        if (!response.ok) {
+          throw new Error(
+            data.message ||
+              "Could not load database sources."
+          );
+        }
+
+        const sources = Array.isArray(data)
+          ? data
+          : Array.isArray(data.data)
+          ? data.data
+          : Array.isArray(data.sources)
+          ? data.sources
+          : [];
+
+        setDatabaseSources(sources);
+
+        if (sources.length > 0) {
+          const currentExists = sources.some(
+            (source) =>
+              String(source.id) ===
+              String(selectedSourceDatabaseId)
+          );
+
+          if (!currentExists) {
+            setSelectedSourceDatabaseId(
+              String(sources[0].id)
+            );
+          }
+        } else {
+          setSelectedSourceDatabaseId("");
+        }
+      } catch (err) {
+        console.error(
+          "Error loading database sources:",
+          err
+        );
+
+        setDatabaseSources([]);
+        setSelectedSourceDatabaseId("");
+
+        setStatus({
+          message:
+            err.message ||
+            "Could not load database sources.",
+          isError: true,
+        });
+      } finally {
+        setIsDatabaseSourcesLoading(false);
+      }
+    };
+
+    fetchDatabaseSources();
+  }, [apiUrl, sourceMode]);
+
+  // =========================================================
+  // LOAD SOURCE SUBJECTS FROM SELECTED DATABASE
   // =========================================================
 
   useEffect(() => {
@@ -388,8 +503,14 @@ const ImportQuestions = () => {
         const token =
           sessionStorage.getItem("token");
 
+        const query = selectedSourceDatabaseId
+          ? `?sourceDatabaseID=${encodeURIComponent(
+              selectedSourceDatabaseId
+            )}`
+          : "";
+
         const response = await fetch(
-          `${apiUrl}/database-import/subjects`,
+          `${apiUrl}/database-import/subjects${query}`,
           {
             method: "GET",
             headers: {
@@ -449,7 +570,11 @@ const ImportQuestions = () => {
     };
 
     fetchSourceSubjects();
-  }, [apiUrl, sourceMode]);
+  }, [
+    apiUrl,
+    sourceMode,
+    selectedSourceDatabaseId,
+  ]);
 
   // =========================================================
   // LOAD QUESTIONS FOR SELECTED SOURCE SUBJECT
@@ -472,8 +597,14 @@ const ImportQuestions = () => {
         const token =
           sessionStorage.getItem("token");
 
+        const query = selectedSourceDatabaseId
+          ? `?sourceDatabaseID=${encodeURIComponent(
+              selectedSourceDatabaseId
+            )}`
+          : "";
+
         const response = await fetch(
-          `${apiUrl}/database-import/questions/${sourceSubjectId}`,
+          `${apiUrl}/database-import/questions/${sourceSubjectId}${query}`,
           {
             method: "GET",
             headers: {
@@ -543,6 +674,7 @@ const ImportQuestions = () => {
     apiUrl,
     sourceMode,
     sourceSubjectId,
+    selectedSourceDatabaseId,
   ]);
 
   // =========================================================
@@ -958,6 +1090,12 @@ const ImportQuestions = () => {
             },
             credentials: "include",
             body: JSON.stringify({
+              sourceDatabaseID:
+                selectedSourceDatabaseId,
+
+              sourceSubjectID:
+                sourceSubjectId,
+
               destinationSubjectID:
                 selectedSubjectId,
 
@@ -1068,6 +1206,246 @@ const ImportQuestions = () => {
         );
       }
     };
+
+  // =========================================================
+  // DATABASE SOURCE FORM
+  // =========================================================
+
+  const updateDatabaseForm = (field, value) => {
+    setDatabaseForm((current) => ({
+      ...current,
+      [field]: value,
+    }));
+  };
+
+  const testDatabaseConnection = async () => {
+    if (!databaseForm.name.trim()) {
+      showToast("Please enter a database name.", "error");
+      return;
+    }
+
+    if (!databaseForm.host.trim()) {
+      showToast("Please enter the database host.", "error");
+      return;
+    }
+
+    if (!databaseForm.port.trim()) {
+      showToast("Please enter the database port.", "error");
+      return;
+    }
+
+    if (!databaseForm.database.trim()) {
+      showToast("Please enter the database name.", "error");
+      return;
+    }
+
+    if (!databaseForm.username.trim()) {
+      showToast("Please enter the database username.", "error");
+      return;
+    }
+
+    setIsTestingDatabase(true);
+
+    try {
+      const token =
+        sessionStorage.getItem("token");
+
+      const response = await fetch(
+        `${apiUrl}/database-sources`,
+        {
+          method: "POST",
+          headers: {
+            Accept: "application/json",
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${token}`,
+          },
+          credentials: "include",
+          body: JSON.stringify({
+            ...databaseForm,
+            port: Number(databaseForm.port),
+          }),
+        }
+      );
+
+      const data = await response.json();
+
+      if (!response.ok) {
+        const firstError =
+          data?.errors &&
+          Object.values(data.errors)[0]?.[0];
+
+        throw new Error(
+          firstError ||
+            data.message ||
+            "Connection test failed."
+        );
+      }
+
+      showToast(
+        "Connection successful. The database source is ready to save.",
+        "success"
+      );
+    } catch (err) {
+      console.error(
+        "Database connection test error:",
+        err
+      );
+
+      showToast(
+        err.message ||
+          "Could not connect to the database.",
+        "error"
+      );
+    } finally {
+      setIsTestingDatabase(false);
+    }
+  };
+
+  const saveDatabaseSource = async () => {
+    if (!databaseForm.name.trim()) {
+      showToast("Please enter a database name.", "error");
+      return;
+    }
+
+    if (!databaseForm.host.trim()) {
+      showToast("Please enter the database host.", "error");
+      return;
+    }
+
+    if (!databaseForm.port.trim()) {
+      showToast("Please enter the database port.", "error");
+      return;
+    }
+
+    if (!databaseForm.database.trim()) {
+      showToast("Please enter the database name.", "error");
+      return;
+    }
+
+    if (!databaseForm.username.trim()) {
+      showToast("Please enter the database username.", "error");
+      return;
+    }
+
+    setIsSavingDatabase(true);
+
+    try {
+      const token =
+        sessionStorage.getItem("token");
+
+      const response = await fetch(
+        `${apiUrl}/database-sources`,
+        {
+          method: "POST",
+          headers: {
+            Accept: "application/json",
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${token}`,
+          },
+          credentials: "include",
+          body: JSON.stringify({
+            ...databaseForm,
+            port: Number(databaseForm.port),
+          }),
+        }
+      );
+
+      const data = await response.json();
+
+      if (!response.ok) {
+        const firstError =
+          data?.errors &&
+          Object.values(data.errors)[0]?.[0];
+
+        throw new Error(
+          firstError ||
+            data.message ||
+            "Could not save the database source."
+        );
+      }
+
+      const newSource =
+        data.source || data.data;
+
+      if (!newSource?.id) {
+        throw new Error(
+          "Database was saved, but the server did not return the source ID."
+        );
+      }
+
+      setDatabaseSources((current) => {
+        const withoutDuplicate =
+          current.filter(
+            (source) =>
+              String(source.id) !==
+              String(newSource.id)
+          );
+
+        return [
+          ...withoutDuplicate,
+          newSource,
+        ].sort((a, b) =>
+          String(a.name || "").localeCompare(
+            String(b.name || "")
+          )
+        );
+      });
+
+      setSelectedSourceDatabaseId(
+        String(newSource.id)
+      );
+
+      setSourceSubjectId("");
+      setSourceQuestions([]);
+      setSelectedQuestionIds([]);
+
+      setDatabaseForm({
+        name: "",
+        driver: "mysql",
+        host: "127.0.0.1",
+        port: "3306",
+        database: "",
+        username: "root",
+        password: "",
+      });
+
+      setShowAddDatabase(false);
+
+      setStatus({
+        message: `${newSource.name} database source added successfully.`,
+        isError: false,
+      });
+
+      showToast(
+        `${newSource.name} added successfully.`,
+        "success"
+      );
+    } catch (err) {
+      console.error(
+        "Save database source error:",
+        err
+      );
+
+      showToast(
+        err.message ||
+          "Could not save the database source.",
+        "error"
+      );
+    } finally {
+      setIsSavingDatabase(false);
+    }
+  };
+
+  // =========================================================
+  // SELECTED SOURCE DATABASE
+  // =========================================================
+
+  const selectedSourceDatabase =
+    databaseSources.find(
+      (source) =>
+        String(source.id) ===
+        String(selectedSourceDatabaseId)
+    );
 
   // =========================================================
   // SELECTED SOURCE SUBJECT
@@ -1315,22 +1693,93 @@ const ImportQuestions = () => {
 
                 {/* SOURCE DATABASE */}
                 <div className="rounded-xl border border-orange-200 bg-orange-50/50 p-4 dark:border-gray-700 dark:bg-gray-800/50">
-                  <div className="flex items-center gap-3">
-                    <i className="bx bx-data text-2xl text-orange-500" />
+                  <div className="mb-3 flex items-center gap-3">
+                    <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-orange-100 text-orange-500 dark:bg-orange-500/10">
+                      <i className="bx bx-data text-2xl" />
+                    </div>
 
-                    <div>
+                    <div className="min-w-0">
                       <div className="outfit-700 text-sm text-gray-800 dark:text-gray-100">
                         Source Database
                       </div>
 
                       <div className="outfit-400 text-xs text-gray-500 dark:text-gray-400">
-                        MySQL •{" "}
-                        <span className="font-semibold">
-                          caps
-                        </span>
+                        Choose where the questions will be imported from.
                       </div>
                     </div>
                   </div>
+
+                  <div className="flex flex-col gap-2 sm:flex-row sm:items-center">
+                    <select
+                      value={
+                        selectedSourceDatabaseId
+                      }
+                      onChange={(e) => {
+                        setSelectedSourceDatabaseId(
+                          e.target.value
+                        );
+
+                        setSourceSubjectId("");
+                        setSourceQuestions([]);
+                        setSelectedQuestionIds([]);
+
+                        setStatus({
+                          message: "",
+                          isError: false,
+                        });
+                      }}
+                      disabled={
+                        isDatabaseSourcesLoading ||
+                        isDatabaseImporting ||
+                        isSavingDatabase
+                      }
+                      className="outfit-400 min-w-0 flex-1 rounded-xl border border-gray-200 bg-white px-3 py-2.5 text-sm text-gray-900 focus:border-orange-400 focus:ring-2 focus:ring-orange-100 focus:outline-none disabled:opacity-60 dark:border-gray-700 dark:bg-[#11161d] dark:text-gray-100"
+                    >
+                      <option value="">
+                        {isDatabaseSourcesLoading
+                          ? "Loading databases..."
+                          : databaseSources.length === 0
+                          ? "No database sources available"
+                          : "Select a database..."}
+                      </option>
+
+                      {databaseSources.map(
+                        (source) => (
+                          <option
+                            key={source.id}
+                            value={source.id}
+                          >
+                            {source.name}
+                          </option>
+                        )
+                      )}
+                    </select>
+
+                    <button
+                      type="button"
+                      onClick={() =>
+                        setShowAddDatabase(true)
+                      }
+                      disabled={
+                        isDatabaseImporting ||
+                        isSavingDatabase
+                      }
+                      className="outfit-700 inline-flex shrink-0 items-center justify-center gap-1.5 rounded-xl border border-orange-300 bg-white px-4 py-2.5 text-sm text-orange-600 transition hover:bg-orange-50 disabled:cursor-not-allowed disabled:opacity-50 dark:border-gray-600 dark:bg-[#171d25] dark:text-orange-400 dark:hover:bg-gray-800"
+                    >
+                      <i className="bx bx-plus text-lg" />
+                      Add Database
+                    </button>
+                  </div>
+
+                  {selectedSourceDatabase && (
+                    <div className="outfit-400 mt-2 flex items-center gap-1.5 text-[11px] text-gray-500 dark:text-gray-400">
+                      <i className="bx bx-server" />
+                      {selectedSourceDatabase.driver || "mysql"} •{" "}
+                      {selectedSourceDatabase.host}:
+                      {selectedSourceDatabase.port} •{" "}
+                      {selectedSourceDatabase.database}
+                    </div>
+                  )}
                 </div>
 
                 {/* SOURCE SUBJECT */}
@@ -1659,6 +2108,231 @@ const ImportQuestions = () => {
           </div>
         </div>
       </div>
+
+      {/* =================================================
+          ADD DATABASE MODAL
+      ================================================= */}
+
+      {showAddDatabase && (
+        <div
+          className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 p-4 backdrop-blur-[2px]"
+          onMouseDown={(e) => {
+            if (e.target === e.currentTarget) {
+              setShowAddDatabase(false);
+            }
+          }}
+        >
+          <div className="w-full max-w-lg rounded-2xl border border-amber-200 bg-white shadow-2xl dark:border-gray-700 dark:bg-[#171d25]">
+            <div className="flex items-center justify-between border-b border-gray-100 px-5 py-4 dark:border-gray-700">
+              <div>
+                <div className="outfit-700 text-lg text-amber-950 dark:text-gray-100">
+                  Add Database
+                </div>
+                <div className="outfit-400 mt-0.5 text-xs text-gray-500 dark:text-gray-400">
+                  Add another question database as an import source.
+                </div>
+              </div>
+
+              <button
+                type="button"
+                onClick={() =>
+                  setShowAddDatabase(false)
+                }
+                disabled={isSavingDatabase}
+                className="flex h-8 w-8 items-center justify-center rounded-lg text-gray-400 hover:bg-gray-100 hover:text-gray-700 disabled:opacity-50 dark:hover:bg-gray-800 dark:hover:text-gray-200"
+              >
+                <i className="bx bx-x text-xl" />
+              </button>
+            </div>
+
+            <div className="space-y-4 p-5">
+              <div>
+                <label className="outfit-700 mb-1.5 block text-[13px] text-amber-950 dark:text-gray-100">
+                  Database Name <span className="text-red-500">*</span>
+                </label>
+                <input
+                  type="text"
+                  value={databaseForm.name}
+                  onChange={(e) =>
+                    updateDatabaseForm(
+                      "name",
+                      e.target.value
+                    )
+                  }
+                  placeholder="e.g. MAGS"
+                  disabled={isSavingDatabase}
+                  className="outfit-400 w-full rounded-xl border border-gray-200 px-3 py-2.5 text-sm text-gray-900 outline-none focus:border-orange-400 focus:ring-2 focus:ring-orange-100 disabled:opacity-60 dark:border-gray-700 dark:bg-[#11161d] dark:text-gray-100"
+                />
+              </div>
+
+              <div className="grid grid-cols-1 gap-4 sm:grid-cols-[1fr_120px]">
+                <div>
+                  <label className="outfit-700 mb-1.5 block text-[13px] text-amber-950 dark:text-gray-100">
+                    Host <span className="text-red-500">*</span>
+                  </label>
+                  <input
+                    type="text"
+                    value={databaseForm.host}
+                    onChange={(e) =>
+                      updateDatabaseForm(
+                        "host",
+                        e.target.value
+                      )
+                    }
+                    placeholder="127.0.0.1"
+                    disabled={isSavingDatabase}
+                    className="outfit-400 w-full rounded-xl border border-gray-200 px-3 py-2.5 text-sm text-gray-900 outline-none focus:border-orange-400 focus:ring-2 focus:ring-orange-100 disabled:opacity-60 dark:border-gray-700 dark:bg-[#11161d] dark:text-gray-100"
+                  />
+                </div>
+
+                <div>
+                  <label className="outfit-700 mb-1.5 block text-[13px] text-amber-950 dark:text-gray-100">
+                    Port <span className="text-red-500">*</span>
+                  </label>
+                  <input
+                    type="number"
+                    value={databaseForm.port}
+                    onChange={(e) =>
+                      updateDatabaseForm(
+                        "port",
+                        e.target.value
+                      )
+                    }
+                    min="1"
+                    max="65535"
+                    disabled={isSavingDatabase}
+                    className="outfit-400 w-full rounded-xl border border-gray-200 px-3 py-2.5 text-sm text-gray-900 outline-none focus:border-orange-400 focus:ring-2 focus:ring-orange-100 disabled:opacity-60 dark:border-gray-700 dark:bg-[#11161d] dark:text-gray-100"
+                  />
+                </div>
+              </div>
+
+              <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
+                <div>
+                  <label className="outfit-700 mb-1.5 block text-[13px] text-amber-950 dark:text-gray-100">
+                    Database <span className="text-red-500">*</span>
+                  </label>
+                  <input
+                    type="text"
+                    value={databaseForm.database}
+                    onChange={(e) =>
+                      updateDatabaseForm(
+                        "database",
+                        e.target.value
+                      )
+                    }
+                    placeholder="mags"
+                    disabled={isSavingDatabase}
+                    className="outfit-400 w-full rounded-xl border border-gray-200 px-3 py-2.5 text-sm text-gray-900 outline-none focus:border-orange-400 focus:ring-2 focus:ring-orange-100 disabled:opacity-60 dark:border-gray-700 dark:bg-[#11161d] dark:text-gray-100"
+                  />
+                </div>
+
+                <div>
+                  <label className="outfit-700 mb-1.5 block text-[13px] text-amber-950 dark:text-gray-100">
+                    Username <span className="text-red-500">*</span>
+                  </label>
+                  <input
+                    type="text"
+                    value={databaseForm.username}
+                    onChange={(e) =>
+                      updateDatabaseForm(
+                        "username",
+                        e.target.value
+                      )
+                    }
+                    placeholder="root"
+                    disabled={isSavingDatabase}
+                    className="outfit-400 w-full rounded-xl border border-gray-200 px-3 py-2.5 text-sm text-gray-900 outline-none focus:border-orange-400 focus:ring-2 focus:ring-orange-100 disabled:opacity-60 dark:border-gray-700 dark:bg-[#11161d] dark:text-gray-100"
+                  />
+                </div>
+              </div>
+
+              <div>
+                <label className="outfit-700 mb-1.5 block text-[13px] text-amber-950 dark:text-gray-100">
+                  Password
+                </label>
+                <input
+                  type="password"
+                  value={databaseForm.password}
+                  onChange={(e) =>
+                    updateDatabaseForm(
+                      "password",
+                      e.target.value
+                    )
+                  }
+                  placeholder="Enter database password"
+                  disabled={isSavingDatabase}
+                  className="outfit-400 w-full rounded-xl border border-gray-200 px-3 py-2.5 text-sm text-gray-900 outline-none focus:border-orange-400 focus:ring-2 focus:ring-orange-100 disabled:opacity-60 dark:border-gray-700 dark:bg-[#11161d] dark:text-gray-100"
+                />
+              </div>
+
+              <div className="rounded-xl bg-amber-50 px-3 py-2.5 text-xs leading-5 text-amber-800 dark:bg-gray-800 dark:text-gray-300">
+                <i className="bx bx-lock-alt mr-1" />
+                Database credentials are handled by the backend and the password is stored encrypted.
+              </div>
+            </div>
+
+            <div className="flex flex-col-reverse gap-2 border-t border-gray-100 px-5 py-4 dark:border-gray-700 sm:flex-row sm:justify-end">
+              <button
+                type="button"
+                onClick={() =>
+                  setShowAddDatabase(false)
+                }
+                disabled={
+                  isSavingDatabase ||
+                  isTestingDatabase
+                }
+                className="outfit-700 rounded-xl border border-gray-200 px-4 py-2.5 text-sm text-gray-600 hover:bg-gray-50 disabled:opacity-50 dark:border-gray-600 dark:text-gray-300 dark:hover:bg-gray-800"
+              >
+                Cancel
+              </button>
+
+              <button
+                type="button"
+                onClick={testDatabaseConnection}
+                disabled={
+                  isSavingDatabase ||
+                  isTestingDatabase
+                }
+                className="outfit-700 rounded-xl border border-orange-300 px-4 py-2.5 text-sm text-orange-600 hover:bg-orange-50 disabled:opacity-50 dark:border-gray-600 dark:text-orange-400 dark:hover:bg-gray-800"
+              >
+                {isTestingDatabase ? (
+                  <>
+                    <i className="bx bx-loader-alt mr-1 animate-spin" />
+                    Testing...
+                  </>
+                ) : (
+                  <>
+                    <i className="bx bx-plug mr-1" />
+                    Test Connection
+                  </>
+                )}
+              </button>
+
+              <button
+                type="button"
+                onClick={saveDatabaseSource}
+                disabled={
+                  isSavingDatabase ||
+                  isTestingDatabase
+                }
+                className="outfit-700 rounded-xl bg-orange-500 px-4 py-2.5 text-sm text-white hover:bg-orange-600 disabled:cursor-not-allowed disabled:opacity-50"
+              >
+                {isSavingDatabase ? (
+                  <>
+                    <i className="bx bx-loader-alt mr-1 animate-spin" />
+                    Saving...
+                  </>
+                ) : (
+                  <>
+                    <i className="bx bx-save mr-1" />
+                    Save Database
+                  </>
+                )}
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
 
       {/* TOAST */}
       <Toast
