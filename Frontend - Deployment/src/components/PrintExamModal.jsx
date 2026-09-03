@@ -36,9 +36,11 @@ export default function ExamGenerator({
   const apiUrl = import.meta.env.VITE_API_BASE_URL;
 
   useEffect(() => {
-    fetchSubjects();
-    fetchDifficultyCounts();
-  }, []);
+    if (isOpen) {
+      fetchSubjects();
+      fetchDifficultyCounts();
+    }
+  }, [isOpen]);
 
   useEffect(() => {
     if (initialSubject && isOpen) {

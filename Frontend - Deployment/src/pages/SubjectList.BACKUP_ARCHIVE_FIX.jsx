@@ -1,4 +1,4 @@
-import React, { useEffect, useState, useRef } from "react";
+﻿import React, { useEffect, useState, useRef } from "react";
 import { createPortal } from "react-dom";
 import {
   useNavigate,
@@ -326,7 +326,7 @@ function SubjectList() {
   const { toast, showToast } = useToast();
   const apiUrl = import.meta.env.VITE_API_BASE_URL;
 
-  // Get unique program names for sidebar buttons — derived from actual subjects
+  // Get unique program names for sidebar buttons â€” derived from actual subjects
   // so only programs that have at least one subject are shown.
   const uniquePrograms = Array.from(
     new Set(subjects.map((s) => s.programName).filter(Boolean)),
@@ -1123,7 +1123,7 @@ function SubjectList() {
                                       month: "short",
                                       day: "numeric",
                                     })
-                                  : "—";
+                                  : "â€”";
 
                               const createdTime =
                                 subject.created_at || subject.createdAt
@@ -1133,7 +1133,7 @@ function SubjectList() {
                                       hour: "2-digit",
                                       minute: "2-digit",
                                     })
-                                  : "—";
+                                  : "â€”";
 
                               const updatedDate =
                                 subject.updated_at || subject.updatedAt
@@ -1144,7 +1144,7 @@ function SubjectList() {
                                       month: "short",
                                       day: "numeric",
                                     })
-                                  : "—";
+                                  : "â€”";
 
                               const updatedTime =
                                 subject.updated_at || subject.updatedAt
@@ -1154,11 +1154,11 @@ function SubjectList() {
                                       hour: "2-digit",
                                       minute: "2-digit",
                                     })
-                                  : "—";
+                                  : "â€”";
 
                               // Format lastQuestionAdded date (for all roles)
-                              let lastQuestionAddedDate = "—";
-                              let lastQuestionAddedTime = "—";
+                              let lastQuestionAddedDate = "â€”";
+                              let lastQuestionAddedTime = "â€”";
 
                               // Check if lastQuestionAdded exists and is not null/empty
                               if (
@@ -1285,7 +1285,7 @@ function SubjectList() {
                                       <div className="absolute right-3 bottom-3 z-20 flex items-center gap-1 rounded-full bg-black/60 px-2 py-1 text-[11px] font-medium text-white md:hidden">
                                         <i className="bx bx-time-five text-sm"></i>
                                         <span className="max-w-[120px] truncate">
-                                          {lastQuestionAddedDate !== "—"
+                                          {lastQuestionAddedDate !== "â€”"
                                             ? `Modified: ${lastQuestionAddedDate}`
                                             : "No questions yet"}
                                         </span>
@@ -1345,11 +1345,11 @@ function SubjectList() {
 
                                       {/* Date Information */}
                                       <div className="outfit-400 space-y-1 text-[12px] text-gray-600">
-                                        {lastQuestionAddedDate !== "—" ? (
+                                        {lastQuestionAddedDate !== "â€”" ? (
                                           // Show last question added date if available
                                           <div>
                                             Last modified: {lastQuestionAddedDate}{" "}
-                                            {lastQuestionAddedTime !== "—" &&
+                                            {lastQuestionAddedTime !== "â€”" &&
                                               `at ${lastQuestionAddedTime}`}
                                           </div>
                                         ) : (
@@ -1899,6 +1899,7 @@ function SubjectList() {
                   setSubjectToDelete(null);
                 }}
                 title="Delete Subject"
+                subtitle="This action cannot be undone."
                 description={
                   <span>
                     Are you sure you want to delete{" "}

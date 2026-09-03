@@ -189,8 +189,8 @@ const ImportQuestions = () => {
   const [ocrProgress, setOcrProgress] = useState(null);
 
   // Destination selection
-  const [qualifying exams, setqualifying exams] = useState([]);
-  const [isqualifying examsLoading, setIsqualifying examsLoading] = useState(false);
+  const [subjects, setSubjects] = useState([]);
+  const [isSubjectsLoading, setIsSubjectsLoading] = useState(false);
   const [selectedSubjectId, setSelectedSubjectId] = useState("");
 
   const fileInputRef = useRef(null);
@@ -198,10 +198,10 @@ const ImportQuestions = () => {
   const { toast, showToast } = useToast();
   const apiUrl = import.meta.env.VITE_API_BASE_URL;
 
-  // Fetch qualifying exams so the user can pick the destination subject before importing
+  // Fetch subjects so the user can pick the destination subject before importing
   useEffect(() => {
-    const fetchqualifying exams = async () => {
-      setIsqualifying examsLoading(true);
+    const fetchSubjects = async () => {
+      setIsSubjectsLoading(true);
       try {
         const token = sessionStorage.getItem("token");
         const response = await fetch(
@@ -219,24 +219,24 @@ const ImportQuestions = () => {
         if (!response.ok) return;
 
         const data = await response.json();
-        if (data.success && Array.isArray(data.qualifying exams)) {
-          const sorted = [...data.qualifying exams].sort((a, b) => {
+        if (data.success && Array.isArray(data.subjects)) {
+          const sorted = [...data.subjects].sort((a, b) => {
             const programCompare = (a.programName || "").localeCompare(
               b.programName || "",
             );
             if (programCompare !== 0) return programCompare;
             return (a.subjectCode || "").localeCompare(b.subjectCode || "");
           });
-          setqualifying exams(sorted);
+          setSubjects(sorted);
         }
       } catch (err) {
-        console.error("Error loading qualifying exams:", err);
+        console.error("Error loading subjects:", err);
       } finally {
-        setIsqualifying examsLoading(false);
+        setIsSubjectsLoading(false);
       }
     };
 
-    fetchqualifying exams();
+    fetchSubjects();
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
@@ -383,16 +383,16 @@ const ImportQuestions = () => {
         failCount ? "error" : "success",
       );
 
-      const subject = qualifying exams.find(
+      const subject = subjects.find(
         (s) => String(s.subjectID) === String(selectedSubjectId),
       );
 
       const user = JSON.parse(sessionStorage.getItem("user") || "{}");
       const roleID = user?.roleID ?? user?.roleId;
-      let path = "/dean/qualifying exams?subject_id=" + selectedSubjectId;
-      if (roleID === 2) path = "/faculty/qualifying exams?subject_id=" + selectedSubjectId;
+      let path = "/dean/subjects?subject_id=" + selectedSubjectId;
+      if (roleID === 2) path = "/faculty/subjects?subject_id=" + selectedSubjectId;
       else if (roleID === 3)
-        path = "/program-chair/qualifying exams?subject_id=" + selectedSubjectId;
+        path = "/program-chair/subjects?subject_id=" + selectedSubjectId;
 
       navigate(path, { state: { subject } });
     } else {
@@ -425,13 +425,13 @@ const ImportQuestions = () => {
                 Import into <span className="text-red-500">*</span>
               </label>
 
-              {isqualifying examsLoading ? (
+              {isSubjectsLoading ? (
                 <div className="outfit-400 text-[13px] text-gray-500 dark:text-gray-400">
-                  Loading qualifying exams...
+                  Loading subjects...
                 </div>
-              ) : qualifying exams.length === 0 ? (
+              ) : subjects.length === 0 ? (
                 <div className="outfit-400 rounded-lg border border-amber-200 bg-amber-50/40 px-3 py-2.5 text-[13px] text-amber-800 dark:border-gray-700 dark:bg-gray-800 dark:text-gray-300">
-                  No qualifying exams found.
+                  No subjects found.
                 </div>
               ) : (
                 <select
@@ -440,7 +440,7 @@ const ImportQuestions = () => {
                   className="outfit-400 w-full rounded-xl border border-gray-200 py-2.5 px-3 text-sm text-gray-900 transition focus:border-orange-400 focus:ring-2 focus:ring-orange-100 focus:outline-none dark:border-gray-700 dark:bg-[#11161d] dark:text-gray-100"
                 >
                   <option value="">Select a subject...</option>
-                  {qualifying exams.map((s) => (
+                  {subjects.map((s) => (
                     <option key={s.subjectID} value={s.subjectID}>
                       {s.subjectCode} - {s.subjectName}
                     </option>

@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
-import qualifying examsearchInput from "./qualifying examsearchInput";
+import SubjectSearchInput from "./SubjectSearchInput";
 import RegisterDropDownSmall from "./registerDropDownSmall";
 import ConfirmModal from "./confirmModal";
 import Toast from "./Toast";
@@ -20,8 +20,8 @@ export default function ExamGenerator({
   const navigate = useNavigate();
   const { toast, showToast } = useToast();
   const [loading, setLoading] = useState(false);
-  const [qualifying exams, setqualifying exams] = useState([]);
-  const [selectedqualifying exams, setSelectedqualifying exams] = useState([]);
+  const [subjects, setSubjects] = useState([]);
+  const [selectedSubjects, setSelectedSubjects] = useState([]);
   const [mode, setMode] = useState("default");
   const [showConfirmClose, setShowConfirmClose] = useState(false);
   const [difficultyCounts, setDifficultyCounts] = useState({});
@@ -35,14 +35,18 @@ export default function ExamGenerator({
 
   const apiUrl = import.meta.env.VITE_API_BASE_URL;
 
+  // Fetch subjects every time the modal is opened, so newly created
+  // subjects show up immediately in the dropdown.
   useEffect(() => {
-    fetchqualifying exams();
-    fetchDifficultyCounts();
-  }, []);
+    if (isOpen) {
+      fetchSubjects();
+      fetchDifficultyCounts();
+    }
+  }, [isOpen]);
 
   useEffect(() => {
     if (initialSubject && isOpen) {
-      setSelectedqualifying exams([
+      setSelectedSubjects([
         {
           subjectID: initialSubject.subjectID,
           subjectName: initialSubject.subjectName,
@@ -55,7 +59,7 @@ export default function ExamGenerator({
     }
   }, [initialSubject, isOpen]);
 
-  // Prevent background scrolling when modal is open (like qualifying examsettingsDeanProgChair)
+  // Prevent background scrolling when modal is open
   useEffect(() => {
     if (isOpen) {
       document.body.style.overflow = "hidden";
@@ -73,7 +77,7 @@ export default function ExamGenerator({
       return;
     }
     // Reset all state
-    setSelectedqualifying exams([]);
+    setSelectedSubjects([]);
     setMode("default");
     setSettings({
       total_items: 10,
@@ -89,7 +93,7 @@ export default function ExamGenerator({
     setLoading(false);
     setShowConfirmClose(false);
     // Reset all state
-    setSelectedqualifying exams([]);
+    setSelectedSubjects([]);
     setMode("default");
     setSettings({
       total_items: 10,
@@ -120,26 +124,26 @@ export default function ExamGenerator({
     };
   }, []);
 
-  const fetchqualifying exams = async () => {
+  const fetchSubjects = async () => {
     try {
-      const response = await fetch(`${apiUrl}/qualifying exams`, {
+      const response = await fetch(`${apiUrl}/subjects`, {
         headers: {
           Authorization: `Bearer ${sessionStorage.getItem("token")}`,
         },
       });
       const data = await response.json();
-      if (data.qualifying exams) {
-        setqualifying exams(data.qualifying exams);
+      if (data.subjects) {
+        setSubjects(data.subjects);
       }
     } catch (err) {
-      showToast("Failed to load qualifying exams", "error");
+      showToast("Failed to load subjects", "error");
     }
   };
 
   const fetchDifficultyCounts = async () => {
     try {
       const response = await fetch(
-        `${apiUrl}/qualifying exams/question-difficulty-counts`,
+        `${apiUrl}/subjects/question-difficulty-counts`,
         {
           headers: {
             Authorization: `Bearer ${sessionStorage.getItem("token")}`,
@@ -202,14 +206,14 @@ export default function ExamGenerator({
 
   const handleSubjectAdd = (e) => {
     const subjectID = parseInt(e.target.value);
-    const subject = qualifying exams.find((s) => s.subjectID === subjectID);
+    const subject = subjects.find((s) => s.subjectID === subjectID);
     if (!subject) return;
 
-    if (!selectedqualifying exams.find((s) => s.subjectID === subject.subjectID)) {
-      const basePercentage = Math.floor(100 / (selectedqualifying exams.length + 1));
-      const remainder = 100 - basePercentage * (selectedqualifying exams.length + 1);
+    if (!selectedSubjects.find((s) => s.subjectID === subject.subjectID)) {
+      const basePercentage = Math.floor(100 / (selectedSubjects.length + 1));
+      const remainder = 100 - basePercentage * (selectedSubjects.length + 1);
 
-      setSelectedqualifying exams((prev) => [
+      setSelectedSubjects((prev) => [
         ...prev.map((s, index) => ({
           ...s,
           percentage: index === 0 ? basePercentage + remainder : basePercentage,
@@ -220,7 +224,7 @@ export default function ExamGenerator({
   };
 
   const handleSubjectPercentageChange = (subjectID, value) => {
-    setSelectedqualifying exams((prev) =>
+    setSelectedSubjects((prev) =>
       prev.map((s) =>
         s.subjectID === subjectID
           ? { ...s, percentage: value === "" ? "" : parseInt(value) || 0 }
@@ -230,7 +234,7 @@ export default function ExamGenerator({
   };
 
   const handleRemoveSubject = (subjectID) => {
-    setSelectedqualifying exams((prev) => {
+    setSelectedSubjects((prev) => {
       const remaining = prev.filter((s) => s.subjectID !== subjectID);
       if (remaining.length > 0) {
         const newPercentage = Math.floor(100 / remaining.length);
@@ -263,14 +267,14 @@ export default function ExamGenerator({
     }
 
     // Validate subject selection
-    if (selectedqualifying exams.length === 0) {
+    if (selectedSubjects.length === 0) {
       showToast("Please select at least one subject", "error");
       setLoading(false);
       return;
     }
 
     // Validate subject percentages
-    const totalSubjectPercentage = selectedqualifying exams.reduce(
+    const totalSubjectPercentage = selectedSubjects.reduce(
       (sum, subject) => sum + subject.percentage,
       0,
     );
@@ -285,7 +289,7 @@ export default function ExamGenerator({
 
       const requestBody = {
         total_items: settings.total_items,
-        qualifying exams: selectedqualifying exams.map((subject) => ({
+        subjects: selectedSubjects.map((subject) => ({
           subjectID: subject.subjectID,
           percentage: subject.percentage,
         })),
@@ -298,10 +302,10 @@ export default function ExamGenerator({
         purpose: "examQuestions",
       };
 
-      // Debug log to see what qualifying exams are being sent
+      // Debug log to see what subjects are being sent
       console.log(
-        "Sending qualifying exams to API:",
-        selectedqualifying exams.map((s) => ({
+        "Sending subjects to API:",
+        selectedSubjects.map((s) => ({
           subjectID: s.subjectID,
           subjectName: s.subjectName,
           subjectCode: s.subjectCode,
@@ -329,7 +333,7 @@ export default function ExamGenerator({
           errorData.message?.toLowerCase().includes("error processing subject")
         ) {
           throw new Error(
-            ` ${errorData.message}. Please try selecting different qualifying exams or contact support if the issue persists.`,
+            ` ${errorData.message}. Please try selecting different subjects or contact support if the issue persists.`,
           );
         }
         throw new Error(
@@ -346,7 +350,7 @@ export default function ExamGenerator({
           examData: data.previewData,
           examKey: data.previewKey,
           totalItems: settings.total_items,
-          qualifying exams: selectedqualifying exams,
+          subjects: selectedSubjects,
           difficultyDistribution: {
             easy: settings.easy_percentage,
             moderate: settings.moderate_percentage,
@@ -369,7 +373,7 @@ export default function ExamGenerator({
 
   const hasAnyInsufficient =
     settings.exam_type !== "personal" &&
-    selectedqualifying exams.some((subject) => {
+    selectedSubjects.some((subject) => {
       const breakdown = getSubjectDifficultyBreakdown(subject);
       return (
         breakdown.subjectItems > 0 &&
@@ -410,11 +414,11 @@ export default function ExamGenerator({
                     <span className="mb-2 block text-[16px] outfit-500 text-gray-900">
                       Select Subject(s)
                     </span>
-                    <qualifying examsearchInput
-                      options={qualifying exams
+                    <SubjectSearchInput
+                      options={subjects
                         .filter(
                           (subject) =>
-                            !selectedqualifying exams.find(
+                            !selectedSubjects.find(
                               (s) => s.subjectID === subject.subjectID,
                             ),
                         )
@@ -440,21 +444,21 @@ export default function ExamGenerator({
                   </div>
                 )}
 
-                {/* Selected qualifying exams Section (always visible, mobile style) */}
+                {/* Selected subjects Section (always visible, mobile style) */}
                 {settings.exam_type !== "personal" &&
-                  selectedqualifying exams.length > 0 && (
+                  selectedSubjects.length > 0 && (
                     <>
                       <div className="relative -mx-[25px] mt-3 bg-gray-50 px-[25px] py-4">
                         <div className="absolute top-0 left-0 h-[1px] w-full bg-gradient-to-r from-transparent via-gray-200 to-transparent" />
 
                         <div className="mb-3 flex items-center justify-between">
                           <h3 className="text-[14px] outfit-500 text-gray-700">
-                            qualifying exams Included
+                            Subjects Included
                           </h3>
                         </div>
 
                         <div className="edit-profile-modal-scrollbar max-h-[400px] space-y-2.5 overflow-y-auto">
-                          {selectedqualifying exams.map((subject) => {
+                          {selectedSubjects.map((subject) => {
                             const breakdown =
                               getSubjectDifficultyBreakdown(subject);
                             const counts = difficultyCounts[
@@ -766,11 +770,6 @@ export default function ExamGenerator({
                 </div>
 
                 <div className="mt-4 mb-3 h-[0.5px] bg-[rgb(200,200,200)]" />
-                {/* error && (
-                  <div className="mt-2 mb-2 rounded-md bg-red-50 p-2 text-center text-[13px] text-red-500">
-                    {error}
-                  </div>
-                ) */}
                 <div>
                   <button
                     type="submit"
@@ -838,11 +837,11 @@ export default function ExamGenerator({
                           Select the subject(s) you want to include.
                         </div>
                       </div>
-                      <qualifying examsearchInput
-                        options={qualifying exams
+                      <SubjectSearchInput
+                        options={subjects
                           .filter(
                             (subject) =>
-                              !selectedqualifying exams.find(
+                              !selectedSubjects.find(
                                 (s) => s.subjectID === subject.subjectID,
                               ),
                           )
@@ -868,19 +867,19 @@ export default function ExamGenerator({
                     </div>
                   )}
                   {settings.exam_type !== "personal" &&
-                    selectedqualifying exams.length > 0 && (
+                    selectedSubjects.length > 0 && (
                       <>
                         <div className="mt-3 mb-5">
                           <div className="relative -mx-[57px] bg-gray-50 px-[57px] py-4">
                             <div className="absolute top-0 left-0 h-[1px] w-full bg-gradient-to-r from-transparent via-gray-200 to-transparent" />
                             <div className="mb-3 flex items-center justify-between">
                               <h3 className="text-[14px] outfit-500 text-gray-900">
-                                qualifying exams included
+                                Subjects included
                               </h3>
                             </div>
 
                             <div className="edit-profile-modal-scrollbar max-h-[450px] space-y-3 overflow-y-auto">
-                              {selectedqualifying exams.map((subject) => {
+                              {selectedSubjects.map((subject) => {
                                 const breakdown =
                                   getSubjectDifficultyBreakdown(subject);
                                 const counts = difficultyCounts[
@@ -1095,11 +1094,11 @@ export default function ExamGenerator({
                         </div>
                       </>
                     )}
-                  {selectedqualifying exams.length === 0 && (
+                  {selectedSubjects.length === 0 && (
                     <div className="-mx-5 mt-3 mb-6 h-[1px] bg-gradient-to-r from-transparent via-gray-300 to-transparent" />
                   )}
 
-                  {/* Total Items Section (copied and adapted) */}
+                  {/* Total Items Section */}
                   <div className="mb-6 flex items-center justify-between gap-4">
                     <div className="flex min-w-0 flex-1 flex-col">
                       <div className="text-[14px] outfit-500 text-gray-900">
@@ -1126,7 +1125,7 @@ export default function ExamGenerator({
                       }
                     />
                   </div>
-                  {/* Difficulty Distribution Section (copied and adapted) */}
+                  {/* Difficulty Distribution Section */}
                   <div className="mb-6 flex items-center justify-between gap-4">
                     <div className="flex min-w-0 flex-1 flex-col">
                       <div className="text-[14px] outfit-500 text-gray-900">
@@ -1193,7 +1192,7 @@ export default function ExamGenerator({
                       )}
                     </div>
                   </div>
-                  {/* Always show Difficulty Percentages, disable if not custom */}
+                  {/* Custom Difficulty Percentages */}
                   <div
                     className={`mb-6 flex flex-col gap-2 ${!settings.isEnabled || mode !== "custom" ? "pointer-events-none opacity-50" : settings.isEnabled ? "" : "pointer-events-none opacity-50"}`}
                   >
@@ -1233,11 +1232,6 @@ export default function ExamGenerator({
                       </div>
                     ))}
                   </div>
-                  {/* error && (
-                    <div className="mt-2 mb-2 rounded-md bg-red-50 p-2 text-center text-[13px] text-red-500">
-                      {error}
-                    </div>
-                  ) */}
                 </form>
               </div>
             </div>
@@ -1269,5 +1263,3 @@ export default function ExamGenerator({
     </>
   );
 }
-
-

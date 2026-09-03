@@ -1,5 +1,6 @@
 <?php
 
+use Modules\Questions\Controllers\DatabaseQuestionImportController;
 use App\Http\Middleware\TokenExpirationMiddleware;
 use Illuminate\Support\Facades\Route;
 use Modules\Users\Controllers\AuthController;
@@ -33,9 +34,10 @@ use Modules\PersonalExams\Controllers\QuizSessionController;
 
 /*
 |--------------------------------------------------------------------------
-| Public API Routes (No authentication required)
+| Public API Routes
 |--------------------------------------------------------------------------
 */
+
 Route::post('/register', [AuthController::class, 'register']);
 Route::post('/login', [AuthController::class, 'login']);
 Route::get('/roles', [RoleController::class, 'indexAvailableRoles']);
@@ -48,326 +50,986 @@ Route::get('/app-version', [AppController::class, 'getVersion']);
 
 /*
 |--------------------------------------------------------------------------
-| Authenticated Routes (All roles)
+| Authenticated Routes - All Roles
 |--------------------------------------------------------------------------
 */
+
 Route::middleware(['auth:sanctum'])->group(function () {
-    // User profile and authentication
+
     Route::post('/change-password', [AuthController::class, 'changePassword']);
     Route::post('/logout', [AuthController::class, 'logout']);
+
     Route::get('/user/profile', [UserController::class, 'getProfile']);
     Route::post('/user/update-profile', [UserController::class, 'updateProfile']);
 
-    // All subjects (no role restriction; any authenticated user)
     Route::get('/subjects/all', [SubjectController::class, 'allSubjects']);
 
-    // Allow all authenticated users to access their exam results for a subject
-    Route::get('/practice-exam/results/{subjectID}', [PracticeExamController::class, 'subjectExamResults']);
+    Route::get(
+        '/practice-exam/results/{subjectID}',
+        [PracticeExamController::class, 'subjectExamResults']
+    );
 
-    // Get all exam results for all students (not filtered by subject)
-    Route::get('/results/all-students', [PracticeExamController::class, 'getAllExamResults']);
-    
-    // Practice Exam Leaderboard & Recent Takers (All authenticated users can access)
-    Route::get('/practice-exam/leaderboard/{subjectID}', [PracticeExamLeaderboardController::class, 'leaderboard']);
-    Route::get('/practice-exam/recent-takers/{subjectID}', [PracticeExamLeaderboardController::class, 'recentTakers']);
-    Route::get('/practice-exam/overall-leaderboard', [PracticeExamLeaderboardController::class, 'overallLeaderboard']);
-    Route::get('/practice-exam/overall-recent-takers', [PracticeExamLeaderboardController::class, 'overallRecentTakers']);
+    Route::get(
+        '/results/all-students',
+        [PracticeExamController::class, 'getAllExamResults']
+    );
 
-    // Get all personal quizzes for a class
-    Route::get('/classes/{classID}/quizzes', [ClassPersonalQuizController::class, 'index']);
+    Route::get(
+        '/practice-exam/leaderboard/{subjectID}',
+        [PracticeExamLeaderboardController::class, 'leaderboard']
+    );
 
-    // Get all classes
-    Route::get('/classes/index', [ClassController::class, 'index']);
+    Route::get(
+        '/practice-exam/recent-takers/{subjectID}',
+        [PracticeExamLeaderboardController::class, 'recentTakers']
+    );
 
+    Route::get(
+        '/practice-exam/overall-leaderboard',
+        [PracticeExamLeaderboardController::class, 'overallLeaderboard']
+    );
 
+    Route::get(
+        '/practice-exam/overall-recent-takers',
+        [PracticeExamLeaderboardController::class, 'overallRecentTakers']
+    );
+
+    Route::get(
+        '/classes/{classID}/quizzes',
+        [ClassPersonalQuizController::class, 'index']
+    );
+
+    Route::get(
+        '/classes/index',
+        [ClassController::class, 'index']
+    );
 });
 
 /*
 |--------------------------------------------------------------------------
-| Routes for Faculty (roleID: 2), Program Chair (roleID: 3), Dean (roleID: 4), and Associate Dean (roleID: 5)
+| Faculty / Program Chair / Dean / Associate Dean
+| roleID: 2,3,4,5
 |--------------------------------------------------------------------------
 */
-Route::middleware(['auth:sanctum', TokenExpirationMiddleware::class, 'role:2,3,4,5'])->group(function () {
-    // User management
+
+Route::middleware([
+    'auth:sanctum',
+    TokenExpirationMiddleware::class,
+    'role:2,3,4,5'
+])->group(function () {
+
+    /*
+    |--------------------------------------------------------------------------
+    | User Management
+    |--------------------------------------------------------------------------
+    */
+
     Route::get('/users', [UserController::class, 'index']);
     Route::patch('/users/{userID}/approve', [UserController::class, 'approveUser']);
     Route::patch('/users/{userID}/disapprove', [UserController::class, 'disapproveUser']);
-    Route::post('/users/approve-multiple', [UserController::class, 'approveMultipleUsers']);
-    Route::post('/users/activate-multiple', [UserController::class, 'activateMultipleUsers']);
-    Route::post('/users/deactivate-multiple', [UserController::class, 'deactivateMultipleUsers']);
-    Route::patch('users/{id}/deactivate', [UserController::class, 'deactivate']);
-    Route::patch('users/{id}/activate', [UserController::class, 'activate']);
 
-    // Choices
-    Route::post('/questions/choices', [ChoiceController::class, 'store']);
-    Route::get('/questions/{questionID}/choices', [ChoiceController::class, 'showChoices']);
+    Route::post(
+        '/users/approve-multiple',
+        [UserController::class, 'approveMultipleUsers']
+    );
 
-    // Subjects
+    Route::post(
+        '/users/activate-multiple',
+        [UserController::class, 'activateMultipleUsers']
+    );
+
+    Route::post(
+        '/users/deactivate-multiple',
+        [UserController::class, 'deactivateMultipleUsers']
+    );
+
+    Route::patch(
+        'users/{id}/deactivate',
+        [UserController::class, 'deactivate']
+    );
+
+    Route::patch(
+        'users/{id}/activate',
+        [UserController::class, 'activate']
+    );
+
+    /*
+    |--------------------------------------------------------------------------
+    | Choices
+    |--------------------------------------------------------------------------
+    */
+
+    Route::post(
+        '/questions/choices',
+        [ChoiceController::class, 'store']
+    );
+
+    Route::get(
+        '/questions/{questionID}/choices',
+        [ChoiceController::class, 'showChoices']
+    );
+
+    /*
+    |--------------------------------------------------------------------------
+    | Subjects
+    |--------------------------------------------------------------------------
+    */
+
     Route::get('/subjects', [SubjectController::class, 'index']);
-    Route::post('/faculty/assign-subject', [FacultySubjectController::class, 'assignSubject']);
-    Route::get('/faculty/my-subjects', [FacultySubjectController::class, 'mySubjects']);
-    Route::get('/faculty/availableSubjects', [FacultySubjectController::class, 'availableSubjects']);
-    Route::delete('/remove-assigned-subject/{subjectID}', [FacultySubjectController::class, 'removeAssignedSubject']);
 
-    // Year Levels
+    Route::post(
+        '/faculty/assign-subject',
+        [FacultySubjectController::class, 'assignSubject']
+    );
+
+    Route::get(
+        '/faculty/my-subjects',
+        [FacultySubjectController::class, 'mySubjects']
+    );
+
+    Route::get(
+        '/faculty/availableSubjects',
+        [FacultySubjectController::class, 'availableSubjects']
+    );
+
+    Route::delete(
+        '/remove-assigned-subject/{subjectID}',
+        [FacultySubjectController::class, 'removeAssignedSubject']
+    );
+
+    /*
+    |--------------------------------------------------------------------------
+    | Year Levels
+    |--------------------------------------------------------------------------
+    */
+
     Route::get('/year-levels', [YearLevelController::class, 'index']);
 
-    // Questions
-    Route::post('/questions/add', [QuestionController::class, 'store']);
-    Route::get('/subjects/{subjectID}/questions', [QuestionController::class, 'indexQuestions']);
-    Route::post('/questions/update/{questionID}', [QuestionController::class, 'update']);
-    Route::delete('/questions/delete/{questionID}', [QuestionController::class, 'destroy']);
-    Route::get('/faculty/my-questions/{subjectID}', [QuestionController::class, 'mySubjectQuestions']);
-    Route::post('/choices/update', [ChoiceController::class, 'updateChoices']);
-    Route::post('/questions/{questionID}/duplicate', [QuestionController::class, 'duplicate']);
-    // New route: Get all questions without choices
-    Route::get('/questions/count', [QuestionController::class, 'questionCount']);
+    /*
+    |--------------------------------------------------------------------------
+    | Questions
+    |--------------------------------------------------------------------------
+    */
 
-    // Printable exam (PDF preview/download)
-    Route::post('/generate-printable-exam/{subjectID}', [PrintController::class, 'generatePrintableExam']);
-    Route::get('/subjects/question-difficulty-counts', [PrintController::class, 'getSubjectQuestionDifficultyCounts']);
-    
-    // Personal Quiz PDF Generation (Faculty only)
-    Route::get('/personal-quiz/{personalQuizID}/questions', [PrintController::class, 'getPersonalQuizQuestions']);
-    Route::post('/generate-personal-quiz-pdf', [PrintController::class, 'generatePersonalQuizPDF']);
+    // Existing FILE import route - DO NOT REMOVE
+    Route::post(
+        '/questions/add',
+        [QuestionController::class, 'store']
+    );
 
-    // Practice exam preview (Dean/Chair/Instructor can preview)
-    Route::get('/practice-exam/preview/{subjectID}', [PracticeExamController::class, 'previewPracticeExam']);
+    /*
+    |--------------------------------------------------------------------------
+    | DATABASE QUESTION IMPORT
+    |--------------------------------------------------------------------------
+    |
+    | Source:
+    |     MySQL database "caps"
+    |
+    | Flow:
+    |     From Database
+    |       -> Select Subject
+    |       -> Get Questions
+    |       -> Select Questions
+    |       -> Import Selected
+    |
+    */
 
-    // Single-subject personal questions preview (Quiz)
-    Route::post('/generate-single-subject-personal-preview', [PrintController::class, 'generateSingleSubjectPersonalPreview']);
+    Route::get(
+        '/database-import/subjects',
+        [DatabaseQuestionImportController::class, 'subjects']
+    );
 
-    //programs listing
+    Route::get(
+        '/database-import/questions/{subjectID}',
+        [DatabaseQuestionImportController::class, 'questions']
+    );
+
+    Route::post(
+        '/database-import/questions',
+        [DatabaseQuestionImportController::class, 'import']
+    );
+
+    /*
+    |--------------------------------------------------------------------------
+    | Existing Question Routes
+    |--------------------------------------------------------------------------
+    */
+
+    Route::get(
+        '/subjects/{subjectID}/questions',
+        [QuestionController::class, 'indexQuestions']
+    );
+
+    Route::post(
+        '/questions/update/{questionID}',
+        [QuestionController::class, 'update']
+    );
+
+    Route::delete(
+        '/questions/delete/{questionID}',
+        [QuestionController::class, 'destroy']
+    );
+
+    Route::get(
+        '/faculty/my-questions/{subjectID}',
+        [QuestionController::class, 'mySubjectQuestions']
+    );
+
+    Route::post(
+        '/choices/update',
+        [ChoiceController::class, 'updateChoices']
+    );
+
+    Route::post(
+        '/questions/{questionID}/duplicate',
+        [QuestionController::class, 'duplicate']
+    );
+
+    Route::get(
+        '/questions/count',
+        [QuestionController::class, 'questionCount']
+    );
+
+    /*
+    |--------------------------------------------------------------------------
+    | Printable Exam
+    |--------------------------------------------------------------------------
+    */
+
+    Route::post(
+        '/generate-printable-exam/{subjectID}',
+        [PrintController::class, 'generatePrintableExam']
+    );
+
+    Route::get(
+        '/subjects/question-difficulty-counts',
+        [PrintController::class, 'getSubjectQuestionDifficultyCounts']
+    );
+
+    /*
+    |--------------------------------------------------------------------------
+    | Personal Quiz PDF
+    |--------------------------------------------------------------------------
+    */
+
+    Route::get(
+        '/personal-quiz/{personalQuizID}/questions',
+        [PrintController::class, 'getPersonalQuizQuestions']
+    );
+
+    Route::post(
+        '/generate-personal-quiz-pdf',
+        [PrintController::class, 'generatePersonalQuizPDF']
+    );
+
+    /*
+    |--------------------------------------------------------------------------
+    | Practice Exam
+    |--------------------------------------------------------------------------
+    */
+
+    Route::get(
+        '/practice-exam/preview/{subjectID}',
+        [PracticeExamController::class, 'previewPracticeExam']
+    );
+
+    Route::post(
+        '/generate-single-subject-personal-preview',
+        [PrintController::class, 'generateSingleSubjectPersonalPreview']
+    );
+
+    /*
+    |--------------------------------------------------------------------------
+    | Programs
+    |--------------------------------------------------------------------------
+    */
+
     Route::get('/programs', [ProgramController::class, 'index']);
 
-    // Personal Quizzes (Libraries)
-    Route::post('/personal-quizzes', [PersonalQuizController::class, 'store']);
-    Route::get('/personal-quizzes', [PersonalQuizController::class, 'index']);
-    Route::get('/personal-quizzes/archived', [PersonalQuizController::class, 'archived']);
-    // Subjects selectable for a SUBJECT-BASED personal quiz
-    // (faculty/chair: own program + General Education (GE); dean/asso-dean: all)
-    Route::get('/personal-quizzes/subject-options', [SubjectController::class, 'quizSubjects']);
-    Route::put('/update-personal-quizzes/{personalQuizID}', [PersonalQuizController::class, 'update']);
-    Route::patch('/personal-quizzes/{personalQuizID}/archive', [PersonalQuizController::class, 'archive']);
-    Route::patch('/personal-quizzes/{personalQuizID}/unarchive', [PersonalQuizController::class, 'unarchive']);
-    Route::delete('/personal-quizzes/{personalQuizID}', [PersonalQuizController::class, 'destroy']);
-    
-    // Personal Quiz Leaderboard and Recent Takers (Faculty only - returns data across all classes)
-    Route::get('/personal-quiz/{personalQuizID}/leaderboard', [PersonalQuizLeaderboardController::class, 'leaderboard']);
-    Route::get('/personal-quiz/{personalQuizID}/recent-takers', [PersonalQuizLeaderboardController::class, 'recentTakers']);
-    // Personal Quiz Questions
-    Route::get('/personal-quiz-questions/{personalQuizID}', [PersonalQuizQuestionController::class, 'index']);
-    Route::post('/personal-quiz-questions', [PersonalQuizQuestionController::class, 'store']);
-    Route::post('/personal-quiz-questions/import', [PersonalQuizQuestionController::class, 'import']); // Handles multiple questions at once
-    Route::post('/personal-quiz-questions/{personalQuizQuestionID}', [PersonalQuizQuestionController::class, 'update']);
-    Route::post('/personal-quiz-questions/{personalQuizQuestionID}/duplicate', [PersonalQuizQuestionController::class, 'duplicate']);
-    Route::delete('/personal-quiz-questions/{personalQuizQuestionID}', [PersonalQuizQuestionController::class, 'destroy']);
+    /*
+    |--------------------------------------------------------------------------
+    | Personal Quizzes
+    |--------------------------------------------------------------------------
+    */
 
-    // Personal Quiz Choices
-    Route::get('/personal-quiz-choices/{personalQuizQuestionID}', [PersonalQuizChoiceController::class, 'show']);
-    Route::post('/personal-quiz-choices', [PersonalQuizChoiceController::class, 'store']);
-    Route::put('/personal-quiz-choices', [PersonalQuizChoiceController::class, 'updateChoices']);
-    Route::post('/personal-quiz-choices/update', [PersonalQuizChoiceController::class, 'updateChoices']); // Alias for frontend compatibility
-    Route::delete('/personal-quiz-choices/{personalQuizChoiceID}', [PersonalQuizChoiceController::class, 'destroy']);
+    Route::post(
+        '/personal-quizzes',
+        [PersonalQuizController::class, 'store']
+    );
 
-    // Class Personal Quiz Settings (CRUD) - per quiz assignment inside a class
-    Route::get('/class-quizzes/{classPersonalQuizID}/settings', [PersonalQuizSettingController::class, 'show']);
-    Route::post('/class-quizzes/{classPersonalQuizID}/settings', [PersonalQuizSettingController::class, 'store']);
-    Route::put('/class-quizzes/{classPersonalQuizID}/settings', [PersonalQuizSettingController::class, 'update']);
-    Route::delete('/class-quizzes/{classPersonalQuizID}/settings', [PersonalQuizSettingController::class, 'destroy']);
+    Route::get(
+        '/personal-quizzes',
+        [PersonalQuizController::class, 'index']
+    );
 
-    // Personal Exam Settings (store, show) - reusing PracticeExamSettingController
-    Route::post('/personal-exam-settings', [PracticeExamSettingController::class, 'store']);
-    Route::get('/personal-exam-settings/{subjectID}', [PracticeExamSettingController::class, 'show']);
+    Route::get(
+        '/personal-quizzes/archived',
+        [PersonalQuizController::class, 'archived']
+    );
 
-    // Get all students enrolled under the authenticated teacher
-    Route::get('/my-students', [StudentTeacherEnrollmentController::class, 'myStudents']);
+    Route::get(
+        '/personal-quizzes/subject-options',
+        [SubjectController::class, 'quizSubjects']
+    );
 
-    // Get exam questions status
-    Route::get('/subjects/{subjectID}/exam-questions-status', [SubjectController::class, 'getExamQuestionsStatus']);
+    Route::put(
+        '/update-personal-quizzes/{personalQuizID}',
+        [PersonalQuizController::class, 'update']
+    );
 
-    // Get leaderboard for a subject (enhanced version)
-    Route::get('/practice-exam/leaderboard/{subjectID}', [PracticeExamLeaderboardController::class, 'leaderboard']);
-    Route::get('/practice-exam/recent-takers/{subjectID}', [PracticeExamLeaderboardController::class, 'recentTakers']);
-    Route::get('/practice-exam/overall-leaderboard', [PracticeExamLeaderboardController::class, 'overallLeaderboard']);
+    Route::patch(
+        '/personal-quizzes/{personalQuizID}/archive',
+        [PersonalQuizController::class, 'archive']
+    );
 
-    // Personal Classes (Faculty)
-    Route::post('/classes', [ClassController::class, 'store']);
-    Route::get('/classes/archived', [ClassController::class, 'archived']);
-    Route::get('/classes/show/{classID}', [ClassController::class, 'show']);
-    Route::put('/classes/update/{classID}', [ClassController::class, 'update']);
-    Route::patch('/classes/archive/{classID}', [ClassController::class, 'archive']);
-    Route::patch('/classes/{classID}/unarchive', [ClassController::class, 'unarchive']);
-    Route::delete('/classes/destroy/{classID}', [ClassController::class, 'destroy']);
+    Route::patch(
+        '/personal-quizzes/{personalQuizID}/unarchive',
+        [PersonalQuizController::class, 'unarchive']
+    );
 
-    // Class Enrollments (Faculty)
-    Route::get('/classes/{classID}/students', [ClassEnrollmentController::class, 'index']);
-    Route::delete('/classes/{classID}/remove-student', [ClassEnrollmentController::class, 'removeStudent']);
+    Route::delete(
+        '/personal-quizzes/{personalQuizID}',
+        [PersonalQuizController::class, 'destroy']
+    );
 
-    // Class Personal Quizzes (Faculty)
-    Route::get('/classes/{classID}/quizzes/available', [ClassPersonalQuizController::class, 'availablePersonalQuizzes']);
-    Route::post('/classes/quizzes', [ClassPersonalQuizController::class, 'store']);
-    Route::put('/classes/quizzes/{classPersonalQuizID}', [ClassPersonalQuizController::class, 'update']);
-    Route::patch('/classes/quizzes/{classPersonalQuizID}/dates', [ClassPersonalQuizController::class, 'updateDates']);
-    Route::delete('/classes/quizzes/{classPersonalQuizID}', [ClassPersonalQuizController::class, 'destroy']);
-    
-    // Personal Quiz to Classes Assignment (Faculty)
-    Route::get('/personal-quizzes/{personalQuizID}/classes', [ClassPersonalQuizController::class, 'getClassesForQuiz']);
-    Route::post('/personal-quizzes/{personalQuizID}/assign-classes', [ClassPersonalQuizController::class, 'assignQuizToClasses']);
-    
-    // Quiz Results (Faculty - can view results for their classes)
-    Route::get('/quiz-results', [StudentQuizResultController::class, 'index']);
-    Route::get('/quiz-results/{id}', [StudentQuizResultController::class, 'show']);
-    Route::put('/quiz-results/{id}', [StudentQuizResultController::class, 'update']);
-    Route::delete('/quiz-results/{id}', [StudentQuizResultController::class, 'destroy']);
-    
-    // Quiz History & Analytics (Faculty)
-    Route::get('/classes/{classID}/quiz-results', [StudentQuizResultController::class, 'classResults']);
-    Route::get('/quizzes/{classPersonalQuizID}/results', [StudentQuizResultController::class, 'quizResults']);
-    Route::get('/quizzes/{classPersonalQuizID}/non-takers', [StudentQuizResultController::class, 'quizNonTakers']);
-    
-    // Quiz Sessions (Faculty)
-    Route::get('/quiz-sessions/faculty-sessions', [QuizSessionController::class, 'facultySessions']);
+    /*
+    |--------------------------------------------------------------------------
+    | Personal Quiz Leaderboard
+    |--------------------------------------------------------------------------
+    */
+
+    Route::get(
+        '/personal-quiz/{personalQuizID}/leaderboard',
+        [PersonalQuizLeaderboardController::class, 'leaderboard']
+    );
+
+    Route::get(
+        '/personal-quiz/{personalQuizID}/recent-takers',
+        [PersonalQuizLeaderboardController::class, 'recentTakers']
+    );
+
+    /*
+    |--------------------------------------------------------------------------
+    | Personal Quiz Questions
+    |--------------------------------------------------------------------------
+    */
+
+    Route::get(
+        '/personal-quiz-questions/{personalQuizID}',
+        [PersonalQuizQuestionController::class, 'index']
+    );
+
+    Route::post(
+        '/personal-quiz-questions',
+        [PersonalQuizQuestionController::class, 'store']
+    );
+
+    Route::post(
+        '/personal-quiz-questions/import',
+        [PersonalQuizQuestionController::class, 'import']
+    );
+
+    Route::post(
+        '/personal-quiz-questions/{personalQuizQuestionID}',
+        [PersonalQuizQuestionController::class, 'update']
+    );
+
+    Route::post(
+        '/personal-quiz-questions/{personalQuizQuestionID}/duplicate',
+        [PersonalQuizQuestionController::class, 'duplicate']
+    );
+
+    Route::delete(
+        '/personal-quiz-questions/{personalQuizQuestionID}',
+        [PersonalQuizQuestionController::class, 'destroy']
+    );
+
+    /*
+    |--------------------------------------------------------------------------
+    | Personal Quiz Choices
+    |--------------------------------------------------------------------------
+    */
+
+    Route::get(
+        '/personal-quiz-choices/{personalQuizQuestionID}',
+        [PersonalQuizChoiceController::class, 'show']
+    );
+
+    Route::post(
+        '/personal-quiz-choices',
+        [PersonalQuizChoiceController::class, 'store']
+    );
+
+    Route::put(
+        '/personal-quiz-choices',
+        [PersonalQuizChoiceController::class, 'updateChoices']
+    );
+
+    Route::post(
+        '/personal-quiz-choices/update',
+        [PersonalQuizChoiceController::class, 'updateChoices']
+    );
+
+    Route::delete(
+        '/personal-quiz-choices/{personalQuizQuestionID}',
+        [PersonalQuizChoiceController::class, 'destroy']
+    );
+
+    /*
+    |--------------------------------------------------------------------------
+    | Class Personal Quiz Settings
+    |--------------------------------------------------------------------------
+    */
+
+    Route::get(
+        '/class-quizzes/{classPersonalQuizID}/settings',
+        [PersonalQuizSettingController::class, 'show']
+    );
+
+    Route::post(
+        '/class-quizzes/{classPersonalQuizID}/settings',
+        [PersonalQuizSettingController::class, 'store']
+    );
+
+    Route::put(
+        '/class-quizzes/{classPersonalQuizID}/settings',
+        [PersonalQuizSettingController::class, 'update']
+    );
+
+    Route::delete(
+        '/class-quizzes/{classPersonalQuizID}/settings',
+        [PersonalQuizSettingController::class, 'destroy']
+    );
+
+    /*
+    |--------------------------------------------------------------------------
+    | Personal Exam Settings
+    |--------------------------------------------------------------------------
+    */
+
+    Route::post(
+        '/personal-exam-settings',
+        [PracticeExamSettingController::class, 'store']
+    );
+
+    Route::get(
+        '/personal-exam-settings/{subjectID}',
+        [PracticeExamSettingController::class, 'show']
+    );
+
+    /*
+    |--------------------------------------------------------------------------
+    | Students
+    |--------------------------------------------------------------------------
+    */
+
+    Route::get(
+        '/my-students',
+        [StudentTeacherEnrollmentController::class, 'myStudents']
+    );
+
+    /*
+    |--------------------------------------------------------------------------
+    | Exam Questions Status
+    |--------------------------------------------------------------------------
+    */
+
+    Route::get(
+        '/subjects/{subjectID}/exam-questions-status',
+        [SubjectController::class, 'getExamQuestionsStatus']
+    );
+
+    /*
+    |--------------------------------------------------------------------------
+    | Practice Exam Leaderboard
+    |--------------------------------------------------------------------------
+    */
+
+    Route::get(
+        '/practice-exam/leaderboard/{subjectID}',
+        [PracticeExamLeaderboardController::class, 'leaderboard']
+    );
+
+    Route::get(
+        '/practice-exam/recent-takers/{subjectID}',
+        [PracticeExamLeaderboardController::class, 'recentTakers']
+    );
+
+    Route::get(
+        '/practice-exam/overall-leaderboard',
+        [PracticeExamLeaderboardController::class, 'overallLeaderboard']
+    );
+
+    /*
+    |--------------------------------------------------------------------------
+    | Personal Classes
+    |--------------------------------------------------------------------------
+    */
+
+    Route::post(
+        '/classes',
+        [ClassController::class, 'store']
+    );
+
+    Route::get(
+        '/classes/archived',
+        [ClassController::class, 'archived']
+    );
+
+    Route::get(
+        '/classes/show/{classID}',
+        [ClassController::class, 'show']
+    );
+
+    Route::put(
+        '/classes/update/{classID}',
+        [ClassController::class, 'update']
+    );
+
+    Route::patch(
+        '/classes/archive/{classID}',
+        [ClassController::class, 'archive']
+    );
+
+    Route::patch(
+        '/classes/{classID}/unarchive',
+        [ClassController::class, 'unarchive']
+    );
+
+    Route::delete(
+        '/classes/destroy/{classID}',
+        [ClassController::class, 'destroy']
+    );
+
+    /*
+    |--------------------------------------------------------------------------
+    | Class Enrollments
+    |--------------------------------------------------------------------------
+    */
+
+    Route::get(
+        '/classes/{classID}/students',
+        [ClassEnrollmentController::class, 'index']
+    );
+
+    Route::delete(
+        '/classes/{classID}/remove-student',
+        [ClassEnrollmentController::class, 'removeStudent']
+    );
+
+    /*
+    |--------------------------------------------------------------------------
+    | Class Personal Quizzes
+    |--------------------------------------------------------------------------
+    */
+
+    Route::get(
+        '/classes/{classID}/quizzes/available',
+        [ClassPersonalQuizController::class, 'availablePersonalQuizzes']
+    );
+
+    Route::post(
+        '/classes/quizzes',
+        [ClassPersonalQuizController::class, 'store']
+    );
+
+    Route::put(
+        '/classes/quizzes/{classPersonalQuizID}',
+        [ClassPersonalQuizController::class, 'update']
+    );
+
+    Route::patch(
+        '/classes/quizzes/{classPersonalQuizID}/dates',
+        [ClassPersonalQuizController::class, 'updateDates']
+    );
+
+    Route::delete(
+        '/classes/quizzes/{classPersonalQuizID}',
+        [ClassPersonalQuizController::class, 'destroy']
+    );
+
+    /*
+    |--------------------------------------------------------------------------
+    | Personal Quiz to Classes Assignment
+    |--------------------------------------------------------------------------
+    */
+
+    Route::get(
+        '/personal-quizzes/{personalQuizID}/classes',
+        [ClassPersonalQuizController::class, 'getClassesForQuiz']
+    );
+
+    Route::post(
+        '/personal-quizzes/{personalQuizID}/assign-classes',
+        [ClassPersonalQuizController::class, 'assignQuizToClasses']
+    );
+
+    /*
+    |--------------------------------------------------------------------------
+    | Quiz Results
+    |--------------------------------------------------------------------------
+    */
+
+    Route::get(
+        '/quiz-results',
+        [StudentQuizResultController::class, 'index']
+    );
+
+    Route::get(
+        '/quiz-results/{id}',
+        [StudentQuizResultController::class, 'show']
+    );
+
+    Route::put(
+        '/quiz-results/{id}',
+        [StudentQuizResultController::class, 'update']
+    );
+
+    Route::delete(
+        '/quiz-results/{id}',
+        [StudentQuizResultController::class, 'destroy']
+    );
+
+    Route::get(
+        '/classes/{classID}/quiz-results',
+        [StudentQuizResultController::class, 'classResults']
+    );
+
+    Route::get(
+        '/quizzes/{classPersonalQuizID}/results',
+        [StudentQuizResultController::class, 'quizResults']
+    );
+
+    Route::get(
+        '/quizzes/{classPersonalQuizID}/non-takers',
+        [StudentQuizResultController::class, 'quizNonTakers']
+    );
+
+    /*
+    |--------------------------------------------------------------------------
+    | Quiz Sessions
+    |--------------------------------------------------------------------------
+    */
+
+    Route::get(
+        '/quiz-sessions/faculty-sessions',
+        [QuizSessionController::class, 'facultySessions']
+    );
 });
 
 /*
 |--------------------------------------------------------------------------
-| Routes for Students (roleID: 1)
+| Students
+| roleID: 1
 |--------------------------------------------------------------------------
 */
-Route::middleware(['api', 'auth:sanctum', 'role:1'])->group(function () {
-    // Get subjects specific to student's program
-    Route::get('/student/practice-subjects', [SubjectController::class, 'getProgramSubjects']);
 
-    // Practice Exam - take, submit, and view history
-    Route::get('/practice-exam/generate/{subjectID}', [PracticeExamController::class, 'generate']);
-    Route::post('/practice-exam/submit', [PracticeExamController::class, 'submit']);
-    Route::get('/practice-exam/history', [PracticeExamController::class, 'history']);
+Route::middleware([
+    'api',
+    'auth:sanctum',
+    'role:1'
+])->group(function () {
 
-    // Enroll under a teacher
-    Route::post('/enroll-teacher', [StudentTeacherEnrollmentController::class, 'enroll']);
-    // Get all teachers a student is enrolled with
-    Route::get('/my-teachers', [StudentTeacherEnrollmentController::class, 'myTeachers']);
+    Route::get(
+        '/student/practice-subjects',
+        [SubjectController::class, 'getProgramSubjects']
+    );
 
-    // Generate personal exam for a subject and teacher
-    Route::post('/personal-exam/generate/{subjectID}/{teacherID}', [PracticeExamController::class, 'generatePersonalExam']);
-    // Submit personal exam results
-    Route::post('/personal-exam/submit', [PracticeExamController::class, 'submitPersonalExam']);
+    Route::get(
+        '/practice-exam/generate/{subjectID}',
+        [PracticeExamController::class, 'generate']
+    );
 
-    // Class Enrollments (Students)
-    Route::get('/classes/my-classes', [ClassEnrollmentController::class, 'myClasses']);
-    Route::post('/classes/join-by-code', [ClassEnrollmentController::class, 'joinByCode']);
-    Route::get('/classes/join/{token}', [ClassEnrollmentController::class, 'joinByLink']);
-    Route::delete('/classes/{classID}/unenroll', [ClassEnrollmentController::class, 'unenroll']);
+    Route::post(
+        '/practice-exam/submit',
+        [PracticeExamController::class, 'submit']
+    );
 
-    // Class Quizzes (Students)
-    Route::get('/classes/{classID}/quizzes/student', [ClassPersonalQuizController::class, 'studentQuizzes']);
-    
-    // Take Quiz
-    Route::get('/quizzes/{classPersonalQuizID}/info', [StudentQuizController::class, 'getQuizInfo']);
-    Route::post('/quizzes/{classPersonalQuizID}/start', [StudentQuizController::class, 'startQuiz']);
-    Route::post('/quizzes/{classPersonalQuizID}/submit', [StudentQuizController::class, 'submitQuiz']);
-    
-    // Quiz Results (Students - own results only)
-    Route::get('/quiz-results', [StudentQuizResultController::class, 'index']);
-    Route::get('/quiz-results/{id}', [StudentQuizResultController::class, 'show']);
-    
-    // Quiz History (Students)
-    Route::get('/classes/{classID}/quiz-history', [StudentQuizResultController::class, 'classHistory']);
-    Route::get('/quizzes/{classPersonalQuizID}/history', [StudentQuizResultController::class, 'quizHistory']);
-    
-// Quiz Sessions (Students)
-    Route::get('/quiz-sessions', [QuizSessionController::class, 'studentSessions']);
+    Route::get(
+        '/practice-exam/history',
+        [PracticeExamController::class, 'history']
+    );
+
+    Route::post(
+        '/enroll-teacher',
+        [StudentTeacherEnrollmentController::class, 'enroll']
+    );
+
+    Route::get(
+        '/my-teachers',
+        [StudentTeacherEnrollmentController::class, 'myTeachers']
+    );
+
+    Route::post(
+        '/personal-exam/generate/{subjectID}/{teacherID}',
+        [PracticeExamController::class, 'generatePersonalExam']
+    );
+
+    Route::post(
+        '/personal-exam/submit',
+        [PracticeExamController::class, 'submitPersonalExam']
+    );
+
+    Route::get(
+        '/classes/my-classes',
+        [ClassEnrollmentController::class, 'myClasses']
+    );
+
+    Route::post(
+        '/classes/join-by-code',
+        [ClassEnrollmentController::class, 'joinByCode']
+    );
+
+    Route::get(
+        '/classes/join/{token}',
+        [ClassEnrollmentController::class, 'joinByLink']
+    );
+
+    Route::delete(
+        '/classes/{classID}/unenroll',
+        [ClassEnrollmentController::class, 'unenroll']
+    );
+
+    Route::get(
+        '/classes/{classID}/quizzes/student',
+        [ClassPersonalQuizController::class, 'studentQuizzes']
+    );
+
+    Route::get(
+        '/quizzes/{classPersonalQuizID}/info',
+        [StudentQuizController::class, 'getQuizInfo']
+    );
+
+    Route::post(
+        '/quizzes/{classPersonalQuizID}/start',
+        [StudentQuizController::class, 'startQuiz']
+    );
+
+    Route::post(
+        '/quizzes/{classPersonalQuizID}/submit',
+        [StudentQuizController::class, 'submitQuiz']
+    );
+
+    Route::get(
+        '/quiz-results',
+        [StudentQuizResultController::class, 'index']
+    );
+
+    Route::get(
+        '/quiz-results/{id}',
+        [StudentQuizResultController::class, 'show']
+    );
+
+    Route::get(
+        '/classes/{classID}/quiz-history',
+        [StudentQuizResultController::class, 'classHistory']
+    );
+
+    Route::get(
+        '/quizzes/{classPersonalQuizID}/history',
+        [StudentQuizResultController::class, 'quizHistory']
+    );
+
+    Route::get(
+        '/quiz-sessions',
+        [QuizSessionController::class, 'studentSessions']
+    );
 });
 
 /*
 |--------------------------------------------------------------------------
-| Routes for Program Chair (roleID: 3)
+| Program Chair
+| roleID: 3
 |--------------------------------------------------------------------------
 */
-Route::middleware(['auth:sanctum', 'role:3'])->group(function () {
-    // Program-specific questions
-    Route::get('/program/{subjectID}', [QuestionController::class, 'indexQuestionsByProgram']);
+
+Route::middleware([
+    'auth:sanctum',
+    'role:3'
+])->group(function () {
+
+    Route::get(
+        '/program/{subjectID}',
+        [QuestionController::class, 'indexQuestionsByProgram']
+    );
 });
 
 /*
 |--------------------------------------------------------------------------
-| Routes for Program Chair and Dean (roleID: 3, 4, 5)
+| Program Chair / Dean / Associate Dean
+| roleID: 3,4,5
 |--------------------------------------------------------------------------
 */
-Route::middleware(['auth:sanctum', 'role:3,4,5'])->group(function () {
-    // Question approval (approve/disapprove)
-    Route::patch('/questions/{questionID}/status', [QuestionController::class, 'updateStatus']);
-    Route::post('/questions/approve-multiple', [QuestionController::class, 'approveMultipleQuestions']);
 
-    // Practice Exam Settings
-    Route::get('/practice-settings/{subjectID}', [PracticeExamSettingController::class, 'show']);
-    Route::post('/practice-settings', [PracticeExamSettingController::class, 'store']); 
+Route::middleware([
+    'auth:sanctum',
+    'role:3,4,5'
+])->group(function () {
 
-    // Multt-subject exam generation
-    Route::post('/generate-multi-subject-exam', [PrintController::class, 'generateMultiSubjectExam']);
+    Route::patch(
+        '/questions/{questionID}/status',
+        [QuestionController::class, 'updateStatus']
+    );
 
+    Route::post(
+        '/questions/approve-multiple',
+        [QuestionController::class, 'approveMultipleQuestions']
+    );
 
+    Route::get(
+        '/practice-settings/{subjectID}',
+        [PracticeExamSettingController::class, 'show']
+    );
+
+    Route::post(
+        '/practice-settings',
+        [PracticeExamSettingController::class, 'store']
+    );
+
+    Route::post(
+        '/generate-multi-subject-exam',
+        [PrintController::class, 'generateMultiSubjectExam']
+    );
 });
 
 /*
 |--------------------------------------------------------------------------
-| Routes for Dean only (roleID: 4)
+| Dean Only
+| roleID: 4
 |--------------------------------------------------------------------------
 */
-Route::middleware(['auth:sanctum', 'role:4'])->group(function () {
-    Route::post('/campuses', [CampusController::class, 'store']);
+
+Route::middleware([
+    'auth:sanctum',
+    'role:4'
+])->group(function () {
+
+    Route::post(
+        '/campuses',
+        [CampusController::class, 'store']
+    );
 });
 
 /*
 |--------------------------------------------------------------------------
-| Routes for Dean and Associate Dean (roleID: 4, 5 only)
+| Dean / Associate Dean
+| roleID: 4,5
 |--------------------------------------------------------------------------
 */
-Route::middleware(['auth:sanctum', 'role:4,5'])->group(function () {
-    Route::patch('/users/{userID}/credentials', [UserController::class, 'updateUserCredentials']);
 
-    // Subject management
-  // Subject management
+Route::middleware([
+    'auth:sanctum',
+    'role:4,5'
+])->group(function () {
 
-// Subject management
+    Route::patch(
+        '/users/{userID}/credentials',
+        [UserController::class, 'updateUserCredentials']
+    );
 
-Route::post('/add-subjects', [SubjectController::class, 'store']);
+    /*
+    |--------------------------------------------------------------------------
+    | Subject Management
+    |--------------------------------------------------------------------------
+    */
 
-Route::get('/subjects/archived', [SubjectController::class, 'archived']);
+    Route::post(
+        '/add-subjects',
+        [SubjectController::class, 'store']
+    );
 
-Route::patch('/subjects/{subjectID}/archive', [SubjectController::class, 'destroy']);
+    Route::get(
+        '/subjects/archived',
+        [SubjectController::class, 'archived']
+    );
 
-Route::patch('/subjects/{subjectID}/restore', [SubjectController::class, 'restore']);
+    Route::patch(
+        '/subjects/{subjectID}/archive',
+        [SubjectController::class, 'destroy']
+    );
 
-Route::delete('/subjects/{subjectID}/permanent-delete', [SubjectController::class, 'permanentDelete']);
+    Route::patch(
+        '/subjects/{subjectID}/restore',
+        [SubjectController::class, 'restore']
+    );
 
-Route::put('/subjects/{subjectID}/update', [SubjectController::class, 'update']);
+    Route::delete(
+        '/subjects/{subjectID}/permanent-delete',
+        [SubjectController::class, 'permanentDelete']
+    );
 
-    // User deletion (Dean and Associate Dean only)
-    Route::delete('/users/{userID}', [UserController::class, 'deleteUser']);
-    Route::post('/users/delete-multiple', [UserController::class, 'deleteMultipleUsers']);
+    Route::put(
+        '/subjects/{subjectID}/update',
+        [SubjectController::class, 'update']
+    );
 
-    // Exam questions management
-    Route::patch('/subjects/{subjectID}/enable-exam-questions', [SubjectController::class, 'enableExamQuestions']);
-    Route::patch('/subjects/{subjectID}/disable-exam-questions', [SubjectController::class, 'disableExamQuestions']);
+    /*
+    |--------------------------------------------------------------------------
+    | User Deletion
+    |--------------------------------------------------------------------------
+    */
+
+    Route::delete(
+        '/users/{userID}',
+        [UserController::class, 'deleteUser']
+    );
+
+    Route::post(
+        '/users/delete-multiple',
+        [UserController::class, 'deleteMultipleUsers']
+    );
+
+    /*
+    |--------------------------------------------------------------------------
+    | Exam Questions Management
+    |--------------------------------------------------------------------------
+    */
+
+    Route::patch(
+        '/subjects/{subjectID}/enable-exam-questions',
+        [SubjectController::class, 'enableExamQuestions']
+    );
+
+    Route::patch(
+        '/subjects/{subjectID}/disable-exam-questions',
+        [SubjectController::class, 'disableExamQuestions']
+    );
 });
 
-// Serve question_images and choices with CORS headers for frontend PDF rendering
-Route::get('storage/question_images/{filename}', function ($filename) {
-    $path = public_path('storage/question_images/' . $filename);
-    if (!file_exists($path)) {
-        abort(404);
+/*
+|--------------------------------------------------------------------------
+| Storage / Images
+|--------------------------------------------------------------------------
+*/
+
+Route::get(
+    'storage/question_images/{filename}',
+    function ($filename) {
+
+        $path = public_path(
+            'storage/question_images/' . $filename
+        );
+
+        if (!file_exists($path)) {
+            abort(404);
+        }
+
+        return response()->file($path);
     }
-    return response()->file($path);
-})->middleware('image.cors');
+)->middleware('image.cors');
 
-Route::get('storage/choices/{filename}', function ($filename) {
-    $path = public_path('storage/choices/' . $filename);
-    if (!file_exists($path)) {
-        abort(404);
+Route::get(
+    'storage/choices/{filename}',
+    function ($filename) {
+
+        $path = public_path(
+            'storage/choices/' . $filename
+        );
+
+        if (!file_exists($path)) {
+            abort(404);
+        }
+
+        return response()->file($path);
     }
-    return response()->file($path);
-})->middleware('image.cors');
-
-
+)->middleware('image.cors');
