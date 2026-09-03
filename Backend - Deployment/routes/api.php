@@ -1,8 +1,11 @@
 <?php
 
 use Modules\Questions\Controllers\DatabaseQuestionImportController;
+use Modules\Questions\Controllers\DatabaseSourceController;
+
 use App\Http\Middleware\TokenExpirationMiddleware;
 use Illuminate\Support\Facades\Route;
+
 use Modules\Users\Controllers\AuthController;
 use Modules\Subjects\Controllers\SubjectController;
 use Modules\FacultySubjects\Controllers\FacultySubjectController;
@@ -32,6 +35,7 @@ use Modules\PersonalExams\Controllers\StudentQuizResultController;
 use Modules\PersonalExams\Controllers\StudentQuizController;
 use Modules\PersonalExams\Controllers\QuizSessionController;
 
+
 /*
 |--------------------------------------------------------------------------
 | Public API Routes
@@ -39,14 +43,38 @@ use Modules\PersonalExams\Controllers\QuizSessionController;
 */
 
 Route::post('/register', [AuthController::class, 'register']);
+
 Route::post('/login', [AuthController::class, 'login']);
+
 Route::get('/roles', [RoleController::class, 'indexAvailableRoles']);
+
 Route::get('/campuses', [CampusController::class, 'index']);
-Route::post('/forgot-password', [PasswordResetController::class, 'sendResetLinkEmail']);
-Route::post('/reset-password', [PasswordResetController::class, 'reset']);
-Route::post('/forgot-user-code', [UserController::class, 'sendUserCodeResetLinkEmail']);
-Route::post('/reset-user-code', [UserController::class, 'resetUserCode']);
-Route::get('/app-version', [AppController::class, 'getVersion']);
+
+Route::post(
+    '/forgot-password',
+    [PasswordResetController::class, 'sendResetLinkEmail']
+);
+
+Route::post(
+    '/reset-password',
+    [PasswordResetController::class, 'reset']
+);
+
+Route::post(
+    '/forgot-user-code',
+    [UserController::class, 'sendUserCodeResetLinkEmail']
+);
+
+Route::post(
+    '/reset-user-code',
+    [UserController::class, 'resetUserCode']
+);
+
+Route::get(
+    '/app-version',
+    [AppController::class, 'getVersion']
+);
+
 
 /*
 |--------------------------------------------------------------------------
@@ -56,13 +84,30 @@ Route::get('/app-version', [AppController::class, 'getVersion']);
 
 Route::middleware(['auth:sanctum'])->group(function () {
 
-    Route::post('/change-password', [AuthController::class, 'changePassword']);
-    Route::post('/logout', [AuthController::class, 'logout']);
+    Route::post(
+        '/change-password',
+        [AuthController::class, 'changePassword']
+    );
 
-    Route::get('/user/profile', [UserController::class, 'getProfile']);
-    Route::post('/user/update-profile', [UserController::class, 'updateProfile']);
+    Route::post(
+        '/logout',
+        [AuthController::class, 'logout']
+    );
 
-    Route::get('/subjects/all', [SubjectController::class, 'allSubjects']);
+    Route::get(
+        '/user/profile',
+        [UserController::class, 'getProfile']
+    );
+
+    Route::post(
+        '/user/update-profile',
+        [UserController::class, 'updateProfile']
+    );
+
+    Route::get(
+        '/subjects/all',
+        [SubjectController::class, 'allSubjects']
+    );
 
     Route::get(
         '/practice-exam/results/{subjectID}',
@@ -105,6 +150,7 @@ Route::middleware(['auth:sanctum'])->group(function () {
     );
 });
 
+
 /*
 |--------------------------------------------------------------------------
 | Faculty / Program Chair / Dean / Associate Dean
@@ -118,15 +164,27 @@ Route::middleware([
     'role:2,3,4,5'
 ])->group(function () {
 
+
     /*
     |--------------------------------------------------------------------------
     | User Management
     |--------------------------------------------------------------------------
     */
 
-    Route::get('/users', [UserController::class, 'index']);
-    Route::patch('/users/{userID}/approve', [UserController::class, 'approveUser']);
-    Route::patch('/users/{userID}/disapprove', [UserController::class, 'disapproveUser']);
+    Route::get(
+        '/users',
+        [UserController::class, 'index']
+    );
+
+    Route::patch(
+        '/users/{userID}/approve',
+        [UserController::class, 'approveUser']
+    );
+
+    Route::patch(
+        '/users/{userID}/disapprove',
+        [UserController::class, 'disapproveUser']
+    );
 
     Route::post(
         '/users/approve-multiple',
@@ -144,14 +202,15 @@ Route::middleware([
     );
 
     Route::patch(
-        'users/{id}/deactivate',
+        '/users/{id}/deactivate',
         [UserController::class, 'deactivate']
     );
 
     Route::patch(
-        'users/{id}/activate',
+        '/users/{id}/activate',
         [UserController::class, 'activate']
     );
+
 
     /*
     |--------------------------------------------------------------------------
@@ -169,13 +228,17 @@ Route::middleware([
         [ChoiceController::class, 'showChoices']
     );
 
+
     /*
     |--------------------------------------------------------------------------
     | Subjects
     |--------------------------------------------------------------------------
     */
 
-    Route::get('/subjects', [SubjectController::class, 'index']);
+    Route::get(
+        '/subjects',
+        [SubjectController::class, 'index']
+    );
 
     Route::post(
         '/faculty/assign-subject',
@@ -197,13 +260,18 @@ Route::middleware([
         [FacultySubjectController::class, 'removeAssignedSubject']
     );
 
+
     /*
     |--------------------------------------------------------------------------
     | Year Levels
     |--------------------------------------------------------------------------
     */
 
-    Route::get('/year-levels', [YearLevelController::class, 'index']);
+    Route::get(
+        '/year-levels',
+        [YearLevelController::class, 'index']
+    );
+
 
     /*
     |--------------------------------------------------------------------------
@@ -211,43 +279,146 @@ Route::middleware([
     |--------------------------------------------------------------------------
     */
 
-    // Existing FILE import route - DO NOT REMOVE
+    /*
+     * Existing FILE import route.
+     *
+     * DO NOT REMOVE.
+     */
     Route::post(
         '/questions/add',
         [QuestionController::class, 'store']
     );
+
+
+    /*
+    |--------------------------------------------------------------------------
+    | DATABASE SOURCES
+    |--------------------------------------------------------------------------
+    |
+    | These routes manage registered source databases.
+    |
+    | Example:
+    |
+    | CAPS
+    | MAGS
+    | Other databases
+    |
+    */
+
+    /*
+     * Get all active database sources.
+     *
+     * GET /api/database-sources
+     */
+    Route::get(
+        '/database-sources',
+        [DatabaseSourceController::class, 'index']
+    );
+
+    /*
+     * Add a new database source.
+     *
+     * POST /api/database-sources
+     */
+    Route::post(
+        '/database-sources',
+        [DatabaseSourceController::class, 'store']
+    );
+
+    /*
+     * Test an existing database source.
+     *
+     * POST /api/database-sources/{id}/test
+     */
+    Route::post(
+        '/database-sources/{id}/test',
+        [DatabaseSourceController::class, 'testConnection']
+    );
+
+    /*
+     * Disable a database source.
+     *
+     * DELETE /api/database-sources/{id}
+     */
+    Route::delete(
+        '/database-sources/{id}',
+        [DatabaseSourceController::class, 'destroy']
+    );
+
 
     /*
     |--------------------------------------------------------------------------
     | DATABASE QUESTION IMPORT
     |--------------------------------------------------------------------------
     |
-    | Source:
-    |     MySQL database "caps"
-    |
     | Flow:
-    |     From Database
-    |       -> Select Subject
-    |       -> Get Questions
-    |       -> Select Questions
-    |       -> Import Selected
+    |
+    | From Database
+    |      ↓
+    | Source Database
+    |      ↓
+    | Source Subject
+    |      ↓
+    | Questions
+    |      ↓
+    | Choices
+    |      ↓
+    | Import Selected
     |
     */
 
+
+    /*
+     * Get available source databases for the importer.
+     *
+     * GET /api/database-import/sources
+     */
+    Route::get(
+        '/database-import/sources',
+        [DatabaseQuestionImportController::class, 'sources']
+    );
+
+
+    /*
+     * Get subjects from selected source database.
+     *
+     * GET /api/database-import/subjects
+     *
+     * Example:
+     *
+     * /api/database-import/subjects?sourceDatabaseID=1
+     */
     Route::get(
         '/database-import/subjects',
         [DatabaseQuestionImportController::class, 'subjects']
     );
 
+
+    /*
+     * Get questions from selected subject.
+     *
+     * GET /api/database-import/questions/{subjectID}
+     *
+     * Example:
+     *
+     * /api/database-import/questions/1?sourceDatabaseID=1
+     */
     Route::get(
         '/database-import/questions/{subjectID}',
         [DatabaseQuestionImportController::class, 'questions']
     );
 
+
+    /*
+     * Import selected questions.
+     *
+     * POST /api/database-import/questions
+     */
     Route::post(
         '/database-import/questions',
         [DatabaseQuestionImportController::class, 'import']
     );
+
 
     /*
     |--------------------------------------------------------------------------
@@ -290,6 +461,7 @@ Route::middleware([
         [QuestionController::class, 'questionCount']
     );
 
+
     /*
     |--------------------------------------------------------------------------
     | Printable Exam
@@ -305,6 +477,7 @@ Route::middleware([
         '/subjects/question-difficulty-counts',
         [PrintController::class, 'getSubjectQuestionDifficultyCounts']
     );
+
 
     /*
     |--------------------------------------------------------------------------
@@ -322,6 +495,7 @@ Route::middleware([
         [PrintController::class, 'generatePersonalQuizPDF']
     );
 
+
     /*
     |--------------------------------------------------------------------------
     | Practice Exam
@@ -338,13 +512,18 @@ Route::middleware([
         [PrintController::class, 'generateSingleSubjectPersonalPreview']
     );
 
+
     /*
     |--------------------------------------------------------------------------
     | Programs
     |--------------------------------------------------------------------------
     */
 
-    Route::get('/programs', [ProgramController::class, 'index']);
+    Route::get(
+        '/programs',
+        [ProgramController::class, 'index']
+    );
+
 
     /*
     |--------------------------------------------------------------------------
@@ -392,6 +571,7 @@ Route::middleware([
         [PersonalQuizController::class, 'destroy']
     );
 
+
     /*
     |--------------------------------------------------------------------------
     | Personal Quiz Leaderboard
@@ -407,6 +587,7 @@ Route::middleware([
         '/personal-quiz/{personalQuizID}/recent-takers',
         [PersonalQuizLeaderboardController::class, 'recentTakers']
     );
+
 
     /*
     |--------------------------------------------------------------------------
@@ -444,6 +625,7 @@ Route::middleware([
         [PersonalQuizQuestionController::class, 'destroy']
     );
 
+
     /*
     |--------------------------------------------------------------------------
     | Personal Quiz Choices
@@ -475,6 +657,7 @@ Route::middleware([
         [PersonalQuizChoiceController::class, 'destroy']
     );
 
+
     /*
     |--------------------------------------------------------------------------
     | Class Personal Quiz Settings
@@ -501,6 +684,7 @@ Route::middleware([
         [PersonalQuizSettingController::class, 'destroy']
     );
 
+
     /*
     |--------------------------------------------------------------------------
     | Personal Exam Settings
@@ -517,6 +701,7 @@ Route::middleware([
         [PracticeExamSettingController::class, 'show']
     );
 
+
     /*
     |--------------------------------------------------------------------------
     | Students
@@ -528,6 +713,7 @@ Route::middleware([
         [StudentTeacherEnrollmentController::class, 'myStudents']
     );
 
+
     /*
     |--------------------------------------------------------------------------
     | Exam Questions Status
@@ -538,6 +724,7 @@ Route::middleware([
         '/subjects/{subjectID}/exam-questions-status',
         [SubjectController::class, 'getExamQuestionsStatus']
     );
+
 
     /*
     |--------------------------------------------------------------------------
@@ -559,6 +746,7 @@ Route::middleware([
         '/practice-exam/overall-leaderboard',
         [PracticeExamLeaderboardController::class, 'overallLeaderboard']
     );
+
 
     /*
     |--------------------------------------------------------------------------
@@ -601,6 +789,7 @@ Route::middleware([
         [ClassController::class, 'destroy']
     );
 
+
     /*
     |--------------------------------------------------------------------------
     | Class Enrollments
@@ -616,6 +805,7 @@ Route::middleware([
         '/classes/{classID}/remove-student',
         [ClassEnrollmentController::class, 'removeStudent']
     );
+
 
     /*
     |--------------------------------------------------------------------------
@@ -648,6 +838,7 @@ Route::middleware([
         [ClassPersonalQuizController::class, 'destroy']
     );
 
+
     /*
     |--------------------------------------------------------------------------
     | Personal Quiz to Classes Assignment
@@ -663,6 +854,7 @@ Route::middleware([
         '/personal-quizzes/{personalQuizID}/assign-classes',
         [ClassPersonalQuizController::class, 'assignQuizToClasses']
     );
+
 
     /*
     |--------------------------------------------------------------------------
@@ -705,6 +897,7 @@ Route::middleware([
         [StudentQuizResultController::class, 'quizNonTakers']
     );
 
+
     /*
     |--------------------------------------------------------------------------
     | Quiz Sessions
@@ -716,6 +909,7 @@ Route::middleware([
         [QuizSessionController::class, 'facultySessions']
     );
 });
+
 
 /*
 |--------------------------------------------------------------------------
@@ -836,6 +1030,7 @@ Route::middleware([
     );
 });
 
+
 /*
 |--------------------------------------------------------------------------
 | Program Chair
@@ -853,6 +1048,7 @@ Route::middleware([
         [QuestionController::class, 'indexQuestionsByProgram']
     );
 });
+
 
 /*
 |--------------------------------------------------------------------------
@@ -892,6 +1088,7 @@ Route::middleware([
     );
 });
 
+
 /*
 |--------------------------------------------------------------------------
 | Dean Only
@@ -910,6 +1107,7 @@ Route::middleware([
     );
 });
 
+
 /*
 |--------------------------------------------------------------------------
 | Dean / Associate Dean
@@ -926,6 +1124,7 @@ Route::middleware([
         '/users/{userID}/credentials',
         [UserController::class, 'updateUserCredentials']
     );
+
 
     /*
     |--------------------------------------------------------------------------
@@ -963,6 +1162,7 @@ Route::middleware([
         [SubjectController::class, 'update']
     );
 
+
     /*
     |--------------------------------------------------------------------------
     | User Deletion
@@ -978,6 +1178,7 @@ Route::middleware([
         '/users/delete-multiple',
         [UserController::class, 'deleteMultipleUsers']
     );
+
 
     /*
     |--------------------------------------------------------------------------
@@ -995,6 +1196,7 @@ Route::middleware([
         [SubjectController::class, 'disableExamQuestions']
     );
 });
+
 
 /*
 |--------------------------------------------------------------------------
@@ -1017,6 +1219,7 @@ Route::get(
         return response()->file($path);
     }
 )->middleware('image.cors');
+
 
 Route::get(
     'storage/choices/{filename}',
