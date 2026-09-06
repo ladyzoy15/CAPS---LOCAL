@@ -16,11 +16,11 @@ class SubjectsTableSeeder extends Seeder
         $fourthYearId = DB::table('year_levels')->where('name', '4th Year')->first()->yearLevelID;
 
         $subjects = [
-            // Computer Science (4 subjects)
-            ['code' => 'CS101', 'name' => 'Introduction to Computer Science', 'year' => $firstYearId, 'program' => 1],
-            ['code' => 'CS201', 'name' => 'Data Structures and Algorithms', 'year' => $secondYearId, 'program' => 1],
-            ['code' => 'CS301', 'name' => 'Database Management Systems', 'year' => $thirdYearId, 'program' => 1],
-            ['code' => 'CS401', 'name' => 'Artificial Intelligence', 'year' => $fourthYearId, 'program' => 1],
+            // Computer Engineering (4 subjects)
+            ['code' => 'CpE101', 'name' => 'Introduction to Computer Engineering', 'year' => $firstYearId, 'program' => 1],
+            ['code' => 'CpE201', 'name' => 'Data Structures and Algorithms', 'year' => $secondYearId, 'program' => 1],
+            ['code' => 'CpE301', 'name' => 'Database Management Systems', 'year' => $thirdYearId, 'program' => 1],
+            ['code' => 'CpE401', 'name' => 'Artificial Intelligence', 'year' => $fourthYearId, 'program' => 1],
 
             // Agricultural Engineering (4 subjects)
             ['code' => 'ABE101', 'name' => 'Introduction to Agricultural Engineering', 'year' => $firstYearId, 'program' => 2],

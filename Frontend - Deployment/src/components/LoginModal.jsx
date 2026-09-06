@@ -170,8 +170,8 @@ export default function LoginModal({
       >
         {/* Ambient glow blobs */}
         <div className="pointer-events-none absolute inset-0">
-          <div className="absolute -top-24 -left-20 h-[380px] w-[700px] rounded-full bg-orange-400/60 blur-[120px]" />
-          <div className="absolute -right-24 top-10 h-[340px] w-[700px] rounded-full bg-yellow-800/60 blur-[120px]" />
+          <div className="absolute -top-24 -left-20 h-[380px] w-[700px] rounded-full bg-orange-400/30 blur-[120px]" />
+          <div className="absolute -right-24 top-10 h-[340px] w-[700px] rounded-full bg-yellow-800/40 blur-[120px]" />
           <div className="absolute -bottom-28 left-1/3 h-[360px] w-[400px] rounded-full bg-amber-600/40 blur-[130px]" />
         </div>
 
@@ -329,7 +329,7 @@ export default function LoginModal({
                 }}
                 className="cursor-pointer font-medium text-red-500 hover:underline"
               >
-                Register
+                Sign Up
               </span>
             </p>
           </form>

@@ -1,8 +1,8 @@
 import { useState, useEffect, useRef } from "react";
 import { Link, useLocation, useNavigate } from "react-router-dom";
 
-import AllSubjectsDropDownProgramChair from "./SubjectsProgramChair";
-import AssignedSubjectsDropDown from "./SubjectsFaculty";
+import AllSubjectsDropDownProgramChair from "./subjectsProgramChair";
+import AssignedSubjectsDropDown from "./subjectsFaculty";
 import PrintExamModal from "./PrintExamModal";
 import { logoutUser } from "../utils/logoutUser";
 import useToast from "../hooks/useToast";
@@ -28,8 +28,8 @@ import UsersIconH from "/src/assets/symbols/usershove.svg";
 import PrintIcon from "/src/assets/symbols/print.svg";
 import PrintIconH from "/src/assets/symbols/printhover.svg";
 
-import SubjectsIcon from "/src/assets/symbols/Subjects.svg";
-import SubjectsIconH from "/src/assets/symbols/Subjectshover.svg";
+import SubjectsIcon from "/src/assets/symbols/subjects.svg";
+import SubjectsIconH from "/src/assets/symbols/subjectshover.svg";
 
 
 const getRoleName = (roleId) => {
@@ -1111,8 +1111,14 @@ const Sidebar = ({
                             className={`bx bx-archive text-[22px] ${
                               isActive("/archive")
                                 ? "text-orange-500"
-                                : "text-black dark:text-gray-100"
+                                : "text-[#3C3C3C]"
                             }`}
+                            style={{
+                              ...getDarkIconStyle(isActive("/archive")),
+                              color: isActive("/archive")
+                                ? "#f97316"
+                                : "#3C3C3C",
+                            }}
                           />
 
                         </span>
@@ -1148,8 +1154,14 @@ const Sidebar = ({
                             className={`bx bx-import text-[22px] ${
                               isActive("/import")
                                 ? "text-orange-500"
-                                : "text-black dark:text-gray-100"
+                                : "text-[#3C3C3C]"
                             }`}
+                            style={{
+                              ...getDarkIconStyle(isActive("/import")),
+                              color: isActive("/import")
+                                ? "#f97316"
+                                : "#3C3C3C",
+                            }}
                           />
 
                         </span>
@@ -2029,8 +2041,14 @@ const Sidebar = ({
                         } ${
                           isActive("/import")
                             ? "text-orange-500"
-                            : "text-black dark:text-gray-100"
+                            : "text-[#3C3C3C]"
                         }`}
+                        style={{
+                          ...getDarkIconStyle(isActive("/import")),
+                          color: isActive("/import")
+                            ? "#f97316"
+                            : "#3C3C3C",
+                        }}
                       >
 
                         <path d="M12 3v12" />
@@ -2208,8 +2226,14 @@ const Sidebar = ({
                           } ${
                             isActive("/archive")
                               ? "text-orange-500"
-                              : "text-black dark:text-gray-100"
+                              : "text-[#3C3C3C]"
                           }`}
+                          style={{
+                            ...getDarkIconStyle(isActive("/archive")),
+                            color: isActive("/archive")
+                              ? "#f97316"
+                              : "#3C3C3C",
+                          }}
                           title="Archive"
                         />
 
@@ -2279,7 +2303,7 @@ const Sidebar = ({
 
                 <img
                   src={CollegeLogo}
-                  alt="REVA"
+                  alt="ARC"
                   className="size-[20px] flex-shrink-0"
                   style={getDarkIconStyle()}
                 />
@@ -2287,7 +2311,7 @@ const Sidebar = ({
 
                 {!isUsersPage && (
                   <span className="outfit-500 flex items-baseline gap-1 text-[15px] whitespace-nowrap text-amber-700 dark:text-gray-400">
-                    REVA
+                    ARC
                     <span className="text-xs font-medium">
                       <AppVersion />
                     </span>

@@ -283,7 +283,7 @@ const ImportQuestions = () => {
     useState({
       name: "",
       driver: "mysql",
-      host: "127.0.0.1",
+      host: "mysql",
       port: "3306",
       database: "",
       username: "root",
@@ -1402,7 +1402,7 @@ const ImportQuestions = () => {
       setDatabaseForm({
         name: "",
         driver: "mysql",
-        host: "127.0.0.1",
+        host: "mysql",
         port: "3306",
         database: "",
         username: "root",
