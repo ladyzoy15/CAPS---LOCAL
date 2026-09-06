@@ -2,32 +2,93 @@
 
 return [
 
-    'paths' => ['api/*', 'sanctum/csrf-cookie'],
+    /*
+    |--------------------------------------------------------------------------
+    | Cross-Origin Resource Sharing (CORS) Configuration
+    |--------------------------------------------------------------------------
+    |
+    | Here you may configure your settings for cross-origin resource sharing
+    | or "CORS". This determines what cross-origin operations may execute
+    | in web browsers.
+    |
+    */
 
-    'allowed_methods' => ['*'],
+    'paths' => [
+        'api/*',
+        'sanctum/csrf-cookie',
+    ],
+
+    /*
+    |--------------------------------------------------------------------------
+    | Allowed Methods
+    |--------------------------------------------------------------------------
+    */
+
+    'allowed_methods' => [
+        '*',
+    ],
+
+    /*
+    |--------------------------------------------------------------------------
+    | Allowed Origins
+    |--------------------------------------------------------------------------
+    |
+    | The Vite frontend runs on port 5173 during development.
+    |
+    */
 
     'allowed_origins' => array_values(array_filter([
-        env('FRONTEND_URL', 'http://localhost:3000'),
+        env('FRONTEND_URL'),
+
+        // Vite development server
+        'http://localhost:5173',
+        'http://127.0.0.1:5173',
+
+        // Keep support for the old development port
         'http://localhost:3000',
         'http://127.0.0.1:3000',
     ])),
 
+    /*
+    |--------------------------------------------------------------------------
+    | Allowed Origin Patterns
+    |--------------------------------------------------------------------------
+    */
+
     'allowed_origins_patterns' => [],
 
+    /*
+    |--------------------------------------------------------------------------
+    | Allowed Headers
+    |--------------------------------------------------------------------------
+    */
+
     'allowed_headers' => [
-        'Content-Type',
-        'X-Requested-With',
-        'Authorization',
-        'Accept',
-        'Origin',
-        'X-CSRF-TOKEN',
-        'X-XSRF-TOKEN',
-        'Cookie',
+        '*',
     ],
+
+    /*
+    |--------------------------------------------------------------------------
+    | Exposed Headers
+    |--------------------------------------------------------------------------
+    */
 
     'exposed_headers' => [],
 
+    /*
+    |--------------------------------------------------------------------------
+    | Max Age
+    |--------------------------------------------------------------------------
+    */
+
     'max_age' => 0,
 
+    /*
+    |--------------------------------------------------------------------------
+    | Supports Credentials
+    |--------------------------------------------------------------------------
+    */
+
     'supports_credentials' => true,
+
 ];

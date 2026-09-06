@@ -636,6 +636,7 @@ public function destroy($subjectID)
     {
         try {
             $user = Auth::user();
+
             if (!$user || !in_array((int) $user->roleID, [2, 3, 4, 5], true)) {
                 return response()->json([
                     'success' => false,
@@ -644,35 +645,68 @@ public function destroy($subjectID)
                 ], 403);
             }
 
-          $query = DB::table('subjects as s')
-    ->join('programs as p', 'p.programID', '=', 's.programID')
-    ->join('year_levels as yl', 'yl.yearLevelID', '=', 's.yearLevelID')
-    ->whereNull('s.archived_at')
-    ->select(
-        's.subjectID',
-        's.subjectCode',
-        's.subjectName',
-        's.programID',
-        'p.programName',
-        's.yearLevelID',
-        'yl.name as yearLevel'
-    );
+            /*
+             * Get subjects from the CURRENT CAPS database.
+             *
+             * LEFT JOIN is intentional so a newly-created subject
+             * will still appear even if its related program or
+             * year-level record is missing.
+             */
+            $query = DB::table('subjects as s')
+                ->leftJoin(
+                    'programs as p',
+                    'p.programID',
+                    '=',
+                    's.programID'
+                )
+                ->leftJoin(
+                    'year_levels as yl',
+                    'yl.yearLevelID',
+                    '=',
+                    's.yearLevelID'
+                )
+                ->whereNull('s.archived_at')
+                ->select(
+                    's.subjectID',
+                    's.subjectCode',
+                    's.subjectName',
+                    's.programID',
+                    DB::raw("COALESCE(p.programName, 'N/A') as programName"),
+                    's.yearLevelID',
+                    DB::raw("COALESCE(yl.name, 'N/A') as yearLevel")
+                );
 
-            // Faculty (2) and Program Chair (3): only their own program's subjects
-            // + General Education (GE) subjects. Dean (4) / Associate Dean (5): all.
+            /*
+             * Faculty (2) and Program Chair (3):
+             * own program + General Education subjects.
+             *
+             * Dean (4) and Associate Dean (5):
+             * ALL non-archived subjects.
+             */
             if (in_array((int) $user->roleID, [2, 3], true)) {
                 $query->where(function ($q) use ($user) {
                     $q->where('s.programID', $user->programID)
-                      ->orWhere('s.programID', 6) // General (GE) subjects
-                      ->orWhere('p.programName', 'LIKE', '%General Education%');
+                        ->orWhere('s.programID', 6)
+                        ->orWhere(
+                            'p.programName',
+                            'LIKE',
+                            '%General Education%'
+                        )
+                        ->orWhereNull('s.programID');
                 });
             }
 
-            $subjects = $query->orderBy('s.subjectID')->get();
+            $subjects = $query
+                ->orderBy('s.subjectID', 'asc')
+                ->get();
 
             $formattedSubjects = $subjects->map(function ($subject) {
-                $programName = $subject->programName ?? '';
-                if ($programName !== '' && strpos($programName, 'BS-') === 0) {
+                $programName = $subject->programName ?? 'N/A';
+
+                if (
+                    $programName !== 'N/A' &&
+                    strpos($programName, 'BS-') === 0
+                ) {
                     $programName = substr($programName, 3);
                 }
 
@@ -683,7 +717,7 @@ public function destroy($subjectID)
                     'programID' => $subject->programID,
                     'programName' => $programName,
                     'yearLevelID' => $subject->yearLevelID,
-                    'yearLevel' => $subject->yearLevel,
+                    'yearLevel' => $subject->yearLevel ?? 'N/A',
                 ];
             });
 
@@ -692,10 +726,15 @@ public function destroy($subjectID)
                 'message' => 'Subjects retrieved successfully.',
                 'subjects' => $formattedSubjects,
             ], 200);
+
         } catch (\Throwable $e) {
             Log::error('Error retrieving quiz subjects', [
+                'user_id' => optional(Auth::user())->userID,
                 'error' => $e->getMessage(),
+                'file' => $e->getFile(),
+                'line' => $e->getLine(),
             ]);
+
             return response()->json([
                 'success' => false,
                 'message' => 'An error occurred while retrieving subjects.',
@@ -703,7 +742,6 @@ public function destroy($subjectID)
             ], 500);
         }
     }
-
     /**
      * Enable exam questions (purpose_id 3) for a subject. Only accessible by the Dean (roleID 4).
      */
