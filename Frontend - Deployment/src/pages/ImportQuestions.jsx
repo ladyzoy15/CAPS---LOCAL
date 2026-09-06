@@ -5,6 +5,7 @@ import mammoth from "mammoth/mammoth.browser";
 import * as pdfjsLib from "pdfjs-dist/build/pdf";
 import pdfjsWorkerUrl from "pdfjs-dist/build/pdf.worker.min.mjs?url";
 import Tesseract from "tesseract.js";
+import DOMPurify from "dompurify";
 
 import useToast from "../hooks/useToast";
 import Toast from "../components/Toast";
@@ -17,6 +18,13 @@ pdfjsLib.GlobalWorkerOptions.workerSrc = pdfjsWorkerUrl;
 
 const DEFAULT_COVERAGE_ID = "1";
 const DEFAULT_PURPOSE_ID = "2";
+
+const renderImportedHtml = (value) => ({
+  __html: DOMPurify.sanitize(String(value ?? ""), {
+    USE_PROFILES: { html: true },
+    FORBID_ATTR: ["style", "class", "id"],
+  }),
+});
 
 // =========================================================
 // FILE PARSING HELPERS
@@ -1958,9 +1966,11 @@ const ImportQuestions = () => {
 
                                     {/* QUESTION TEXT */}
                                     <div className="outfit-500 whitespace-pre-wrap text-sm leading-6 text-gray-800 dark:text-gray-100">
-                                      {
-                                        question.questionText
-                                      }
+                                      <span
+                                        dangerouslySetInnerHTML={renderImportedHtml(
+                                          question.questionText
+                                        )}
+                                      />
                                     </div>
 
                                     {/* CHOICES */}
@@ -1997,9 +2007,11 @@ const ImportQuestions = () => {
                                                   .
                                                 </span>
 
-                                                {
-                                                  choice.choiceText
-                                                }
+                                                <span
+                                                  dangerouslySetInnerHTML={renderImportedHtml(
+                                                    choice.choiceText
+                                                  )}
+                                                />
 
                                                 {choice.isCorrect && (
                                                   <span className="ml-2 text-xs font-semibold">

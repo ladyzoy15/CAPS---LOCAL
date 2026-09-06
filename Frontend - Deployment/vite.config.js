@@ -9,6 +9,10 @@ const useHttps =
   process.env.HTTPS === "true";
 
 export default defineConfig({
+  build: {
+    target: "esnext",
+  },
+
   plugins: [
     react(),
     tailwindcss(),
@@ -77,6 +81,7 @@ export default defineConfig({
         cleanupOutdatedCaches: true,
         skipWaiting: true,
         clientsClaim: true,
+        maximumFileSizeToCacheInBytes: 5 * 1024 * 1024, // 5 MB limit (default 2MB)
       },
 
       devOptions: {

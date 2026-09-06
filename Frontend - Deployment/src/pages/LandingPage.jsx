@@ -238,7 +238,7 @@ function LandingPage() {
           </div>
 
           <span className="outfit-500 text-[20px] tracking-wide text-gray-900 md:text-[24px]">
-            REVA
+            ARC
           </span>
 
         </div>
@@ -333,7 +333,7 @@ function LandingPage() {
               >
 
                 {/* =====================================================
-                    HERO CONTENT — REFERENCE DESIGN
+                    HERO CONTENT ï¿½ REFERENCE DESIGN
                 ====================================================== */}
 
                 <div className="relative mx-auto min-h-[790px] max-w-[1280px] text-center md:min-h-[820px]">
@@ -452,7 +452,7 @@ function LandingPage() {
                     </button>
                   </div>
 
-                  {/* Engineering disciplines — 4 display-only cards with BROWN BORDERS */}
+                  {/* Engineering disciplines ï¿½ 4 display-only cards with BROWN BORDERS */}
                   <div className="relative z-40 mx-auto mt-10 grid max-w-[1160px] grid-cols-2 gap-4 px-4 md:mt-12 md:grid-cols-4 md:gap-5 md:px-0">
 
                     {/* CIVIL - Brown Border */}
@@ -607,13 +607,13 @@ function LandingPage() {
               <h2 className="outfit-500 text-[24px] font-semibold leading-tight text-gray-900 md:text-[25px] lg:text-[33px] xl:text-[45px]">
 
                 <span className="text-gray-800">
-                  Review Evaluation
+                  Academic Readiness 
                 </span>
 
                 <br />
 
                 <span className="bg-gradient-to-r from-orange-500 via-orange-400 to-orange-600 bg-clip-text text-transparent">
-                  &amp; and Validation Assessment
+                  &amp; Review for Competence
                 </span>
 
               </h2>
@@ -653,7 +653,7 @@ function LandingPage() {
                   lg:text-lg
                 "
               >
-                [ REVA FEATURES ]
+                [ ARC FEATURES ]
               </span>
 
             </div>
@@ -664,7 +664,7 @@ function LandingPage() {
 
             <p className="outfit-400 mx-auto mt-8 max-w-2xl text-[14px] text-gray-700 lg:text-[16px] xl:text-lg">
 
-              REVA gives students a focused space to practice questions,
+              ARC gives students a focused space to practice questions,
               review difficult topics, track progress, and build confidence before exam day.
 
             </p>
@@ -1124,7 +1124,7 @@ function LandingPage() {
                     Ready? Start Reviewing with{" "}
 
                     <span className="text-orange-600">
-                      REVA
+                      ARC
                     </span>
 
                     <br />
@@ -1139,7 +1139,7 @@ function LandingPage() {
 
                   <p className="outfit-400 mt-1 hidden text-gray-700 sm:block sm:text-[11px] md:mt-2 md:text-[13px] lg:mt-3 lg:text-[15px] xl:text-base">
 
-                    Use REVA to practice, review your lessons, and
+                    Use ARC to practice, review your lessons, and
                     prepare for exams in a smarter and more organized way.
 
                   </p>
@@ -1213,7 +1213,7 @@ function LandingPage() {
             <div className="pointer-events-none absolute inset-x-16 top-0 h-px bg-gradient-to-r from-transparent via-orange-300/50 to-transparent" />
 
             <h2 className="outfit-700 text-2xl text-gray-900 md:text-3xl lg:text-4xl xl:text-5xl">
-              More REVA Features to come!
+              More ARC Features to come!
             </h2>
 
             <p className="outfit-400 mt-4 text-sm text-gray-700 md:text-[14px] lg:text-base">
@@ -1271,7 +1271,7 @@ function LandingPage() {
                 </div>
 
                 <span className="outfit-700 text-base text-gray-900">
-                  REVA
+                  ARC
                 </span>
 
                 <span className="text-[12px] text-gray-500">
@@ -1282,7 +1282,7 @@ function LandingPage() {
 
               <p className="outfit-400 max-w-sm text-xs text-gray-600 md:text-sm">
 
-                REVA is a smart assessment and exam review platform designed
+                ARC is a smart assessment and exam review platform designed
                 to help students practice, review lessons, and prepare with confidence.
 
               </p>
@@ -1340,7 +1340,7 @@ function LandingPage() {
                   <li>
 
                     <a
-                      href="/team-REVA"
+                      href="/team-ARC"
                       className="outfit-400 transition hover:text-gray-900"
                     >
                       Developers
@@ -1382,7 +1382,7 @@ function LandingPage() {
             >
 
               <p className="outfit-400">
-                © 2026 REVA – Review Evaluation and Validation Assessment.
+                ï¿½ 2026 ARC ï¿½ Academic Readiness and Review for Competence. All rights reserved.
               </p>
 
               <p className="outfit-400">

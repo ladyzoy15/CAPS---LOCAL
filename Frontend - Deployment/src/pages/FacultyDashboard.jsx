@@ -180,7 +180,7 @@ export default function FacultyDashboard() {
                 color: isDarkMode ? "#ffffff" : "#374151",
               }}
             >
-              REVA.
+              ARC.
             </strong>
           </p>
 
