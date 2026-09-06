@@ -1,4 +1,4 @@
-﻿import { useState, useEffect, useRef } from "react";
+import { useState, useEffect, useRef } from "react";
 import { Link, useLocation, useNavigate } from "react-router-dom";
 
 import AllSubjectsDropDownProgramChair from "./subjectsProgramChair";
@@ -462,7 +462,7 @@ const Sidebar = ({
       ...baseMenuItems,
     ];
 
-    if (parsedRoleId >= 3) {
+    if (parsedRoleId >= 2) {
 
       menuItems = [
         ...menuItems,
@@ -1088,16 +1088,14 @@ const Sidebar = ({
                       ARCHIVE - MOBILE
                   ================================================= */}
 
-                  {parsedRoleId >= 2 && (
+                  {parsedRoleId >= 4 && (
                     <div className="flex h-16 flex-1 flex-col items-center justify-center">
 
                       <Link
                         to={
-                          parsedRoleId === 2
-                            ? "/faculty/Subjects/archive"
-                            : parsedRoleId === 5
-                              ? "/asso-dean/Subjects/archive"
-                              : "/dean/Subjects/archive"
+                          parsedRoleId === 5
+                            ? "/asso-dean/Subjects/archive"
+                            : "/dean/Subjects/archive"
                         }
                         onClick={handleMenuClick}
                         className={`flex flex-col items-center transition-colors ${
@@ -2094,7 +2092,7 @@ const Sidebar = ({
                   EXPORT
               ================================================= */}
 
-              {parsedRoleId >= 2 && (
+              {parsedRoleId >= 3 && (
                 <li className="group relative">
 
                   <div className="px-3">
@@ -2169,7 +2167,7 @@ const Sidebar = ({
                   ARCHIVE
               ================================================= */}
 
-              {parsedRoleId >= 2 && (
+              {parsedRoleId >= 4 && (
                 <li className="group relative">
 
                   <span
@@ -2185,11 +2183,9 @@ const Sidebar = ({
 
                     <Link
                       to={
-                        parsedRoleId === 2
-                          ? "/faculty/Subjects/archive"
-                          : parsedRoleId === 5
-                            ? "/asso-dean/Subjects/archive"
-                            : "/dean/Subjects/archive"
+                        parsedRoleId === 5
+                          ? "/asso-dean/Subjects/archive"
+                          : "/dean/Subjects/archive"
                       }
                       onClick={() => {
 
