@@ -15,17 +15,21 @@ syncPersistedSession();
 // to intermittent "failed to parse response as JSON" errors and stale
 // JS bundles being served even after editing source files.
 if (import.meta.env.PROD) {
-  const { registerSW } = await import("virtual:pwa-register");
-
-  registerSW({
-    immediate: true,
-    onRegisteredSW() {
-      window.dispatchEvent(new CustomEvent("pwa-sw-ready"));
-    },
-    onRegisterError(err) {
-      console.warn("[PWA] Service worker registration failed:", err);
-    },
-  });
+  import("virtual:pwa-register")
+    .then(({ registerSW }) => {
+      registerSW({
+        immediate: true,
+        onRegisteredSW() {
+          window.dispatchEvent(new CustomEvent("pwa-sw-ready"));
+        },
+        onRegisterError(err) {
+          console.warn("[PWA] Service worker registration failed:", err);
+        },
+      });
+    })
+    .catch((err) => {
+      console.warn("[PWA] Service worker import failed:", err);
+    });
 }
 
 createRoot(document.getElementById("root")).render(
