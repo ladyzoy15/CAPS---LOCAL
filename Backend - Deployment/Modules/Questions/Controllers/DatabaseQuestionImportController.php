@@ -3,6 +3,7 @@
 namespace Modules\Questions\Controllers;
 
 use Illuminate\Http\Request;
+use Illuminate\Encryption\Encrypter;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Config;
 use Illuminate\Support\Facades\Crypt;
@@ -16,6 +17,27 @@ use Throwable;
 
 class DatabaseQuestionImportController
 {
+    private function getSourceEncrypter(): ?Encrypter
+    {
+        $key = env('SOURCE_APP_KEY');
+
+        if (!$key) {
+            return null;
+        }
+
+        if (str_starts_with($key, 'base64:')) {
+            $decodedKey = base64_decode(substr($key, 7), true);
+
+            if ($decodedKey === false) {
+                throw new \RuntimeException('SOURCE_APP_KEY is not valid base64.');
+            }
+
+            $key = $decodedKey;
+        }
+
+        return new Encrypter($key, config('app.cipher', 'AES-256-CBC'));
+    }
+
     /**
      * Create a dynamic connection for the selected source database.
      */
@@ -182,6 +204,7 @@ class DatabaseQuestionImportController
         $source = $this->resolveSource($request);
 
         $connectionName = $this->getSourceConnection($source);
+        $sourceEncrypter = $this->getSourceEncrypter();
 
         try {
             $connection = DB::connection($connectionName);
@@ -237,7 +260,8 @@ class DatabaseQuestionImportController
                         'choiceID' => $choice->choiceID,
 
                         'choiceText' => $this->decryptValue(
-                            $choice->choiceText
+                            $choice->choiceText,
+                            $sourceEncrypter
                         ),
 
                         'isCorrect' => (bool) $choice->isCorrect,
@@ -254,7 +278,8 @@ class DatabaseQuestionImportController
                     'subjectID' => $question->subjectID,
 
                     'questionText' => $this->decryptValue(
-                        $question->questionText
+                        $question->questionText,
+                        $sourceEncrypter
                     ),
 
                     'image' => $question->image,
@@ -386,6 +411,7 @@ class DatabaseQuestionImportController
         }
 
         $connectionName = $this->getSourceConnection($source);
+        $sourceEncrypter = $this->getSourceEncrypter();
 
         try {
             $sourceDB = DB::connection($connectionName);
@@ -459,6 +485,7 @@ class DatabaseQuestionImportController
                 $sourceDB,
                 $sourceQuestions,
                 $request,
+                $sourceEncrypter,
                 &$importedCount,
                 &$importedQuestionIDs
             ) {
@@ -495,7 +522,8 @@ class DatabaseQuestionImportController
                         'questionText' =>
                             Crypt::encryptString(
                                 $this->decryptValue(
-                                    $sourceQuestion->questionText
+                                    $sourceQuestion->questionText,
+                                    $sourceEncrypter
                                 )
                             ),
 
@@ -535,7 +563,8 @@ class DatabaseQuestionImportController
                             'choiceText' =>
                                 Crypt::encryptString(
                                     $this->decryptValue(
-                                        $sourceChoice->choiceText
+                                        $sourceChoice->choiceText,
+                                        $sourceEncrypter
                                     )
                                 ),
 
@@ -599,15 +628,24 @@ class DatabaseQuestionImportController
      * If the value is already plaintext,
      * return it without changing it.
      */
-    private function decryptValue($value)
+    private function decryptValue($value, ?Encrypter $sourceEncrypter = null)
     {
         if ($value === null) {
             return null;
         }
 
         try {
-            return Crypt::decryptString($value);
+            return ($sourceEncrypter ?? app('encrypter'))
+                ->decryptString($value);
         } catch (Throwable $e) {
+            $decoded = base64_decode($value, true);
+
+            if ($decoded !== false && str_starts_with($decoded, '{"iv"')) {
+                throw new \RuntimeException(
+                    'Imported question data is encrypted with a different APP_KEY. Configure SOURCE_APP_KEY with the original source key.'
+                );
+            }
+
             return $value;
         }
     }
