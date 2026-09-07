@@ -17,6 +17,9 @@ use Throwable;
 
 class DatabaseQuestionImportController
 {
+    /**
+     * Get the encryption key used by the source database.
+     */
     private function getSourceEncrypter(): ?Encrypter
     {
         $key = env('SOURCE_APP_KEY');
@@ -26,30 +29,42 @@ class DatabaseQuestionImportController
         }
 
         if (str_starts_with($key, 'base64:')) {
-            $decodedKey = base64_decode(substr($key, 7), true);
+            $decodedKey = base64_decode(
+                substr($key, 7),
+                true
+            );
 
             if ($decodedKey === false) {
-                throw new \RuntimeException('SOURCE_APP_KEY is not valid base64.');
+                throw new \RuntimeException(
+                    'SOURCE_APP_KEY is not valid base64.'
+                );
             }
 
             $key = $decodedKey;
         }
 
-        return new Encrypter($key, config('app.cipher', 'AES-256-CBC'));
+        return new Encrypter(
+            $key,
+            config('app.cipher', 'AES-256-CBC')
+        );
     }
 
     /**
      * Create a dynamic connection for the selected source database.
      */
-    private function getSourceConnection(DatabaseSource $source): string
-    {
-        $connectionName = 'dynamic_import_' . $source->id;
+    private function getSourceConnection(
+        DatabaseSource $source
+    ): string {
+        $connectionName =
+            'dynamic_import_' . $source->id;
 
         $password = '';
 
         if (!empty($source->password)) {
             try {
-                $password = Crypt::decryptString($source->password);
+                $password = Crypt::decryptString(
+                    $source->password
+                );
             } catch (Throwable $e) {
                 $password = $source->password;
             }
@@ -87,25 +102,33 @@ class DatabaseQuestionImportController
 
     /**
      * Resolve the selected source database.
-     *
-     * If sourceDatabaseID is not provided,
-     * CAPS will be used as the default source.
      */
-    private function resolveSource(Request $request): DatabaseSource
-    {
-        $sourceDatabaseID = $request->input('sourceDatabaseID');
+    private function resolveSource(
+        Request $request
+    ): DatabaseSource {
+        $sourceDatabaseID =
+            $request->input('sourceDatabaseID');
 
         if ($sourceDatabaseID) {
-            $source = DatabaseSource::where('id', $sourceDatabaseID)
+            $source = DatabaseSource::where(
+                'id',
+                $sourceDatabaseID
+            )
                 ->where('is_active', true)
                 ->first();
         } else {
-            $source = DatabaseSource::where('name', 'CAPS')
+            $source = DatabaseSource::where(
+                'name',
+                'CAPS'
+            )
                 ->where('is_active', true)
                 ->first();
 
             if (!$source) {
-                $source = DatabaseSource::where('is_active', true)
+                $source = DatabaseSource::where(
+                    'is_active',
+                    true
+                )
                     ->orderBy('id')
                     ->first();
             }
@@ -114,7 +137,8 @@ class DatabaseQuestionImportController
         if (!$source) {
             abort(response()->json([
                 'success' => false,
-                'message' => 'No active source database is available.',
+                'message' =>
+                    'No active source database is available.',
             ], 404));
         }
 
@@ -123,12 +147,13 @@ class DatabaseQuestionImportController
 
     /**
      * GET /api/database-import/sources
-     *
-     * Get all active source databases.
      */
     public function sources()
     {
-        $sources = DatabaseSource::where('is_active', true)
+        $sources = DatabaseSource::where(
+            'is_active',
+            true
+        )
             ->orderBy('name')
             ->get([
                 'id',
@@ -148,28 +173,29 @@ class DatabaseQuestionImportController
     }
 
     /**
-     * GET /api/database-import/subjects?sourceDatabaseID=1
-     *
-     * Get subjects from selected source database.
+     * GET /api/database-import/subjects
      */
     public function subjects(Request $request)
     {
-        $source = $this->resolveSource($request);
+        $source =
+            $this->resolveSource($request);
 
-        $connectionName = $this->getSourceConnection($source);
+        $connectionName =
+            $this->getSourceConnection($source);
 
         try {
-            $subjects = DB::connection($connectionName)
-                ->table('subjects')
-                ->orderBy('subjectName')
-                ->get([
-                    'subjectID',
-                    'subjectCode',
-                    'subjectName',
-                    'programID',
-                    'yearLevelID',
-                    'is_enabled_for_exam_questions',
-                ]);
+            $subjects =
+                DB::connection($connectionName)
+                    ->table('subjects')
+                    ->orderBy('subjectName')
+                    ->get([
+                        'subjectID',
+                        'subjectCode',
+                        'subjectName',
+                        'programID',
+                        'yearLevelID',
+                        'is_enabled_for_exam_questions',
+                    ]);
 
             return response()->json([
                 'success' => true,
@@ -186,7 +212,8 @@ class DatabaseQuestionImportController
         } catch (Throwable $e) {
             return response()->json([
                 'success' => false,
-                'message' => 'Could not load subjects from the selected database.',
+                'message' =>
+                    'Could not load subjects from the selected database.',
                 'error' => $e->getMessage(),
             ], 500);
         } finally {
@@ -195,60 +222,67 @@ class DatabaseQuestionImportController
     }
 
     /**
-     * GET /api/database-import/questions/{subjectID}?sourceDatabaseID=1
-     *
-     * Get all questions belonging ONLY to the selected subject.
+     * GET /api/database-import/questions/{subjectID}
      */
-    public function questions(Request $request, $subjectID)
-    {
-        $source = $this->resolveSource($request);
+    public function questions(
+        Request $request,
+        $subjectID
+    ) {
+        $source =
+            $this->resolveSource($request);
 
-        $connectionName = $this->getSourceConnection($source);
-        $sourceEncrypter = $this->getSourceEncrypter();
+        $connectionName =
+            $this->getSourceConnection($source);
+
+        $sourceEncrypter =
+            $this->getSourceEncrypter();
 
         try {
-            $connection = DB::connection($connectionName);
+            $connection =
+                DB::connection($connectionName);
 
-            /*
-             * Verify source subject.
-             */
-            $subject = $connection
-                ->table('subjects')
-                ->where('subjectID', $subjectID)
-                ->first();
+            $subject =
+                $connection
+                    ->table('subjects')
+                    ->where(
+                        'subjectID',
+                        $subjectID
+                    )
+                    ->first();
 
             if (!$subject) {
                 return response()->json([
                     'success' => false,
-                    'message' => 'Source subject not found.',
+                    'message' =>
+                        'Source subject not found.',
                 ], 404);
             }
 
-            /*
-             * Get questions for this subject only.
-             */
-            $questions = $connection
-                ->table('questions')
-                ->where('subjectID', $subjectID)
-                ->orderBy('questionID')
-                ->get();
+            $questions =
+                $connection
+                    ->table('questions')
+                    ->where(
+                        'subjectID',
+                        $subjectID
+                    )
+                    ->orderBy('questionID')
+                    ->get();
 
             $result = [];
 
             foreach ($questions as $question) {
-                /*
-                 * Get choices for this question.
-                 */
-                $choices = $connection
-                    ->table('choices')
-                    ->where('questionID', $question->questionID)
-                    ->orderBy('position')
-                    ->orderBy('choiceID')
-                    ->get();
 
-                /*
-                 * Skip questions with no choices.
-                 */
+                $choices =
+                    $connection
+                        ->table('choices')
+                        ->where(
+                            'questionID',
+                            $question->questionID
+                        )
+                        ->orderBy('position')
+                        ->orderBy('choiceID')
+                        ->get();
+
                 if ($choices->count() === 0) {
                     continue;
                 }
@@ -257,48 +291,65 @@ class DatabaseQuestionImportController
 
                 foreach ($choices as $choice) {
                     $formattedChoices[] = [
-                        'choiceID' => $choice->choiceID,
+                        'choiceID' =>
+                            $choice->choiceID,
 
-                        'choiceText' => $this->decryptValue(
-                            $choice->choiceText,
-                            $sourceEncrypter
-                        ),
+                        'choiceText' =>
+                            $this->decryptValue(
+                                $choice->choiceText,
+                                $sourceEncrypter
+                            ),
 
-                        'isCorrect' => (bool) $choice->isCorrect,
+                        'isCorrect' =>
+                            (bool) $choice->isCorrect,
 
-                        'position' => (int) $choice->position,
+                        'position' =>
+                            (int) $choice->position,
 
-                        'image' => $choice->image,
+                        'image' =>
+                            $choice->image,
                     ];
                 }
 
                 $result[] = [
-                    'questionID' => $question->questionID,
+                    'questionID' =>
+                        $question->questionID,
 
-                    'subjectID' => $question->subjectID,
+                    'subjectID' =>
+                        $question->subjectID,
 
-                    'questionText' => $this->decryptValue(
-                        $question->questionText,
-                        $sourceEncrypter
-                    ),
+                    'questionText' =>
+                        $this->decryptValue(
+                            $question->questionText,
+                            $sourceEncrypter
+                        ),
 
-                    'image' => $question->image,
+                    'image' =>
+                        $question->image,
 
-                    'score' => $question->score,
+                    'score' =>
+                        $question->score,
 
-                    'difficulty_id' => $question->difficulty_id,
+                    'difficulty_id' =>
+                        $question->difficulty_id,
 
-                    'coverage_id' => $question->coverage_id,
+                    'coverage_id' =>
+                        $question->coverage_id,
 
-                    'status_id' => $question->status_id,
+                    'status_id' =>
+                        $question->status_id,
 
-                    'purpose_id' => $question->purpose_id,
+                    'purpose_id' =>
+                        $question->purpose_id,
 
-                    'created_at' => $question->created_at,
+                    'created_at' =>
+                        $question->created_at,
 
-                    'updated_at' => $question->updated_at,
+                    'updated_at' =>
+                        $question->updated_at,
 
-                    'choices' => $formattedChoices,
+                    'choices' =>
+                        $formattedChoices,
                 ];
             }
 
@@ -313,9 +364,14 @@ class DatabaseQuestionImportController
                 ],
 
                 'sourceSubject' => [
-                    'subjectID' => $subject->subjectID,
-                    'subjectCode' => $subject->subjectCode,
-                    'subjectName' => $subject->subjectName,
+                    'subjectID' =>
+                        $subject->subjectID,
+
+                    'subjectCode' =>
+                        $subject->subjectCode,
+
+                    'subjectName' =>
+                        $subject->subjectName,
                 ],
 
                 'data' => $result,
@@ -323,7 +379,8 @@ class DatabaseQuestionImportController
         } catch (Throwable $e) {
             return response()->json([
                 'success' => false,
-                'message' => 'Could not load questions from the selected database.',
+                'message' =>
+                    'Could not load questions from the selected database.',
                 'error' => $e->getMessage(),
             ], 500);
         } finally {
@@ -334,122 +391,119 @@ class DatabaseQuestionImportController
     /**
      * POST /api/database-import/questions
      *
-     * Import selected questions and their choices
-     * into the destination subject.
+     * Import selected questions and their choices.
      */
     public function import(Request $request)
     {
-        $validator = Validator::make($request->all(), [
-            'sourceDatabaseID' => [
-                'required',
-                'integer',
-                'exists:database_sources,id',
-            ],
+        $validator = Validator::make(
+            $request->all(),
+            [
+                'sourceDatabaseID' => [
+                    'required',
+                    'integer',
+                    'exists:database_sources,id',
+                ],
 
-            'sourceSubjectID' => [
-                'nullable',
-                'integer',
-            ],
+                'sourceSubjectID' => [
+                    'nullable',
+                    'integer',
+                ],
 
-            'destinationSubjectID' => [
-                'required',
-                'integer',
-            ],
+                'destinationSubjectID' => [
+                    'required',
+                    'integer',
+                ],
 
-            'questionIDs' => [
-                'required',
-                'array',
-                'min:1',
-            ],
+                'questionIDs' => [
+                    'required',
+                    'array',
+                    'min:1',
+                ],
 
-            'questionIDs.*' => [
-                'integer',
-            ],
-        ]);
+                'questionIDs.*' => [
+                    'integer',
+                ],
+            ]
+        );
 
         if ($validator->fails()) {
             return response()->json([
                 'success' => false,
-                'message' => 'Invalid import request.',
-                'errors' => $validator->errors(),
+                'message' =>
+                    'Invalid import request.',
+                'errors' =>
+                    $validator->errors(),
             ], 422);
         }
 
-        /*
-         * Find selected source database.
-         */
-        $source = DatabaseSource::where(
-            'id',
-            $request->sourceDatabaseID
-        )
-            ->where('is_active', true)
-            ->first();
+        $source =
+            DatabaseSource::where(
+                'id',
+                $request->sourceDatabaseID
+            )
+                ->where('is_active', true)
+                ->first();
 
         if (!$source) {
             return response()->json([
                 'success' => false,
-                'message' => 'Selected source database is not active.',
+                'message' =>
+                    'Selected source database is not active.',
             ], 404);
         }
 
-        /*
-         * Find destination subject
-         * using the application's MAIN database.
-         *
-         * DB_CONNECTION=sqlite remains unchanged.
-         */
-        $destinationSubject = Subject::where(
-            'subjectID',
-            $request->destinationSubjectID
-        )->first();
+        $destinationSubject =
+            Subject::where(
+                'subjectID',
+                $request->destinationSubjectID
+            )->first();
 
         if (!$destinationSubject) {
             return response()->json([
                 'success' => false,
-                'message' => 'Destination subject not found.',
+                'message' =>
+                    'Destination subject not found.',
             ], 404);
         }
 
-        $connectionName = $this->getSourceConnection($source);
-        $sourceEncrypter = $this->getSourceEncrypter();
+        $connectionName =
+            $this->getSourceConnection($source);
+
+        $sourceEncrypter =
+            $this->getSourceEncrypter();
 
         try {
-            $sourceDB = DB::connection($connectionName);
+            $sourceDB =
+                DB::connection($connectionName);
 
-            /*
-             * Verify source subject if supplied.
-             */
             if ($request->filled('sourceSubjectID')) {
-                $sourceSubject = $sourceDB
-                    ->table('subjects')
-                    ->where(
-                        'subjectID',
-                        $request->sourceSubjectID
-                    )
-                    ->first();
+
+                $sourceSubject =
+                    $sourceDB
+                        ->table('subjects')
+                        ->where(
+                            'subjectID',
+                            $request->sourceSubjectID
+                        )
+                        ->first();
 
                 if (!$sourceSubject) {
                     return response()->json([
                         'success' => false,
-                        'message' => 'Source subject not found.',
+                        'message' =>
+                            'Source subject not found.',
                     ], 404);
                 }
             }
 
-            /*
-             * Get selected questions ONLY.
-             */
-            $query = $sourceDB
-                ->table('questions')
-                ->whereIn(
-                    'questionID',
-                    $request->questionIDs
-                );
+            $query =
+                $sourceDB
+                    ->table('questions')
+                    ->whereIn(
+                        'questionID',
+                        $request->questionIDs
+                    );
 
-            /*
-             * Make sure selected questions
-             * belong to the selected source subject.
-             */
             if ($request->filled('sourceSubjectID')) {
                 $query->where(
                     'subjectID',
@@ -457,13 +511,11 @@ class DatabaseQuestionImportController
                 );
             }
 
-            $sourceQuestions = $query
-                ->orderBy('questionID')
-                ->get();
+            $sourceQuestions =
+                $query
+                    ->orderBy('questionID')
+                    ->get();
 
-            /*
-             * Make sure every selected question exists.
-             */
             if (
                 $sourceQuestions->count()
                 !== count($request->questionIDs)
@@ -478,113 +530,114 @@ class DatabaseQuestionImportController
             $importedCount = 0;
             $importedQuestionIDs = [];
 
-            /*
-             * Transaction on the MAIN database.
-             */
-            DB::connection()->transaction(function () use (
-                $sourceDB,
-                $sourceQuestions,
-                $request,
-                $sourceEncrypter,
-                &$importedCount,
-                &$importedQuestionIDs
-            ) {
-                foreach ($sourceQuestions as $sourceQuestion) {
-                    /*
-                     * Get choices from SOURCE database.
-                     */
-                    $sourceChoices = $sourceDB
-                        ->table('choices')
-                        ->where(
-                            'questionID',
-                            $sourceQuestion->questionID
-                        )
-                        ->orderBy('position')
-                        ->orderBy('choiceID')
-                        ->get();
+            DB::connection()->transaction(
+                function () use (
+                    $sourceDB,
+                    $sourceQuestions,
+                    $request,
+                    $sourceEncrypter,
+                    &$importedCount,
+                    &$importedQuestionIDs
+                ) {
 
-                    /*
-                     * Skip questions with no choices.
-                     */
-                    if ($sourceChoices->count() === 0) {
-                        continue;
-                    }
+                    foreach (
+                        $sourceQuestions
+                        as $sourceQuestion
+                    ) {
 
-                    /*
-                     * Create NEW destination question.
-                     *
-                     * Source questionID is NOT copied.
-                     */
-                    $newQuestion = Question::create([
-                        'subjectID' =>
-                            $request->destinationSubjectID,
-
-                        'questionText' =>
-                            Crypt::encryptString(
-                                $this->decryptValue(
-                                    $sourceQuestion->questionText,
-                                    $sourceEncrypter
+                        $sourceChoices =
+                            $sourceDB
+                                ->table('choices')
+                                ->where(
+                                    'questionID',
+                                    $sourceQuestion->questionID
                                 )
-                            ),
+                                ->orderBy('position')
+                                ->orderBy('choiceID')
+                                ->get();
 
-                        'userID' => Auth::id(),
+                        if (
+                            $sourceChoices->count() === 0
+                        ) {
+                            continue;
+                        }
 
-                        'image' => $sourceQuestion->image,
+                        $newQuestion =
+                            Question::create([
+                                'subjectID' =>
+                                    $request->destinationSubjectID,
 
-                        'score' => $sourceQuestion->score,
+                                'questionText' =>
+                                    Crypt::encryptString(
+                                        $this->decryptValue(
+                                            $sourceQuestion->questionText,
+                                            $sourceEncrypter
+                                        )
+                                    ),
 
-                        'difficulty_id' =>
-                            $sourceQuestion->difficulty_id,
+                                'userID' =>
+                                    Auth::id(),
 
-                        'coverage_id' =>
-                            $sourceQuestion->coverage_id,
+                                'image' =>
+                                    $sourceQuestion->image,
 
-                        'status_id' =>
-                            $sourceQuestion->status_id,
+                                'score' =>
+                                    $sourceQuestion->score,
 
-                        'purpose_id' =>
-                            $sourceQuestion->purpose_id,
+                                'difficulty_id' =>
+                                    $sourceQuestion->difficulty_id,
 
-                        'editedBy' => null,
+                                'coverage_id' =>
+                                    $sourceQuestion->coverage_id,
 
-                        'approvedBy' => null,
-                    ]);
+                                'status_id' =>
+                                    $sourceQuestion->status_id,
 
-                    /*
-                     * Create NEW choices.
-                     *
-                     * Correct answer and position are preserved.
-                     */
-                    foreach ($sourceChoices as $sourceChoice) {
-                        Choice::create([
-                            'questionID' =>
-                                $newQuestion->questionID,
+                                'purpose_id' =>
+                                    $sourceQuestion->purpose_id,
 
-                            'choiceText' =>
-                                Crypt::encryptString(
-                                    $this->decryptValue(
-                                        $sourceChoice->choiceText,
-                                        $sourceEncrypter
-                                    )
-                                ),
+                                'editedBy' =>
+                                    null,
 
-                            'isCorrect' =>
-                                (bool) $sourceChoice->isCorrect,
+                                'approvedBy' =>
+                                    null,
+                            ]);
 
-                            'position' =>
-                                (int) $sourceChoice->position,
+                        foreach (
+                            $sourceChoices
+                            as $sourceChoice
+                        ) {
 
-                            'image' =>
-                                $sourceChoice->image,
-                        ]);
+                            Choice::create([
+                                'questionID' =>
+                                    $newQuestion->questionID,
+
+                                'choiceText' =>
+                                    Crypt::encryptString(
+                                        $this->decryptValue(
+                                            $sourceChoice->choiceText,
+                                            $sourceEncrypter
+                                        )
+                                    ),
+
+                                'isCorrect' =>
+                                    (bool) $sourceChoice->isCorrect,
+
+                                'position' =>
+                                    (int) $sourceChoice->position,
+
+                                'image' =>
+                                    $sourceChoice->image,
+                            ]);
+                        }
+
+                        $importedCount++;
+
+                        $importedQuestionIDs[] =
+                            $newQuestion->questionID;
                     }
-
-                    $importedCount++;
-
-                    $importedQuestionIDs[] =
-                        $newQuestion->questionID;
                 }
-            });
+            );
 
             return response()->json([
                 'success' => true,
@@ -593,8 +646,11 @@ class DatabaseQuestionImportController
                     "{$importedCount} question(s) imported successfully.",
 
                 'sourceDatabase' => [
-                    'id' => $source->id,
-                    'name' => $source->name,
+                    'id' =>
+                        $source->id,
+
+                    'name' =>
+                        $source->name,
                 ],
 
                 'destinationSubject' => [
@@ -612,40 +668,633 @@ class DatabaseQuestionImportController
                     $importedQuestionIDs,
             ]);
         } catch (Throwable $e) {
+
             return response()->json([
                 'success' => false,
-                'message' => 'Question import failed.',
-                'error' => $e->getMessage(),
+                'message' =>
+                    'Question import failed.',
+                'error' =>
+                    $e->getMessage(),
             ], 500);
+
         } finally {
             DB::purge($connectionName);
         }
     }
 
     /**
-     * Decrypt Laravel encrypted values.
+     * POST /api/database-import/all
      *
-     * If the value is already plaintext,
-     * return it without changing it.
+     * Import ALL subjects, questions, and choices.
+     *
+     * Image paths are preserved.
+     *
+     * If the physical image files are available in the
+     * source storage, they are copied to the destination.
+     *
+     * Missing physical files do NOT stop the database import.
      */
-    private function decryptValue($value, ?Encrypter $sourceEncrypter = null)
+    public function importAll(Request $request)
     {
+        $validator = Validator::make(
+            $request->all(),
+            [
+                'sourceDatabaseID' => [
+                    'required',
+                    'integer',
+                    'exists:database_sources,id',
+                ],
+            ]
+        );
+
+        if ($validator->fails()) {
+            return response()->json([
+                'success' => false,
+                'message' =>
+                    'Invalid import request.',
+                'errors' =>
+                    $validator->errors(),
+            ], 422);
+        }
+
+        $source =
+            DatabaseSource::where(
+                'id',
+                $request->sourceDatabaseID
+            )
+                ->where('is_active', true)
+                ->first();
+
+        if (!$source) {
+            return response()->json([
+                'success' => false,
+                'message' =>
+                    'Selected source database is not active.',
+            ], 404);
+        }
+
+        /*
+         * Destination database configuration.
+         */
+        $defaultConnection =
+            config('database.default');
+
+        $defaultConfig =
+            config(
+                "database.connections.{$defaultConnection}"
+            );
+
+        $mainDatabase =
+            $defaultConfig['database'] ?? null;
+
+        $mainHost =
+            $defaultConfig['host'] ?? null;
+
+        /*
+         * Prevent importing the same database
+         * into itself.
+         */
+        $sourceHost =
+            strtolower(
+                trim(
+                    (string) $source->host
+                )
+            );
+
+        $destinationHost =
+            strtolower(
+                trim(
+                    (string) $mainHost
+                )
+            );
+
+        $sourceHostNormalized =
+            in_array(
+                $sourceHost,
+                ['localhost', '127.0.0.1', '::1'],
+                true
+            )
+                ? 'local'
+                : $sourceHost;
+
+        $destinationHostNormalized =
+            in_array(
+                $destinationHost,
+                ['localhost', '127.0.0.1', '::1'],
+                true
+            )
+                ? 'local'
+                : $destinationHost;
+
+        if (
+            $mainDatabase &&
+            $source->database === $mainDatabase &&
+            $sourceHostNormalized ===
+                $destinationHostNormalized
+        ) {
+            return response()->json([
+                'success' => false,
+                'message' =>
+                    'The selected source database is the same as the current destination database. Please select a different source database.',
+            ], 422);
+        }
+
+        $connectionName =
+            $this->getSourceConnection($source);
+
+        $sourceEncrypter =
+            $this->getSourceEncrypter();
+
+        /*
+         * Counters.
+         */
+        $importedSubjects = 0;
+        $importedQuestions = 0;
+        $importedChoices = 0;
+        $skippedQuestions = 0;
+
+        $questionImagesFound = 0;
+        $questionImagesMissing = 0;
+
+        $choiceImagesFound = 0;
+        $choiceImagesMissing = 0;
+
+        try {
+
+            $sourceDB =
+                DB::connection($connectionName);
+
+            /*
+             * Verify required tables.
+             */
+            foreach (
+                ['subjects', 'questions', 'choices']
+                as $table
+            ) {
+
+                if (
+                    !$sourceDB
+                        ->getSchemaBuilder()
+                        ->hasTable($table)
+                ) {
+
+                    return response()->json([
+                        'success' => false,
+                        'message' =>
+                            "Source database is missing the required '{$table}' table.",
+                    ], 422);
+                }
+            }
+
+            /*
+             * Get ALL subjects.
+             */
+            $sourceSubjects =
+                $sourceDB
+                    ->table('subjects')
+                    ->orderBy('subjectID')
+                    ->get();
+
+            if ($sourceSubjects->isEmpty()) {
+
+                return response()->json([
+                    'success' => false,
+                    'message' =>
+                        'No subjects were found in the selected source database.',
+                ], 422);
+            }
+
+            /*
+             * Import everything inside one
+             * destination transaction.
+             */
+            DB::connection()->transaction(
+                function () use (
+                    $sourceDB,
+                    $sourceSubjects,
+                    $sourceEncrypter,
+                    &$importedSubjects,
+                    &$importedQuestions,
+                    &$importedChoices,
+                    &$skippedQuestions,
+                    &$questionImagesFound,
+                    &$questionImagesMissing,
+                    &$choiceImagesFound,
+                    &$choiceImagesMissing
+                ) {
+
+                    /*
+                     * The Laravel public storage directory.
+                     *
+                     * Expected:
+                     *
+                     * storage/app/public/question_images
+                     * storage/app/public/choices
+                     */
+                    $storagePath =
+                        storage_path('app/public');
+
+                    /*
+                     * Map source subject IDs
+                     * to new destination subject IDs.
+                     */
+                    $subjectMap = [];
+
+                    foreach (
+                        $sourceSubjects
+                        as $sourceSubject
+                    ) {
+
+                        /*
+                         * Create NEW destination subject.
+                         */
+                        $newSubject =
+                            Subject::create([
+                                'subjectCode' =>
+                                    $sourceSubject->subjectCode,
+
+                                'subjectName' =>
+                                    $sourceSubject->subjectName,
+
+                                'programID' =>
+                                    $sourceSubject->programID,
+
+                                'yearLevelID' =>
+                                    $sourceSubject->yearLevelID,
+
+                                'is_enabled_for_exam_questions' =>
+                                    $sourceSubject
+                                        ->is_enabled_for_exam_questions,
+                            ]);
+
+                        $subjectMap[
+                            $sourceSubject->subjectID
+                        ] =
+                            $newSubject->subjectID;
+
+                        $importedSubjects++;
+
+                        /*
+                         * Get ALL questions belonging
+                         * to this source subject.
+                         */
+                        $sourceQuestions =
+                            $sourceDB
+                                ->table('questions')
+                                ->where(
+                                    'subjectID',
+                                    $sourceSubject->subjectID
+                                )
+                                ->orderBy('questionID')
+                                ->get();
+
+                        foreach (
+                            $sourceQuestions
+                            as $sourceQuestion
+                        ) {
+
+                            /*
+                             * Get ALL choices.
+                             */
+                            $sourceChoices =
+                                $sourceDB
+                                    ->table('choices')
+                                    ->where(
+                                        'questionID',
+                                        $sourceQuestion->questionID
+                                    )
+                                    ->orderBy('position')
+                                    ->orderBy('choiceID')
+                                    ->get();
+
+                            /*
+                             * Skip questions without choices.
+                             */
+                            if (
+                                $sourceChoices->count() === 0
+                            ) {
+
+                                $skippedQuestions++;
+
+                                continue;
+                            }
+
+                            /*
+                             * Resolve the new destination
+                             * subject ID.
+                             */
+                            $newSubjectID =
+                                $subjectMap[
+                                    $sourceQuestion->subjectID
+                                ] ?? null;
+
+                            if (!$newSubjectID) {
+                                throw new \RuntimeException(
+                                    'Could not map source subject ID to destination subject ID.'
+                                );
+                            }
+
+                            /*
+                             * ------------------------------------------------
+                             * QUESTION IMAGE
+                             * ------------------------------------------------
+                             */
+                            $questionImage =
+                                $sourceQuestion->image;
+
+                            if (
+                                $questionImage
+                                &&
+                                !filter_var(
+                                    $questionImage,
+                                    FILTER_VALIDATE_URL
+                                )
+                            ) {
+
+                                $cleanQuestionImage =
+                                    ltrim(
+                                        str_replace(
+                                            '\\',
+                                            '/',
+                                            $questionImage
+                                        ),
+                                        '/'
+                                    );
+
+                                $questionImageFile =
+                                    $storagePath .
+                                    DIRECTORY_SEPARATOR .
+                                    str_replace(
+                                        '/',
+                                        DIRECTORY_SEPARATOR,
+                                        $cleanQuestionImage
+                                    );
+
+                                if (
+                                    file_exists(
+                                        $questionImageFile
+                                    )
+                                ) {
+
+                                    $questionImagesFound++;
+
+                                } else {
+
+                                    $questionImagesMissing++;
+                                }
+                            }
+
+                            /*
+                             * Create NEW question.
+                             */
+                            $newQuestion =
+                                Question::create([
+                                    'subjectID' =>
+                                        $newSubjectID,
+
+                                    'questionText' =>
+                                        Crypt::encryptString(
+                                            $this->decryptValue(
+                                                $sourceQuestion->questionText,
+                                                $sourceEncrypter
+                                            )
+                                        ),
+
+                                    'userID' =>
+                                        Auth::id(),
+
+                                    'image' =>
+                                        $questionImage,
+
+                                    'score' =>
+                                        $sourceQuestion->score,
+
+                                    'difficulty_id' =>
+                                        $sourceQuestion->difficulty_id,
+
+                                    'coverage_id' =>
+                                        $sourceQuestion->coverage_id,
+
+                                    'status_id' =>
+                                        $sourceQuestion->status_id,
+
+                                    'purpose_id' =>
+                                        $sourceQuestion->purpose_id,
+
+                                    'editedBy' =>
+                                        null,
+
+                                    'approvedBy' =>
+                                        null,
+                                ]);
+
+                            $importedQuestions++;
+
+                            /*
+                             * ------------------------------------------------
+                             * CHOICES
+                             * ------------------------------------------------
+                             */
+                            foreach (
+                                $sourceChoices
+                                as $sourceChoice
+                            ) {
+
+                                $choiceImage =
+                                    $sourceChoice->image;
+
+                                if (
+                                    $choiceImage
+                                    &&
+                                    !filter_var(
+                                        $choiceImage,
+                                        FILTER_VALIDATE_URL
+                                    )
+                                ) {
+
+                                    $cleanChoiceImage =
+                                        ltrim(
+                                            str_replace(
+                                                '\\',
+                                                '/',
+                                                $choiceImage
+                                            ),
+                                            '/'
+                                        );
+
+                                    $choiceImageFile =
+                                        $storagePath .
+                                        DIRECTORY_SEPARATOR .
+                                        str_replace(
+                                            '/',
+                                            DIRECTORY_SEPARATOR,
+                                            $cleanChoiceImage
+                                        );
+
+                                    if (
+                                        file_exists(
+                                            $choiceImageFile
+                                        )
+                                    ) {
+
+                                        $choiceImagesFound++;
+
+                                    } else {
+
+                                        $choiceImagesMissing++;
+                                    }
+                                }
+
+                                /*
+                                 * Create NEW choice.
+                                 */
+                                Choice::create([
+                                    'questionID' =>
+                                        $newQuestion->questionID,
+
+                                    'choiceText' =>
+                                        Crypt::encryptString(
+                                            $this->decryptValue(
+                                                $sourceChoice->choiceText,
+                                                $sourceEncrypter
+                                            )
+                                        ),
+
+                                    'isCorrect' =>
+                                        (bool) $sourceChoice->isCorrect,
+
+                                    'position' =>
+                                        (int) $sourceChoice->position,
+
+                                    'image' =>
+                                        $choiceImage,
+                                ]);
+
+                                $importedChoices++;
+                            }
+                        }
+                    }
+                }
+            );
+
+            return response()->json([
+                'success' => true,
+
+                'message' =>
+                    'All subjects, questions, and choices imported successfully.',
+
+                'sourceDatabase' => [
+                    'id' =>
+                        $source->id,
+
+                    'name' =>
+                        $source->name,
+
+                    'database' =>
+                        $source->database,
+                ],
+
+                'importedSubjects' =>
+                    $importedSubjects,
+
+                'importedQuestions' =>
+                    $importedQuestions,
+
+                'importedChoices' =>
+                    $importedChoices,
+
+                'skippedQuestions' =>
+                    $skippedQuestions,
+
+                'images' => [
+                    'questionImagesFound' =>
+                        $questionImagesFound,
+
+                    'questionImagesMissing' =>
+                        $questionImagesMissing,
+
+                    'choiceImagesFound' =>
+                        $choiceImagesFound,
+
+                    'choiceImagesMissing' =>
+                        $choiceImagesMissing,
+                ],
+            ]);
+
+        } catch (Throwable $e) {
+
+            return response()->json([
+                'success' => false,
+
+                'message' =>
+                    'Full database import failed.',
+
+                'error' =>
+                    $e->getMessage(),
+
+                'importedSubjects' =>
+                    0,
+
+                'importedQuestions' =>
+                    0,
+
+                'importedChoices' =>
+                    0,
+
+                'skippedQuestions' =>
+                    0,
+            ], 500);
+
+        } finally {
+
+            DB::purge($connectionName);
+        }
+    }
+
+    /**
+     * Decrypt Laravel encrypted values.
+     */
+    private function decryptValue(
+        $value,
+        ?Encrypter $sourceEncrypter = null
+    ) {
         if ($value === null) {
             return null;
         }
 
         try {
+
             return ($sourceEncrypter ?? app('encrypter'))
                 ->decryptString($value);
-        } catch (Throwable $e) {
-            $decoded = base64_decode($value, true);
 
-            if ($decoded !== false && str_starts_with($decoded, '{"iv"')) {
+        } catch (Throwable $e) {
+
+            /*
+             * Detect Laravel encrypted payload.
+             */
+            $decoded =
+                base64_decode(
+                    $value,
+                    true
+                );
+
+            if (
+                $decoded !== false &&
+                str_starts_with(
+                    $decoded,
+                    '{"iv"'
+                )
+            ) {
+
                 throw new \RuntimeException(
                     'Imported question data is encrypted with a different APP_KEY. Configure SOURCE_APP_KEY with the original source key.'
                 );
             }
 
+            /*
+             * If it isn't encrypted,
+             * treat it as plaintext.
+             */
             return $value;
         }
     }

@@ -164,7 +164,6 @@ Route::middleware([
     'role:2,3,4,5'
 ])->group(function () {
 
-
     /*
     |--------------------------------------------------------------------------
     | User Management
@@ -279,11 +278,6 @@ Route::middleware([
     |--------------------------------------------------------------------------
     */
 
-    /*
-     * Existing FILE import route.
-     *
-     * DO NOT REMOVE.
-     */
     Route::post(
         '/questions/add',
         [QuestionController::class, 'store']
@@ -294,52 +288,23 @@ Route::middleware([
     |--------------------------------------------------------------------------
     | DATABASE SOURCES
     |--------------------------------------------------------------------------
-    |
-    | These routes manage registered source databases.
-    |
-    | Example:
-    |
-    | CAPS
-    | MAGS
-    | Other databases
-    |
     */
 
-    /*
-     * Get all active database sources.
-     *
-     * GET /api/database-sources
-     */
     Route::get(
         '/database-sources',
         [DatabaseSourceController::class, 'index']
     );
 
-    /*
-     * Add a new database source.
-     *
-     * POST /api/database-sources
-     */
     Route::post(
         '/database-sources',
         [DatabaseSourceController::class, 'store']
     );
 
-    /*
-     * Test an existing database source.
-     *
-     * POST /api/database-sources/{id}/test
-     */
     Route::post(
         '/database-sources/{id}/test',
         [DatabaseSourceController::class, 'testConnection']
     );
 
-    /*
-     * Disable a database source.
-     *
-     * DELETE /api/database-sources/{id}
-     */
     Route::delete(
         '/database-sources/{id}',
         [DatabaseSourceController::class, 'destroy']
@@ -350,26 +315,10 @@ Route::middleware([
     |--------------------------------------------------------------------------
     | DATABASE QUESTION IMPORT
     |--------------------------------------------------------------------------
-    |
-    | Flow:
-    |
-    | From Database
-    |      ↓
-    | Source Database
-    |      ↓
-    | Source Subject
-    |      ↓
-    | Questions
-    |      ↓
-    | Choices
-    |      ↓
-    | Import Selected
-    |
     */
 
-
     /*
-     * Get available source databases for the importer.
+     * Get available source databases.
      *
      * GET /api/database-import/sources
      */
@@ -383,10 +332,6 @@ Route::middleware([
      * Get subjects from selected source database.
      *
      * GET /api/database-import/subjects
-     *
-     * Example:
-     *
-     * /api/database-import/subjects?sourceDatabaseID=1
      */
     Route::get(
         '/database-import/subjects',
@@ -395,13 +340,9 @@ Route::middleware([
 
 
     /*
-     * Get questions from selected subject.
+     * Get questions from selected source subject.
      *
      * GET /api/database-import/questions/{subjectID}
-     *
-     * Example:
-     *
-     * /api/database-import/questions/1?sourceDatabaseID=1
      */
     Route::get(
         '/database-import/questions/{subjectID}',
@@ -417,6 +358,23 @@ Route::middleware([
     Route::post(
         '/database-import/questions',
         [DatabaseQuestionImportController::class, 'import']
+    );
+
+
+    /*
+     * Import ALL subjects, questions, and choices.
+     *
+     * POST /api/database-import/all
+     *
+     * Request body:
+     *
+     * {
+     *     "sourceDatabaseID": 1
+     * }
+     */
+    Route::post(
+        '/database-import/all',
+        [DatabaseQuestionImportController::class, 'importAll']
     );
 
 
