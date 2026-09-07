@@ -58,6 +58,15 @@ export function clearAuth() {
   localStorage.removeItem(REMEMBERED_USER_CODE_KEY);
 }
 
+export function handleUnauthorized(response) {
+  if (response.status !== 401) return false;
+
+  clearAuth();
+  window.location.replace("/");
+
+  return true;
+}
+
 export function syncPersistedSession() {
   if (!isRememberMeEnabled()) return;
 

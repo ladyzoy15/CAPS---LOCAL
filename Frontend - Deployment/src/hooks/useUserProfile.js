@@ -6,7 +6,10 @@ import {
   setPersistedAvatarColor,
 } from "../components/ProfileModals";
 import { normalizeUserProfile } from "../utils/userProfileUtils";
-import { getToken } from "../utils/authStorage";
+import {
+  getToken,
+  handleUnauthorized,
+} from "../utils/authStorage";
 
 export function useUserProfile() {
   const apiUrl = import.meta.env.VITE_API_BASE_URL;
@@ -28,6 +31,8 @@ export function useUserProfile() {
             Authorization: `Bearer ${token}`,
           },
         });
+
+        if (handleUnauthorized(response)) return;
 
         const body = await response.json();
 

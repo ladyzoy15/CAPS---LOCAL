@@ -15,30 +15,66 @@ return Application::configure(basePath: dirname(__DIR__))
         commands: __DIR__.'/../routes/console.php',
         health: '/up',
     )
+
     ->withMiddleware(function (Middleware $middleware) {
+
         $middleware->web(append: [
             HandleInertiaRequests::class,
             AddLinkHeadersForPreloadedAssets::class,
         ]);
 
-        // API requests should NOT redirect to a web login route
+        /*
+         * Never redirect API/frontend requests
+         * to a Laravel login route.
+         */
         $middleware->redirectGuestsTo(function (Request $request) {
-            if ($request->is('api/*')) {
-                return null;
-            }
-
-            return route('login');
+            return null;
         });
 
-        // Ensure CORS is handled for API routes
+        /*
+         * Enable CORS.
+         */
         $middleware->api(prepend: [
             HandleCors::class,
         ]);
     })
+
     ->withExceptions(function (Exceptions $exceptions) {
-        // Return JSON for API authentication/errors
-        $exceptions->shouldRenderJsonWhen(function (Request $request, Throwable $e) {
-            return $request->is('api/*') || $request->expectsJson();
+
+        /*
+         * Return JSON instead of an HTML login redirect
+         * for unauthenticated requests.
+         */
+        $exceptions->render(function (
+            \Illuminate\Auth\AuthenticationException $e,
+            Request $request
+        ) {
+            if (
+                $request->expectsJson() ||
+                $request->is('api/*') ||
+                $request->is('user/*') ||
+                $request->is('subjects/*') ||
+                $request->is('database-import/*')
+            ) {
+                return response()->json([
+                    'message' => 'Unauthenticated.',
+                ], 401);
+            }
+        });
+
+        /*
+         * Force API/frontend errors to JSON.
+         */
+        $exceptions->shouldRenderJsonWhen(function (
+            Request $request,
+            \Throwable $e
+        ) {
+            return $request->expectsJson()
+                || $request->is('api/*')
+                || $request->is('user/*')
+                || $request->is('subjects/*')
+                || $request->is('database-import/*');
         });
     })
+
     ->create();

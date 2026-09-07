@@ -9,7 +9,11 @@ import DOMPurify from "dompurify";
 
 import useToast from "../hooks/useToast";
 import Toast from "../components/Toast";
-import { getToken, getUser } from "../utils/authStorage";
+import {
+  getToken,
+  getUser,
+  handleUnauthorized,
+} from "../utils/authStorage";
 
 pdfjsLib.GlobalWorkerOptions.workerSrc = pdfjsWorkerUrl;
 
@@ -76,9 +80,7 @@ const parseSpreadsheet = (file) =>
 
         resolve(
           rows
-            .map((r) =>
-              String(r[qColIdx] ?? "").trim()
-            )
+            .map((r) => String(r[qColIdx] ?? "").trim())
             .filter(Boolean)
         );
       } catch (err) {
@@ -361,6 +363,8 @@ const ImportQuestions = () => {
           }
         );
 
+        if (handleUnauthorized(response)) return;
+
         if (!response.ok) {
           console.error(
             "Failed to load destination subjects:",
@@ -438,6 +442,8 @@ const ImportQuestions = () => {
           }
         );
 
+        if (handleUnauthorized(response)) return;
+
         const data = await response.json();
 
         if (!response.ok) {
@@ -499,91 +505,165 @@ const ImportQuestions = () => {
   // LOAD SOURCE SUBJECTS FROM SELECTED DATABASE
   // =========================================================
 
-  useEffect(() => {
-    if (sourceMode !== "database") {
-      return;
-    }
+ // =========================================================
+// LOAD SOURCE SUBJECTS FROM SELECTED DATABASE
+// =========================================================
 
-    const fetchSourceSubjects = async () => {
-      setIsSourceSubjectsLoading(true);
+useEffect(() => {
+  // Only load source subjects when Database mode is active.
+  if (sourceMode !== "database") {
+    setSourceSubjects([]);
+    setSourceSubjectId("");
+    setSourceQuestions([]);
+    setSelectedQuestionIds([]);
+    return;
+  }
 
-      try {
-        const token =
-          getToken();
+  // IMPORTANT:
+  // Do not call the API until a database has been selected.
+  if (!selectedSourceDatabaseId) {
+    setSourceSubjects([]);
+    setSourceSubjectId("");
+    setSourceQuestions([]);
+    setSelectedQuestionIds([]);
+    setIsSourceSubjectsLoading(false);
+    return;
+  }
 
-        const query = selectedSourceDatabaseId
-          ? `?sourceDatabaseID=${encodeURIComponent(
-              selectedSourceDatabaseId
-            )}`
-          : "";
+  let cancelled = false;
 
-        const response = await fetch(
-          `${apiUrl}/database-import/subjects${query}`,
-          {
-            method: "GET",
-            headers: {
-              Accept: "application/json",
-              Authorization: `Bearer ${token}`,
-            },
-            credentials: "include",
-          }
-        );
+  const fetchSourceSubjects = async () => {
+    setIsSourceSubjectsLoading(true);
 
-        const data = await response.json();
+    try {
+      const token = getToken();
 
-        if (!response.ok) {
-          throw new Error(
-            data.message ||
-              "Could not load source subjects."
-          );
+      const query = `?sourceDatabaseID=${encodeURIComponent(
+        selectedSourceDatabaseId
+      )}`;
+
+      console.log(
+        "Loading source subjects for database:",
+        selectedSourceDatabaseId
+      );
+
+      const response = await fetch(
+        `${apiUrl}/database-import/subjects${query}`,
+        {
+          method: "GET",
+          headers: {
+            Accept: "application/json",
+            Authorization: `Bearer ${token}`,
+          },
+          credentials: "include",
         }
+      );
 
-        const sourceData = Array.isArray(
-          data.data
+      if (handleUnauthorized(response)) return;
+
+      const data = await response.json();
+
+      console.log(
+        "Source subjects API response:",
+        response.status,
+        data
+      );
+
+      if (!response.ok) {
+        throw new Error(
+          data.message ||
+            "Could not load source subjects."
+        );
+      }
+
+      const sourceData = Array.isArray(data.data)
+        ? data.data
+        : [];
+
+      // Ignore this response if the database selection
+      // has already changed.
+      if (cancelled) {
+        return;
+      }
+
+      console.log(
+        "SOURCE SUBJECTS RECEIVED:",
+        sourceData
+      );
+
+      setSourceSubjects(sourceData);
+
+      // Make sure the currently selected subject still
+      // belongs to the newly selected database.
+      if (
+        sourceSubjectId &&
+        !sourceData.some(
+          (subject) =>
+            String(subject.subjectID) ===
+            String(sourceSubjectId)
         )
-          ? data.data
-          : [];
+      ) {
+        setSourceSubjectId("");
+        setSourceQuestions([]);
+        setSelectedQuestionIds([]);
+      }
 
-        setSourceSubjects(sourceData);
-
-        if (sourceData.length === 0) {
-          setStatus({
-            message:
-              "No subjects were found in the source database.",
-            isError: true,
-          });
-        } else {
-          setStatus({
-            message: "",
-            isError: false,
-          });
-        }
-      } catch (err) {
-        console.error(
-          "Error loading source subjects:",
-          err
-        );
-
-        setSourceSubjects([]);
-
+      if (sourceData.length === 0) {
         setStatus({
           message:
-            err.message ||
-            "Could not load source database subjects.",
+            "No subjects were found in the source database.",
           isError: true,
         });
-      } finally {
+      } else {
+        setStatus({
+          message: "",
+          isError: false,
+        });
+      }
+    } catch (err) {
+      // Ignore errors from an old request.
+      if (cancelled) {
+        return;
+      }
+
+      console.error(
+        "Error loading source subjects:",
+        err
+      );
+
+      /*
+       * IMPORTANT:
+       * Do NOT clear sourceSubjects here.
+       *
+       * If a previous request successfully loaded
+       * subjects and another request fails, keep the
+       * successfully loaded subjects on screen.
+       */
+      setStatus({
+        message:
+          err.message ||
+          "Could not load source database subjects.",
+        isError: true,
+      });
+    } finally {
+      if (!cancelled) {
         setIsSourceSubjectsLoading(false);
       }
-    };
+    }
+  };
 
-    fetchSourceSubjects();
-  }, [
-    apiUrl,
-    sourceMode,
-    selectedSourceDatabaseId,
-  ]);
+  fetchSourceSubjects();
 
+  // Cancel this request when the selected database
+  // changes or Database mode is left.
+  return () => {
+    cancelled = true;
+  };
+}, [
+  apiUrl,
+  sourceMode,
+  selectedSourceDatabaseId,
+]);
   // =========================================================
   // LOAD QUESTIONS FOR SELECTED SOURCE SUBJECT
   // =========================================================
@@ -622,6 +702,8 @@ const ImportQuestions = () => {
             credentials: "include",
           }
         );
+
+        if (handleUnauthorized(response)) return;
 
         const data = await response.json();
 
@@ -1900,7 +1982,8 @@ const ImportQuestions = () => {
                     }}
                     disabled={
                       isSourceSubjectsLoading ||
-                      isDatabaseImporting}
+                      isDatabaseImporting
+                    }
                     className="outfit-400 w-full rounded-xl border border-gray-200 px-3 py-2.5 text-sm text-gray-900 focus:border-orange-400 focus:ring-2 focus:ring-orange-100 focus:outline-none disabled:opacity-60 dark:border-gray-700 dark:bg-[#11161d] dark:text-gray-100"
                   >
                     <option value="">
@@ -2295,7 +2378,8 @@ const ImportQuestions = () => {
                     }
                     placeholder="127.0.0.1"
                     disabled={
-                      isSavingDatabase}
+                      isSavingDatabase
+                    }
                     className="outfit-400 w-full rounded-xl border border-gray-200 px-3 py-2.5 text-sm text-gray-900 outline-none focus:border-orange-400 focus:ring-2 focus:ring-orange-100 disabled:opacity-60 dark:border-gray-700 dark:bg-[#11161d] dark:text-gray-100"
                   />
                 </div>
@@ -2322,7 +2406,8 @@ const ImportQuestions = () => {
                     min="1"
                     max="65535"
                     disabled={
-                      isSavingDatabase}
+                      isSavingDatabase
+                    }
                     className="outfit-400 w-full rounded-xl border border-gray-200 px-3 py-2.5 text-sm text-gray-900 outline-none focus:border-orange-400 focus:ring-2 focus:ring-orange-100 disabled:opacity-60 dark:border-gray-700 dark:bg-[#11161d] dark:text-gray-100"
                   />
                 </div>
@@ -2350,7 +2435,8 @@ const ImportQuestions = () => {
                     }
                     placeholder="mags"
                     disabled={
-                      isSavingDatabase}
+                      isSavingDatabase
+                    }
                     className="outfit-400 w-full rounded-xl border border-gray-200 px-3 py-2.5 text-sm text-gray-900 outline-none focus:border-orange-400 focus:ring-2 focus:ring-orange-100 disabled:opacity-60 dark:border-gray-700 dark:bg-[#11161d] dark:text-gray-100"
                   />
                 </div>
@@ -2376,7 +2462,8 @@ const ImportQuestions = () => {
                     }
                     placeholder="root"
                     disabled={
-                      isSavingDatabase}
+                      isSavingDatabase
+                    }
                     className="outfit-400 w-full rounded-xl border border-gray-200 px-3 py-2.5 text-sm text-gray-900 outline-none focus:border-orange-400 focus:ring-2 focus:ring-orange-100 disabled:opacity-60 dark:border-gray-700 dark:bg-[#11161d] dark:text-gray-100"
                   />
                 </div>

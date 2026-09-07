@@ -7,15 +7,30 @@ return [
     | Cross-Origin Resource Sharing (CORS) Configuration
     |--------------------------------------------------------------------------
     |
-    | Here you may configure your settings for cross-origin resource sharing
-    | or "CORS". This determines what cross-origin operations may execute
-    | in web browsers.
+    | Configure which cross-origin requests are allowed by the application.
+    |
+    */
+
+    /*
+    |--------------------------------------------------------------------------
+    | Paths
+    |--------------------------------------------------------------------------
+    |
+    | Use '*' so CORS headers are applied to all Laravel routes, including:
+    |
+    | /login
+    | /api/*
+    | /user/profile
+    | /users
+    | /subjects
+    | /programs
+    | /year-levels
+    | /database-import/*
     |
     */
 
     'paths' => [
-        'api/*',
-        'sanctum/csrf-cookie',
+        '*',
     ],
 
     /*
@@ -33,21 +48,16 @@ return [
     | Allowed Origins
     |--------------------------------------------------------------------------
     |
-    | The Vite frontend runs on port 5173 during development.
+    | Local Vite development servers.
     |
     */
 
-    'allowed_origins' => array_values(array_filter([
-        env('FRONTEND_URL'),
-
-        // Vite development server
+    'allowed_origins' => [
         'http://localhost:5173',
         'http://127.0.0.1:5173',
-
-        // Keep support for the old development port
         'http://localhost:3000',
         'http://127.0.0.1:3000',
-    ])),
+    ],
 
     /*
     |--------------------------------------------------------------------------
@@ -87,6 +97,9 @@ return [
     |--------------------------------------------------------------------------
     | Supports Credentials
     |--------------------------------------------------------------------------
+    |
+    | Required if the frontend sends cookies/authenticated requests.
+    |
     */
 
     'supports_credentials' => true,

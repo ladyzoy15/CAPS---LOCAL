@@ -26,11 +26,13 @@ class Subject extends Model
     'subjectName', 
     'yearLevelID',
     'is_enabled_for_exam_questions',
+        'is_imported',
     'archived_at',
 ];
 
 protected $casts = [
     'is_enabled_for_exam_questions' => 'boolean',
+        'is_imported' => 'boolean',
     'archived_at' => 'datetime',
 ];
 
@@ -70,3 +72,4 @@ protected $casts = [
     }
 
 }
+
