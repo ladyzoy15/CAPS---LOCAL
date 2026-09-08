@@ -151,6 +151,32 @@ const FacultyContent = () => {
     }
   }, [selectedSubject]);
 
+  // Sync selectedSubject from location.state when URL subjectID doesn't match context
+  useEffect(() => {
+    const urlSubjectId = new URLSearchParams(
+      location.search
+    ).get("subjectID");
+
+    if (
+      urlSubjectId &&
+      (!selectedSubject ||
+        !selectedSubject.subjectID ||
+        String(selectedSubject.subjectID) !== String(urlSubjectId))
+    ) {
+      const subjectFromState = location.state?.subject;
+
+      if (subjectFromState && subjectFromState.subjectID) {
+        setSelectedSubject(subjectFromState);
+      }
+    }
+  }, [
+    location.key,
+    location.search,
+    location.state,
+    selectedSubject,
+    setSelectedSubject,
+  ]);
+
   // Helper function to fix image URLs
   const fixImageUrl = (url) => {
     if (!url) return "";

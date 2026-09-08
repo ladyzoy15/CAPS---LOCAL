@@ -202,6 +202,7 @@ class SubjectController extends Controller
     ->leftJoin('programs as p', 'p.programID', '=', 's.programID')
     ->leftJoin('year_levels as yl', 'yl.yearLevelID', '=', 's.yearLevelID')
     ->whereNull('s.archived_at')
+    ->where('s.userID', $user->userID)
     ->select(
         's.subjectID',
         's.subjectCode',

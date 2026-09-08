@@ -591,7 +591,7 @@ class DatabaseQuestionImportController
                                     $sourceQuestion->coverage_id,
 
                                 'status_id' =>
-                                    $sourceQuestion->status_id,
+                                    1,
 
                                 'purpose_id' =>
                                     $sourceQuestion->purpose_id,
@@ -904,6 +904,28 @@ class DatabaseQuestionImportController
                         $sourceSubjects
                         as $sourceSubject
                     ) {
+
+                        /*
+                         * Check if subject already exists
+                         * in the destination database by
+                         * subjectCode.
+                         */
+                        $existingSubject =
+                            Subject::where(
+                                'subjectCode',
+                                $sourceSubject->subjectCode
+                            )
+                            ->whereNull('archived_at')
+                            ->first();
+
+                        if ($existingSubject) {
+                            $subjectMap[
+                                $sourceSubject->subjectID
+                            ] =
+                                $existingSubject->subjectID;
+
+                            continue;
+                        }
 
                         /*
                          * Create NEW destination subject.

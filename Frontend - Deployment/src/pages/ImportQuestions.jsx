@@ -964,29 +964,42 @@ const ImportQuestions = () => {
             String(selectedSubjectId)
         );
 
+      if (subject) {
+        localStorage.setItem(
+          "selectedSubject",
+          JSON.stringify(subject)
+        );
+      }
+
       const user = getUser() || {};
 
       const roleID =
         user?.roleID ??
         user?.roleId;
 
-      let path =
-        "/dean/subjects?subject_id=" +
-        selectedSubjectId;
+      let contentPath =
+        "/dean/subjects/content";
 
       if (roleID === 2) {
-        path =
-          "/faculty/subjects?subject_id=" +
-          selectedSubjectId;
+        contentPath =
+          "/faculty/subjects/content";
       } else if (roleID === 3) {
-        path =
-          "/program-chair/subjects?subject_id=" +
-          selectedSubjectId;
+        contentPath =
+          "/program-chair/subjects/content";
+      } else if (roleID === 5) {
+        contentPath =
+          "/asso-dean/subjects/content";
       }
 
-      navigate(path, {
-        state: { subject },
-      });
+      navigate(
+        `${contentPath}?subjectID=${selectedSubjectId}`,
+        {
+          state: {
+            subject,
+            initialTab: 4,
+          },
+        }
+      );
     } else {
       setStatus({
         message:
@@ -1157,6 +1170,13 @@ const ImportQuestions = () => {
               )
           );
 
+        if (subject) {
+          localStorage.setItem(
+            "selectedSubject",
+            JSON.stringify(subject)
+          );
+        }
+
         const user = JSON.parse(
           sessionStorage.getItem(
             "user"
@@ -1167,23 +1187,29 @@ const ImportQuestions = () => {
           user?.roleID ??
           user?.roleId;
 
-        let path =
-          "/dean/subjects?subject_id=" +
-          selectedSubjectId;
+        let contentPath =
+          "/dean/subjects/content";
 
         if (roleID === 2) {
-          path =
-            "/faculty/subjects?subject_id=" +
-            selectedSubjectId;
+          contentPath =
+            "/faculty/subjects/content";
         } else if (roleID === 3) {
-          path =
-            "/program-chair/subjects?subject_id=" +
-            selectedSubjectId;
+          contentPath =
+            "/program-chair/subjects/content";
+        } else if (roleID === 5) {
+          contentPath =
+            "/asso-dean/subjects/content";
         }
 
-        navigate(path, {
-          state: { subject },
-        });
+        navigate(
+          `${contentPath}?subjectID=${selectedSubjectId}`,
+          {
+            state: {
+              subject,
+              initialTab: 4,
+            },
+          }
+        );
       } catch (err) {
         console.error(
           "Database import error:",

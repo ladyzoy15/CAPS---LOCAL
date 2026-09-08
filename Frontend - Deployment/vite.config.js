@@ -23,13 +23,13 @@ export default defineConfig({
         id: "/",
 
         // APP NAME
-        name: "REVA",
+        name: "ARC",
 
         // SHORT APP NAME
-        short_name: "REVA",
+        short_name: "ARC",
 
         description:
-          "REVA - Review, Evaluation and Validation Assessement for JRMSU students.",
+          "ARC - Academic Readiness & Review for Competence",
 
         theme_color: "#ffffff",
         background_color: "#ffffff",

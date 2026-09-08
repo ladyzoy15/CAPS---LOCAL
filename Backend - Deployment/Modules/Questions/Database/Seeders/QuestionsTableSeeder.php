@@ -94,7 +94,7 @@ class QuestionsTableSeeder extends Seeder
         $text = str_replace(
             ['{subject}', '{concept}'],
             [$subject->subjectName, $concept],
-            $template . " (Option " . ($choiceIndex + 1) . ")"
+            $template
         );
 
         return Crypt::encryptString($text);
@@ -113,6 +113,16 @@ class QuestionsTableSeeder extends Seeder
         $batchSize = 100; // Insert questions in batches for better performance
 
         foreach ($subjects as $subject) {
+            // Skip subjects that already have questions
+            $existingCount = DB::table('questions')
+                ->where('subjectID', $subject->subjectID)
+                ->count();
+
+            if ($existingCount > 0) {
+                echo "Skipping subject {$subject->subjectID} ({$subject->subjectName}) - already has {$existingCount} questions\n";
+                continue;
+            }
+
             // Generate questions for each purpose ID (1 and 2)
             for ($purposeId = 1; $purposeId <= 2; $purposeId++) {
                 $questions = [];

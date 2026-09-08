@@ -7,7 +7,7 @@ import notFoundImage from "../assets/icons/notfound.png";
 import noInternetImage from "../assets/icons/404notfound.png";
 import emptyImage from "../assets/icons/empty.png";
 import SubjectsIcon from "/src/assets/symbols/subjects.svg";
-import SubjectsIconH from "/src/assets/symbols/Subjectshover.svg";
+import SubjectsIconH from "/src/assets/symbols/subjectshover.svg";
 
 // Helper function to transform program names
 const getDisplayProgramName = (programName) => {
