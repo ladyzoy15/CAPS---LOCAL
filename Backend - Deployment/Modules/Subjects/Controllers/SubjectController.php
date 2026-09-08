@@ -19,50 +19,106 @@ class SubjectController extends Controller
     public function store(Request $request)
     {
         try {
-            // Validate input fields
-            $request->validate([
+            $validated = $request->validate([
                 'programID'    => 'required|exists:programs,programID',
-                'subjectCode'  => 'required|string',
-                'subjectName'  => 'required|string',
+                'subjectCode'  => 'required|string|max:50',
+                'subjectName'  => 'required|string|max:255',
                 'yearLevelID'  => 'required|exists:year_levels,yearLevelID',
             ]);
 
-            // Prevent duplicate subject entries (same code, name, program and year level)
-            $existingSubject = Subject::where('subjectCode', $request->subjectCode)
-                ->where('subjectName', $request->subjectName)
-                ->where('programID', $request->programID)
-                ->where('yearLevelID', $request->yearLevelID)
-                ->first();
+            $user = Auth::user();
 
-            if ($existingSubject) {
+            if (!$user) {
                 return response()->json([
-                    'message' => 'Subject already exists for this program and year level.',
-                    'existing_subject' => $existingSubject
-                ], 409);
-            } else {
-                // Create new subject
-                $subject = Subject::create([
-                    'programID'   => $request->programID,
-                    'subjectCode' => $request->subjectCode,
-                    'subjectName' => $request->subjectName,
-                    'yearLevelID' => $request->yearLevelID,
-                    'is_enabled_for_exam_questions' => true,
-                ]);
-                return response()->json([
-                    'message' => 'Subject created successfully.',
-                    'subject' => $subject
-                ], 201);
+                    'success' => false,
+                    'message' => 'Unauthorized. Please log in again.',
+                ], 401);
             }
-        } catch (\Exception $e) {
-            Log::error('Error creating subject: ' . $e->getMessage());
+
+            $result = DB::transaction(function () use ($validated, $user) {
+
+                $existingSubject = Subject::where(
+                    'subjectCode',
+                    trim($validated['subjectCode'])
+                )
+                    ->where('subjectName', trim($validated['subjectName']))
+                    ->where('programID', $validated['programID'])
+                    ->where('yearLevelID', $validated['yearLevelID'])
+                    ->first();
+
+                if ($existingSubject) {
+                    return [
+                        'duplicate' => true,
+                        'subject' => $existingSubject,
+                    ];
+                }
+
+                $subject = Subject::create([
+                    'programID'   => $validated['programID'],
+                    'subjectCode' => trim($validated['subjectCode']),
+                    'subjectName' => trim($validated['subjectName']),
+                    'yearLevelID' => $validated['yearLevelID'],
+                    'is_enabled_for_exam_questions' => true,
+                    'is_imported' => false,
+                ]);
+
+                /*
+                 * ONLY Faculty (roleID 2) gets an assignment.
+                 * Dean and Associate Dean do not get faculty_subjects records.
+                 */
+                if ((int) $user->roleID === 2) {
+                    DB::table('faculty_subjects')->insert([
+                        'facultyID' => $user->userID,
+                        'subjectID' => $subject->subjectID,
+                    ]);
+                }
+
+                return [
+                    'duplicate' => false,
+                    'subject' => $subject->fresh(),
+                ];
+            });
+
+            if ($result['duplicate']) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Subject already exists for this program and year level.',
+                    'existing_subject' => $result['subject'],
+                ], 409);
+            }
 
             return response()->json([
+                'success' => true,
+                'message' => 'Subject created successfully.',
+                'subject' => $result['subject'],
+            ], 201);
+
+        } catch (\Illuminate\Validation\ValidationException $e) {
+
+            return response()->json([
+                'success' => false,
+                'message' => 'Validation failed.',
+                'errors' => $e->errors(),
+            ], 422);
+
+        } catch (\Throwable $e) {
+
+            Log::error('Error creating subject', [
+                'userID' => optional(Auth::user())->userID,
+                'roleID' => optional(Auth::user())->roleID,
+                'request' => $request->all(),
+                'error' => $e->getMessage(),
+                'file' => $e->getFile(),
+                'line' => $e->getLine(),
+            ]);
+
+            return response()->json([
+                'success' => false,
                 'error'   => 'Internal Server Error',
-                'message' => 'An internal error occurred.'
+                'message' => 'An internal error occurred while creating the subject.',
             ], 500);
         }
     }
-
     /**
      * Retrieve subjects based on the user's role (Program Chair, Dean, or Instructor).
      */
@@ -126,7 +182,14 @@ class SubjectController extends Controller
                 });
             }
 
-            // Dean (4) and Associate Dean (5): see all subjects (no additional filter needed)
+            // Dean (4) and Associate Dean (5): show only subjects that are NOT assigned to Faculty
+if (in_array((int) $user->roleID, [4, 5])) {
+    $query->whereNotExists(function ($q) {
+        $q->select(DB::raw(1))
+            ->from('faculty_subjects as fs')
+            ->whereColumn('fs.subjectID', 's.subjectID');
+    });
+}
 
             $subjects = $query->orderBy('s.subjectID')->get();
 
@@ -999,3 +1062,4 @@ public function restore($subjectID)
     }
 }
 }
+

@@ -438,7 +438,7 @@ class QuestionController extends Controller
                 ], 500);
             }
 
-            $questions = Question::with(['status'])
+            $questions = Question::with(['status', 'user'])
                 ->whereIn('questionID', $validated['questionIDs'])
                 ->get()
                 ->keyBy('questionID');
@@ -993,12 +993,37 @@ class QuestionController extends Controller
             return 'Only questions with pending status can be approved.';
         }
 
-        if ($approverId === $question->userID && !$question->editedBy) {
+        // Cannot approve own question
+        if ($approverId === (int)$question->userID) {
             return 'You cannot approve your own question.';
         }
 
-        if ($approverId === $question->editedBy) {
+        if ($question->editedBy && $approverId === (int)$question->editedBy) {
             return 'You cannot approve a question you last edited.';
+        }
+
+        // Dean (roleID = 4) rules:
+        // Dean cannot approve their own question, and can ONLY approve questions
+        // submitted by Faculty (roleID = 2) and Associate Dean (roleID = 5).
+        $approver = Auth::user();
+        if ($approver && (int)$approver->roleID === 4) {
+            $creator = $question->user;
+            if (!$creator && $question->userID) {
+                $creator = \Modules\Users\Models\User::find($question->userID);
+            }
+            $creatorRoleId = $creator ? (int)$creator->roleID : null;
+
+            if (!in_array($creatorRoleId, [2, 5])) {
+                return 'Deans can only approve questions submitted by Faculty or Associate Deans.';
+            }
+
+            if ($question->editedBy) {
+                $editor = \Modules\Users\Models\User::find($question->editedBy);
+                $editorRoleId = $editor ? (int)$editor->roleID : null;
+                if (!in_array($editorRoleId, [2, 5])) {
+                    return 'Deans can only approve questions edited by Faculty or Associate Deans.';
+                }
+            }
         }
 
         return null;
@@ -1047,6 +1072,7 @@ class QuestionController extends Controller
 
         $question->image = $this->generateUrl($question->image);
         $question->creatorName = optional($question->user)->firstName . ' ' . optional($question->user)->lastName;
+        $question->creatorRoleID = optional($question->user)->roleID;
         
         // Add editor and approver information
         $question->editorName = optional($question->editor)->firstName . ' ' . optional($question->editor)->lastName;

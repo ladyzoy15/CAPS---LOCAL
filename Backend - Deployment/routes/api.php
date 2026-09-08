@@ -1075,7 +1075,7 @@ Route::middleware([
 
 Route::middleware([
     'auth:sanctum',
-    'role:4,5'
+    'role:2,4,5'
 ])->group(function () {
 
     Route::patch(
@@ -1194,3 +1194,4 @@ Route::get(
         return response()->file($path);
     }
 )->middleware('image.cors');
+

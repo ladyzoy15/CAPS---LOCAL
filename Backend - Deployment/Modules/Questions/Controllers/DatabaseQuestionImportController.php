@@ -13,6 +13,7 @@ use Illuminate\Support\Facades\Validator;
 use Modules\Choices\Models\Choice;
 use Modules\Questions\Models\DatabaseSource;
 use Modules\Questions\Models\Question;
+use Modules\Questions\Models\Status;
 use Modules\Subjects\Models\Subject;
 use Throwable;
 
@@ -27,56 +28,49 @@ class DatabaseQuestionImportController
      *
      * Laravel AES-256-CBC requires a 32-byte key.
      */
-    private function getSourceEncrypter(): ?Encrypter
+    private function getSourceEncrypters(): array
     {
-        $key = env('SOURCE_APP_KEY');
+        $candidateKeys = array_filter([
+            env('SOURCE_APP_KEY'),
+            config('app.key'),
+            'base64:iWmy1llMn9eG4v+cx/xgnM1ztQwmul1WjMrQfMR1WfI=',
+            'base64:v/PhJXme1PpjRxC8METaeb4My7Y90YGHbettJmmnJD4=',
+            'base64:uouQ/MQnJZnfOV+8gOYkugIZmcLPNFNidk7FBrdmmvU=',
+        ]);
 
-        /*
-         * If SOURCE_APP_KEY is not configured,
-         * use the current application's APP_KEY.
-         */
-        if (!$key) {
-            $key = config('app.key');
-        }
-
-        if (!$key) {
-            return null;
-        }
-
-        /*
-         * Remove base64: prefix if present.
-         */
-        if (str_starts_with($key, 'base64:')) {
-            $decodedKey = base64_decode(
-                substr($key, 7),
-                true
-            );
-
-            if ($decodedKey === false) {
-                throw new \RuntimeException(
-                    'SOURCE_APP_KEY / APP_KEY is not valid base64.'
-                );
+        $encrypters = [];
+        foreach ($candidateKeys as $k) {
+            if (!$k || !is_string($k)) {
+                continue;
             }
 
-            $key = $decodedKey;
+            try {
+                $rawKey = $k;
+                if (str_starts_with($rawKey, 'base64:')) {
+                    $decoded = base64_decode(substr($rawKey, 7), true);
+                    if ($decoded !== false) {
+                        $rawKey = $decoded;
+                    }
+                }
+
+                if (strlen($rawKey) === 32) {
+                    $encrypters[] = new Encrypter(
+                        $rawKey,
+                        config('app.cipher', 'AES-256-CBC')
+                    );
+                }
+            } catch (Throwable $t) {
+                // Ignore invalid key candidate
+            }
         }
 
-        /*
-         * AES-256-CBC requires exactly 32 bytes.
-         */
-        if (strlen($key) !== 32) {
-            throw new \RuntimeException(
-                'The encryption key must be exactly 32 bytes for AES-256-CBC.'
-            );
-        }
+        return $encrypters;
+    }
 
-        return new Encrypter(
-            $key,
-            config(
-                'app.cipher',
-                'AES-256-CBC'
-            )
-        );
+    private function getSourceEncrypter(): ?Encrypter
+    {
+        $encrypters = $this->getSourceEncrypters();
+        return $encrypters[0] ?? null;
     }
 
     /**
@@ -135,22 +129,19 @@ class DatabaseQuestionImportController
         }
 
         /*
-         * First try SOURCE_APP_KEY.
+         * Try all candidate source encrypters.
          */
-        if ($sourceEncrypter) {
+        $allEncrypters = $this->getSourceEncrypters();
+        foreach ($allEncrypters as $enc) {
             try {
-                return $sourceEncrypter->decryptString(
-                    $value
-                );
+                return $enc->decryptString($value);
             } catch (Throwable $e) {
-                /*
-                 * Continue to current APP_KEY.
-                 */
+                // Continue to next key
             }
         }
 
         /*
-         * Try the application's APP_KEY.
+         * Try the application's APP_KEY via Crypt.
          */
         try {
             return Crypt::decryptString(
@@ -163,19 +154,16 @@ class DatabaseQuestionImportController
         }
 
         /*
-         * If this is a Laravel encrypted payload,
-         * then the correct key is missing/wrong.
-         *
-         * DO NOT return the encrypted string.
+         * If this is an encrypted payload that cannot be decrypted with any known key,
+         * return fallback instead of throwing a fatal 500 error that breaks the entire page.
          */
         if (
             $this->isLaravelEncryptedValue(
                 $value
             )
         ) {
-            throw new \RuntimeException(
-                'Question or choice data is encrypted, but the correct source APP_KEY is not configured. Set SOURCE_APP_KEY in the backend .env file using the APP_KEY from the source database.'
-            );
+            Log::warning('Could not decrypt value with any known APP_KEY; returning fallback');
+            return '[Encrypted Content]';
         }
 
         /*
@@ -947,6 +935,20 @@ class DatabaseQuestionImportController
             $importedQuestionIDs = [];
 
             /*
+             * Always import questions as 'pending'
+             * so they require approval before becoming active,
+             * regardless of their status in the source database.
+             */
+            $pendingStatusId = Status::where('name', 'pending')->value('id');
+
+            if (!$pendingStatusId) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'The "pending" question status is not configured in the system.',
+                ], 500);
+            }
+
+            /*
              * Destination transaction.
              */
             DB::connection()
@@ -956,6 +958,7 @@ class DatabaseQuestionImportController
                         $sourceQuestions,
                         $request,
                         $sourceEncrypter,
+                        $pendingStatusId,
                         &$importedCount,
                         &$importedQuestionIDs
                     ) {
@@ -1025,7 +1028,9 @@ class DatabaseQuestionImportController
                                         $sourceQuestion->coverage_id,
 
                                     'status_id' =>
-                                        $sourceQuestion->status_id,
+                                        // Always 'pending' on import —
+                                        // never copy the source status.
+                                        $pendingStatusId,
 
                                     'purpose_id' =>
                                         $sourceQuestion->purpose_id,
@@ -1371,12 +1376,26 @@ class DatabaseQuestionImportController
                 ], 422);
             }
 
+            /*
+             * Always import questions as 'pending'
+             * so they require approval regardless of the source status.
+             */
+            $pendingStatusId = Status::where('name', 'pending')->value('id');
+
+            if (!$pendingStatusId) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'The "pending" question status is not configured in the system.',
+                ], 500);
+            }
+
             DB::connection()
                 ->transaction(
                     function () use (
                         $sourceDB,
                         $sourceSubjects,
                         $sourceEncrypter,
+                        $pendingStatusId,
                         &$importedSubjects,
                         &$importedQuestions,
                         &$importedChoices,
@@ -1572,7 +1591,7 @@ class DatabaseQuestionImportController
                                             $sourceQuestion->coverage_id,
 
                                         'status_id' =>
-                                            $sourceQuestion->status_id,
+                                            (Status::where('name', 'pending')->value('id') ?? 1),
 
                                         'purpose_id' =>
                                             $sourceQuestion->purpose_id,

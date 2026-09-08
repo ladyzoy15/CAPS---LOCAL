@@ -1,4 +1,4 @@
-﻿<?php
+<?php
 
 require __DIR__ . '/vendor/autoload.php';
 
@@ -42,7 +42,7 @@ foreach ($roots as $root) {
 $files = array_values(array_unique($files));
 
 $pdo = new PDO(
-    'mysql:host=127.0.0.1;port=3306;dbname=caps_import;charset=utf8mb4',
+    'mysql:host=127.0.0.1;port=3306;dbname=caps;charset=utf8mb4',
     'root',
     ''
 );

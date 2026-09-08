@@ -1,4 +1,4 @@
-﻿<?php
+<?php
 
 require __DIR__ . '/vendor/autoload.php';
 
@@ -6,12 +6,12 @@ use Illuminate\Encryption\Encrypter;
 
 $envFiles = [
     'C:\Users\Kriscel Aquiman\CAPS\Backend - Deployment\.env',
-    'C:\Users\Kriscel Aquiman\CAPS---LOCAL\.env',
+    'C:\Users\Kriscel Aquiman\CAPS---LOCAL\Backend - Deployment\.env',
     'C:\Users\Kriscel Aquiman\CAPS---LOCAL\Backend - Deployment\.env',
 ];
 
 $pdo = new PDO(
-    'mysql:host=127.0.0.1;port=3306;dbname=caps_import;charset=utf8mb4',
+    'mysql:host=127.0.0.1;port=3306;dbname=caps;charset=utf8mb4',
     'root',
     ''
 );
