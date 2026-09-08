@@ -1,4 +1,4 @@
-import { useState, useEffect, useRef } from "react";
+﻿import { useState, useEffect, useRef } from "react";
 import SubPhoto from "../assets/gottfield.jpg";
 import { Textfit } from "react-textfit";
 
@@ -172,9 +172,8 @@ const SubjectCard = ({
   }, [activeIndex]);
 
   const tabs = [
-    { label: "Practice Exam", index: 0 },
-    { label: "Subject", index: 1 },
-    { label: "Pending", index: 4 },
+    { label: "Question", index: 0 },
+    { label: "Pending", index: 1 },
   ];
 
   // Refs for tab elements and dropdown positioning
@@ -419,13 +418,13 @@ const SubjectCard = ({
                   <i className="bx bx-book mt-[1px] text-lg"></i>
                   <p className="text-[14px]">{subjectCode}</p>
                   <span className="mx-1 mt-[1.5px] align-middle leading-none text-gray-400">
-                    •
+                    â€¢
                   </span>
                   <p className="text-[14px]">
                     {programName === "GE" ? "General " : programName || "-"}
                   </p>
                   <span className="mx-1 mt-[1.5px] align-middle leading-none text-gray-400">
-                    •
+                    â€¢
                   </span>
                   <p className="text-[14px]">{yearLevel || "-"}</p>
                 </div>
@@ -452,7 +451,7 @@ const SubjectCard = ({
 
                   <p className="text-[14px]">{subjectCode}</p>
                   <span className="mx-1 mt-[1.5px] align-middle leading-none text-gray-400">
-                    •
+                    â€¢
                   </span>
                   <p className="text-[14px]">
                     {programName === "GE"
@@ -460,7 +459,7 @@ const SubjectCard = ({
                       : programName || "-"}
                   </p>
                   <span className="mx-1 mt-[1.5px] align-middle leading-none text-gray-400">
-                    •
+                    â€¢
                   </span>
                   <p className="text-[14px]">{yearLevel || "-"}</p>
                 </div>
@@ -605,7 +604,7 @@ const SubjectCard = ({
                   <i className="bx bx-book mt-[1px] text-[16px]"></i>
                   <p className="outfit-400 text-[14px]">{subjectCode}</p>
                   <span className="mx-1 mt-[2px] align-middle leading-none text-gray-400">
-                    •
+                    â€¢
                   </span>
                   <i className="bx bx-cog mt-[1px] text-[16px]"></i>
                   <p className="outfit-400 text-[14px]">
@@ -614,7 +613,7 @@ const SubjectCard = ({
                       : programName || "-"}
                   </p>
                   <span className="mx-1 mt-[2px] align-middle leading-none text-gray-400">
-                    •
+                    â€¢
                   </span>
                   <i className="bx bx-people-diversity mt-[1px] text-[16px]"></i>
                   <p className="outfit-400 text-[14px]">{yearLevel || "-"}</p>
@@ -716,6 +715,10 @@ const SubjectCard = ({
 };
 
 export default SubjectCard;
+
+
+
+
 
 
 

@@ -1,4 +1,4 @@
-import React, { useEffect, useState, useRef } from "react";
+﻿import React, { useEffect, useState, useRef } from "react";
 import { createPortal } from "react-dom";
 import {
   useNavigate,
@@ -326,7 +326,7 @@ function SubjectList() {
   const { toast, showToast } = useToast();
   const apiUrl = import.meta.env.VITE_API_BASE_URL;
 
-  // Get unique program names for sidebar buttons — derived from actual subjects
+  // Get unique program names for sidebar buttons â€” derived from actual subjects
   // so only programs that have at least one subject are shown.
   const uniquePrograms = Array.from(
     new Set(subjects.map((s) => s.programName).filter(Boolean)),
@@ -999,25 +999,14 @@ function SubjectList() {
                   {Number(effectiveRoleId) !== 3 && (
                     <button
                       type="button"
-                      onClick={() => {
-                        if (Number(effectiveRoleId) === 2) {
-                          setShowAssignModal(true);
-                          fetchAvailableSubjects();
-                        } else {
-                          setShowAddModal(true);
-                        }
-                      }}
+                      onClick={() => { setShowAddModal(true); }}
                       title={
-                        Number(effectiveRoleId) === 2
-                          ? "Assign subject"
-                          : "Create subject"
+                        "Create subject"
                       }
                       className="outfit-500 -mb-2 hidden cursor-pointer items-center rounded-xl bg-orange-500 p-2 text-[12px] font-medium text-white transition-colors hover:bg-orange-600 md:mb-0 md:inline-flex md:px-4 md:py-2 md:text-[14px]"
                     >
                       <i className="bx bx-plus text-[20px] md:mr-2 md:text-[16px]" />
-                      <span className="hidden md:inline">
-                        {Number(roleId) === 2 ? "Assign subject" : "Create subject"}
-                      </span>
+                      <span className="hidden md:inline">Create subject</span>
                     </button>
                   )}
                 </div>
@@ -1123,7 +1112,7 @@ function SubjectList() {
                                       month: "short",
                                       day: "numeric",
                                     })
-                                  : "—";
+                                  : "â€”";
 
                               const createdTime =
                                 subject.created_at || subject.createdAt
@@ -1133,7 +1122,7 @@ function SubjectList() {
                                       hour: "2-digit",
                                       minute: "2-digit",
                                     })
-                                  : "—";
+                                  : "â€”";
 
                               const updatedDate =
                                 subject.updated_at || subject.updatedAt
@@ -1144,7 +1133,7 @@ function SubjectList() {
                                       month: "short",
                                       day: "numeric",
                                     })
-                                  : "—";
+                                  : "â€”";
 
                               const updatedTime =
                                 subject.updated_at || subject.updatedAt
@@ -1154,11 +1143,11 @@ function SubjectList() {
                                       hour: "2-digit",
                                       minute: "2-digit",
                                     })
-                                  : "—";
+                                  : "â€”";
 
                               // Format lastQuestionAdded date (for all roles)
-                              let lastQuestionAddedDate = "—";
-                              let lastQuestionAddedTime = "—";
+                              let lastQuestionAddedDate = "â€”";
+                              let lastQuestionAddedTime = "â€”";
 
                               // Check if lastQuestionAdded exists and is not null/empty
                               if (
@@ -1285,7 +1274,7 @@ function SubjectList() {
                                       <div className="absolute right-3 bottom-3 z-20 flex items-center gap-1 rounded-full bg-black/60 px-2 py-1 text-[11px] font-medium text-white md:hidden">
                                         <i className="bx bx-time-five text-sm"></i>
                                         <span className="max-w-[120px] truncate">
-                                          {lastQuestionAddedDate !== "—"
+                                          {lastQuestionAddedDate !== "â€”"
                                             ? `Modified: ${lastQuestionAddedDate}`
                                             : "No questions yet"}
                                         </span>
@@ -1345,11 +1334,11 @@ function SubjectList() {
 
                                       {/* Date Information */}
                                       <div className="outfit-400 space-y-1 text-[12px] text-gray-600">
-                                        {lastQuestionAddedDate !== "—" ? (
+                                        {lastQuestionAddedDate !== "â€”" ? (
                                           // Show last question added date if available
                                           <div>
                                             Last modified: {lastQuestionAddedDate}{" "}
-                                            {lastQuestionAddedTime !== "—" &&
+                                            {lastQuestionAddedTime !== "â€”" &&
                                               `at ${lastQuestionAddedTime}`}
                                           </div>
                                         ) : (
@@ -1378,14 +1367,7 @@ function SubjectList() {
             <div className="fixed right-4 bottom-[110px] z-50 md:hidden">
               <button
                 type="button"
-                onClick={() => {
-                  if (Number(effectiveRoleId) === 2) {
-                    setShowAssignModal(true);
-                    fetchAvailableSubjects();
-                  } else {
-                    setShowAddModal(true);
-                  }
-                }}
+                onClick={() => { setShowAddModal(true); }}
                 className="outfit-400 flex cursor-pointer items-center gap-2 rounded-full bg-orange-500 p-4 text-[14px] font-medium text-white shadow-xl transition-colors hover:bg-orange-600"
               >
                 <i className="bx bx-plus text-[22px]" />
@@ -2083,6 +2065,8 @@ function SubjectList() {
 }
 
 export default SubjectList;
+
+
 
 
 

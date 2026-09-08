@@ -1598,8 +1598,12 @@ useEffect(() => {
     );
 
   // =========================================================
-  // SELECTED SOURCE SUBJECT
+  // SELECTED SOURCE & DESTINATION SUBJECTS
   // =========================================================
+
+  const selectedDestinationSubject = subjects.find(
+    (s) => String(s.subjectID) === String(selectedSubjectId)
+  );
 
   const selectedSourceSubject =
     sourceSubjects.find(
@@ -1607,6 +1611,29 @@ useEffect(() => {
         String(s.subjectID) ===
         String(sourceSubjectId)
     );
+
+  // Exclude whichever subject is chosen in "Import into" so it never reflects in "Source Subject"
+  const availableSourceSubjects = sourceSubjects.filter((s) => {
+    if (!selectedSubjectId) return true;
+
+    // Filter out by subjectID
+    if (String(s.subjectID) === String(selectedSubjectId)) {
+      return false;
+    }
+
+    // Also filter out by matching subjectCode or subjectName
+    if (
+      selectedDestinationSubject &&
+      s.subjectCode &&
+      selectedDestinationSubject.subjectCode &&
+      s.subjectCode.trim().toLowerCase() ===
+        selectedDestinationSubject.subjectCode.trim().toLowerCase()
+    ) {
+      return false;
+    }
+
+    return true;
+  });
 
   // =========================================================
   // RENDER
@@ -1653,11 +1680,27 @@ useEffect(() => {
                   value={
                     selectedSubjectId
                   }
-                  onChange={(e) =>
-                    setSelectedSubjectId(
-                      e.target.value
-                    )
-                  }
+                  onChange={(e) => {
+                    const nextSubjectId = e.target.value;
+                    setSelectedSubjectId(nextSubjectId);
+
+                    const nextDest = subjects.find(
+                      (s) => String(s.subjectID) === String(nextSubjectId)
+                    );
+
+                    // If currently selected source matches the new destination, reset it
+                    if (
+                      String(sourceSubjectId) === String(nextSubjectId) ||
+                      (nextDest &&
+                        selectedSourceSubject &&
+                        selectedSourceSubject.subjectCode?.trim().toLowerCase() ===
+                          nextDest.subjectCode?.trim().toLowerCase())
+                    ) {
+                      setSourceSubjectId("");
+                      setSourceQuestions([]);
+                      setSelectedQuestionIds([]);
+                    }
+                  }}
                   disabled={
                     isImporting ||
                     isDatabaseImporting
@@ -1992,7 +2035,7 @@ useEffect(() => {
                         : "Select a source subject..."}
                     </option>
 
-                    {sourceSubjects.map(
+                    {availableSourceSubjects.map(
                       (s) => (
                         <option
                           key={
