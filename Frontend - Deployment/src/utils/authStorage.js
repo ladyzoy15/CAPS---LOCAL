@@ -85,6 +85,20 @@ export function getDashboardPathForRole(roleId) {
   }
 }
 
+export function handleUnauthorized(response) {
+  if (response.status === 401 || response.status === 403) {
+    clearAuth();
+
+    if (typeof window !== "undefined") {
+      window.location.href = "/";
+    }
+
+    return true;
+  }
+
+  return false;
+}
+
 
 
 

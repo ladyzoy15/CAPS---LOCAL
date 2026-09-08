@@ -9,7 +9,7 @@ import DOMPurify from "dompurify";
 
 import useToast from "../hooks/useToast";
 import Toast from "../components/Toast";
-import { getToken, getUser } from "../utils/authStorage";
+import { getToken, getUser, handleUnauthorized } from "../utils/authStorage";
 
 pdfjsLib.GlobalWorkerOptions.workerSrc = pdfjsWorkerUrl;
 
@@ -361,6 +361,8 @@ const ImportQuestions = () => {
           }
         );
 
+        if (handleUnauthorized(response)) return;
+
         if (!response.ok) {
           console.error(
             "Failed to load destination subjects:",
@@ -438,6 +440,8 @@ const ImportQuestions = () => {
           }
         );
 
+        if (handleUnauthorized(response)) return;
+
         const data = await response.json();
 
         if (!response.ok) {
@@ -493,7 +497,7 @@ const ImportQuestions = () => {
     };
 
     fetchDatabaseSources();
-  }, [apiUrl, sourceMode]);
+  }, [apiUrl, sourceMode, selectedSourceDatabaseId]);
 
   // =========================================================
   // LOAD SOURCE SUBJECTS FROM SELECTED DATABASE
@@ -501,21 +505,33 @@ const ImportQuestions = () => {
 
   useEffect(() => {
     if (sourceMode !== "database") {
+      setSourceSubjects([]);
+      setSourceSubjectId("");
+      setSourceQuestions([]);
+      setSelectedQuestionIds([]);
       return;
     }
+
+    if (!selectedSourceDatabaseId) {
+      setSourceSubjects([]);
+      setSourceSubjectId("");
+      setSourceQuestions([]);
+      setSelectedQuestionIds([]);
+      setIsSourceSubjectsLoading(false);
+      return;
+    }
+
+    let cancelled = false;
 
     const fetchSourceSubjects = async () => {
       setIsSourceSubjectsLoading(true);
 
       try {
-        const token =
-          getToken();
+        const token = getToken();
 
-        const query = selectedSourceDatabaseId
-          ? `?sourceDatabaseID=${encodeURIComponent(
-              selectedSourceDatabaseId
-            )}`
-          : "";
+        const query = `?sourceDatabaseID=${encodeURIComponent(
+          selectedSourceDatabaseId
+        )}`;
 
         const response = await fetch(
           `${apiUrl}/database-import/subjects${query}`,
@@ -529,6 +545,8 @@ const ImportQuestions = () => {
           }
         );
 
+        if (handleUnauthorized(response)) return;
+
         const data = await response.json();
 
         if (!response.ok) {
@@ -538,13 +556,28 @@ const ImportQuestions = () => {
           );
         }
 
-        const sourceData = Array.isArray(
-          data.data
-        )
+        const sourceData = Array.isArray(data.data)
           ? data.data
           : [];
 
+        if (cancelled) {
+          return;
+        }
+
         setSourceSubjects(sourceData);
+
+        if (
+          sourceSubjectId &&
+          !sourceData.some(
+            (subject) =>
+              String(subject.subjectID) ===
+              String(sourceSubjectId)
+          )
+        ) {
+          setSourceSubjectId("");
+          setSourceQuestions([]);
+          setSelectedQuestionIds([]);
+        }
 
         if (sourceData.length === 0) {
           setStatus({
@@ -559,12 +592,14 @@ const ImportQuestions = () => {
           });
         }
       } catch (err) {
+        if (cancelled) {
+          return;
+        }
+
         console.error(
           "Error loading source subjects:",
           err
         );
-
-        setSourceSubjects([]);
 
         setStatus({
           message:
@@ -573,15 +608,22 @@ const ImportQuestions = () => {
           isError: true,
         });
       } finally {
-        setIsSourceSubjectsLoading(false);
+        if (!cancelled) {
+          setIsSourceSubjectsLoading(false);
+        }
       }
     };
 
     fetchSourceSubjects();
+
+    return () => {
+      cancelled = true;
+    };
   }, [
     apiUrl,
     sourceMode,
     selectedSourceDatabaseId,
+    sourceSubjectId,
   ]);
 
   // =========================================================
@@ -1119,6 +1161,11 @@ const ImportQuestions = () => {
             }),
           }
         );
+
+        if (handleUnauthorized(response)) {
+          setIsDatabaseImporting(false);
+          return;
+        }
 
         const data =
           await response.json();

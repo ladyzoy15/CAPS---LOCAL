@@ -180,10 +180,13 @@ class DatabaseQuestionImportController
         $source =
             $this->resolveSource($request);
 
-        $connectionName =
-            $this->getSourceConnection($source);
+        $connectionName = null;
 
         try {
+
+            $connectionName =
+                $this->getSourceConnection($source);
+
             $subjects =
                 DB::connection($connectionName)
                     ->table('subjects')
@@ -210,6 +213,27 @@ class DatabaseQuestionImportController
                 'data' => $subjects,
             ]);
         } catch (Throwable $e) {
+
+            Log::error(
+                'DatabaseQuestionImportController@subjects failed',
+                [
+                    'sourceDatabaseID' =>
+                        $source->id,
+
+                    'message' =>
+                        $e->getMessage(),
+
+                    'file' =>
+                        $e->getFile(),
+
+                    'line' =>
+                        $e->getLine(),
+
+                    'trace' =>
+                        $e->getTraceAsString(),
+                ]
+            );
+
             return response()->json([
                 'success' => false,
                 'message' =>
@@ -217,7 +241,11 @@ class DatabaseQuestionImportController
                 'error' => $e->getMessage(),
             ], 500);
         } finally {
-            DB::purge($connectionName);
+            if ($connectionName) {
+                DB::purge(
+                    $connectionName
+                );
+            }
         }
     }
 
@@ -466,13 +494,16 @@ class DatabaseQuestionImportController
             ], 404);
         }
 
-        $connectionName =
-            $this->getSourceConnection($source);
-
-        $sourceEncrypter =
-            $this->getSourceEncrypter();
+        $connectionName = null;
 
         try {
+
+            $connectionName =
+                $this->getSourceConnection($source);
+
+            $sourceEncrypter =
+                $this->getSourceEncrypter();
+
             $sourceDB =
                 DB::connection($connectionName);
 
@@ -669,16 +700,49 @@ class DatabaseQuestionImportController
             ]);
         } catch (Throwable $e) {
 
+            Log::error(
+                'DatabaseQuestionImportController@import failed',
+                [
+                    'sourceDatabaseID' =>
+                        $request->input(
+                            'sourceDatabaseID'
+                        ),
+
+                    'destinationSubjectID' =>
+                        $request->input(
+                            'destinationSubjectID'
+                        ),
+
+                    'message' =>
+                        $e->getMessage(),
+
+                    'file' =>
+                        $e->getFile(),
+
+                    'line' =>
+                        $e->getLine(),
+
+                    'trace' =>
+                        $e->getTraceAsString(),
+                ]
+            );
+
             return response()->json([
                 'success' => false,
+
                 'message' =>
                     'Question import failed.',
+
                 'error' =>
                     $e->getMessage(),
             ], 500);
 
         } finally {
-            DB::purge($connectionName);
+            if ($connectionName) {
+                DB::purge(
+                    $connectionName
+                );
+            }
         }
     }
 
@@ -799,27 +863,29 @@ class DatabaseQuestionImportController
             ], 422);
         }
 
-        $connectionName =
-            $this->getSourceConnection($source);
-
-        $sourceEncrypter =
-            $this->getSourceEncrypter();
-
-        /*
-         * Counters.
-         */
-        $importedSubjects = 0;
-        $importedQuestions = 0;
-        $importedChoices = 0;
-        $skippedQuestions = 0;
-
-        $questionImagesFound = 0;
-        $questionImagesMissing = 0;
-
-        $choiceImagesFound = 0;
-        $choiceImagesMissing = 0;
+        $connectionName = null;
 
         try {
+
+            $connectionName =
+                $this->getSourceConnection($source);
+
+            $sourceEncrypter =
+                $this->getSourceEncrypter();
+
+            /*
+             * Counters.
+             */
+            $importedSubjects = 0;
+            $importedQuestions = 0;
+            $importedChoices = 0;
+            $skippedQuestions = 0;
+
+            $questionImagesFound = 0;
+            $questionImagesMissing = 0;
+
+            $choiceImagesFound = 0;
+            $choiceImagesMissing = 0;
 
             $sourceDB =
                 DB::connection($connectionName);
@@ -1245,6 +1311,26 @@ class DatabaseQuestionImportController
 
         } catch (Throwable $e) {
 
+            Log::error(
+                'Full database import failed',
+                [
+                    'sourceDatabaseID' =>
+                        $request->sourceDatabaseID,
+
+                    'message' =>
+                        $e->getMessage(),
+
+                    'file' =>
+                        $e->getFile(),
+
+                    'line' =>
+                        $e->getLine(),
+
+                    'trace' =>
+                        $e->getTraceAsString(),
+                ]
+            );
+
             return response()->json([
                 'success' => false,
 
@@ -1268,9 +1354,13 @@ class DatabaseQuestionImportController
             ], 500);
 
         } finally {
-
-            DB::purge($connectionName);
+            if ($connectionName) {
+                DB::purge(
+                    $connectionName
+                );
+            }
         }
+    }
     }
 
     /**
