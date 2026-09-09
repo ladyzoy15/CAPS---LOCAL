@@ -172,8 +172,7 @@ const SubjectCard = ({
   }, [activeIndex]);
 
   const tabs = [
-    { label: "Practice Exam", index: 0 },
-    { label: "Subject", index: 1 },
+    { label: "Approved Questions", index: 0 },
     { label: "Pending", index: 4 },
   ];
 
@@ -470,16 +469,6 @@ const SubjectCard = ({
             {/* Button row for Tablet and Mobile (Configure, Preview, Refresh, Search) */}
             <div className="outfit-500 mt-7 flex w-full flex-row items-center justify-start gap-2 font-semibold md:hidden">
               <button
-                onClick={() =>
-                  alert("Exam preview will be available in a future update.")
-                }
-                className="border-color outfit-500 mb-6 flex cursor-pointer items-center gap-1 rounded-xl border bg-white px-4 py-2 text-gray-700 transition hover:bg-gray-100"
-              >
-                <i className="bx bx-eye text-lg"></i>
-                <span className="text-[14px]">Preview</span>
-              </button>
-
-              <button
                 onClick={() => {
                   setSubjectToDelete({ subjectID, subjectName, subjectCode });
                   setShowDeleteModal(true);
@@ -635,19 +624,6 @@ const SubjectCard = ({
                 >
                   <i className="bx bx-trash text-[16px]"></i>
                   <span className="text-[14px]">Remove</span>
-                </button>
-
-                {/* Preview */}
-                <button
-                  onClick={() =>
-                    alert("Exam preview will be available in a future update.")
-                  }
-                  className="outfit-500 flex cursor-pointer items-center gap-2 rounded-xl border border-b-4 border-orange-600 bg-orange-500 px-4 py-2 text-white transition-all duration-100 hover:bg-orange-600 active:translate-y-[2px] active:border-b-2"
-                >
-                  <i className="bx bx-eye-big text-xl"></i>
-                  <span className="outfit text-[14px] font-semibold">
-                    Preview
-                  </span>
                 </button>
               </div>
             </div>

@@ -57,30 +57,166 @@ const parseSpreadsheet = (file) =>
           defval: "",
         });
 
-        let qColIdx = 0;
-
-        if (rows.length) {
-          const header = rows[0].map((h) =>
-            String(h).toLowerCase()
+        if (rows.length === 0) {
+          reject(
+            new Error(
+              "The spreadsheet is empty."
+            )
           );
 
-          const found = header.findIndex((h) =>
-            h.includes("question")
+          return;
+        }
+
+        const header = rows[0].map((h) =>
+          String(h).toLowerCase().trim()
+        );
+
+        let qColIdx = header.findIndex((h) =>
+          h.includes("question")
+        );
+
+        if (qColIdx === -1) {
+          const textCol = header.findIndex(
+            (h) =>
+              h &&
+              !/^(no|id|num|#|index|sn|code)$/i.test(
+                h
+              )
           );
 
-          if (found !== -1) {
-            qColIdx = found;
-            rows.shift();
+          if (textCol !== -1) {
+            qColIdx = textCol;
           }
         }
 
-        resolve(
-          rows
-            .map((r) =>
-              String(r[qColIdx] ?? "").trim()
+        if (qColIdx === -1) {
+          reject(
+            new Error(
+              "Could not detect a valid question column in this file."
             )
-            .filter(Boolean)
-        );
+          );
+
+          return;
+        }
+
+        const choiceColIndices = [];
+        const choiceLabels = [
+          "a",
+          "b",
+          "c",
+          "d",
+          "e",
+          "choice a",
+          "choice b",
+          "choice c",
+          "choice d",
+          "choice e",
+        ];
+
+        header.forEach((h, idx) => {
+          const lower = h
+            .toLowerCase()
+            .trim();
+          if (
+            choiceLabels.includes(lower) ||
+            /^choice\s*[a-e]$/i.test(lower)
+          ) {
+            choiceColIndices.push(idx);
+          }
+        });
+
+        let correctColIdx = -1;
+        header.forEach((h, idx) => {
+          if (
+            /^(correct|answer|correct answer)$/i.test(
+              h
+            )
+          ) {
+            correctColIdx = idx;
+          }
+        });
+
+        const dataRows = rows.slice(1);
+        const isStructured =
+          choiceColIndices.length > 0;
+
+        if (isStructured) {
+          const questions = [];
+
+          for (const row of dataRows) {
+            const qText = String(
+              row[qColIdx] ?? ""
+            ).trim();
+
+            if (!qText || qText.length <= 3)
+              continue;
+
+            const choices = [];
+            choiceColIndices.forEach(
+              (colIdx, i) => {
+                const choiceText = String(
+                  row[colIdx] ?? ""
+                ).trim();
+
+                if (choiceText) {
+                  choices.push({
+                    choiceText,
+                    isCorrect:
+                      correctColIdx !==
+                      -1
+                        ? String(
+                            row[
+                              correctColIdx
+                            ] ?? ""
+                          ).trim() ===
+                          choiceText
+                        : false,
+                    position: i + 1,
+                  });
+                }
+              }
+            );
+
+            questions.push({
+              questionText: qText,
+              choices,
+            });
+          }
+
+          if (questions.length === 0) {
+            reject(
+              new Error(
+                "No valid question rows found in the spreadsheet."
+              )
+            );
+
+            return;
+          }
+
+          resolve(questions);
+        } else {
+          const questionLines = dataRows
+            .map((r) =>
+              String(r[qColIdx] ?? "")
+                .trim()
+            )
+            .filter((l) => l.length > 3);
+
+          if (
+            questionLines.length === 0 &&
+            dataRows.length > 0
+          ) {
+            reject(
+              new Error(
+                "No question text found in the detected column."
+              )
+            );
+
+            return;
+          }
+
+          resolve(questionLines);
+        }
       } catch (err) {
         reject(err);
       }

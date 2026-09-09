@@ -312,9 +312,6 @@ const FacultyContent = () => {
         (activeTab === 0 &&
           question.purpose_id === 2 && // 1 for practice questions
           question.status_id === 2) || // 2 is approved
-        (activeTab === 1 &&
-          question.purpose_id === 1 && // 2 for exam questions
-          question.status_id === 2) || // 2 is approved
         (activeTab === 4 &&
           question.status_id === 1 && // 1 is pending
           (pendingSort
@@ -527,7 +524,7 @@ const FacultyContent = () => {
             </div>
 
             {/* Add Question Section */}
-            {(activeTab === 0 || activeTab === 1) && (
+            {activeTab === 0 && (
               <div>
                 {/* Show Add Question Button Only If No Active Question */}
                 {!submittedQuestion && filteredQuestions.length > 0 && (
@@ -581,7 +578,7 @@ const FacultyContent = () => {
             )}
 
             {/* Questions List */}
-            {(activeTab === 0 || activeTab === 1 || activeTab === 4) && ( // Practice Questions
+            {(activeTab === 0 || activeTab === 4) && ( // Practice Questions
               <div className="relative sm:mx-0">
                 <div className="w-full">
                   {isLoading ? (
@@ -593,14 +590,11 @@ const FacultyContent = () => {
                       {(() => {
                         const activeQuestions = filteredQuestions.filter(
                           (question) =>
-                            (activeTab === 4 && question.status_id === 1) || // 1 is pending
-                            (activeTab === 0 &&
-                              question.purpose_id === 2 &&
-                              question.status_id === 2) || // 2 is approved
-                            (activeTab === 1 &&
-                              question.purpose_id === 1 &&
-                              question.status_id === 2), // 2 is approved
-                        );
+                             (activeTab === 4 && question.status_id === 1) || // 1 is pending
+                             (activeTab === 0 &&
+                               question.purpose_id === 2 &&
+                               question.status_id === 2) // 2 is approved
+                         );
                         const total = activeQuestions.length;
                         const counts = getDifficultyCounts(activeQuestions);
                         const easyCount = counts.easy || 0;
@@ -719,13 +713,10 @@ const FacultyContent = () => {
                       {filteredQuestions
                         .filter(
                           (question) =>
-                            (activeTab === 4 && question.status_id === 1) || // 1 is pending
-                            (activeTab === 0 &&
-                              question.purpose_id === 2 && // 1 for practice questions
-                              question.status_id === 2) || // 2 is approved
-                            (activeTab === 1 &&
-                              question.purpose_id === 1 && // 2 for exam questions
-                              question.status_id === 2), // 2 is approved
+                             (activeTab === 4 && question.status_id === 1) || // 1 is pending
+                             (activeTab === 0 &&
+                               question.purpose_id === 2 && // 1 for practice questions
+                               question.status_id === 2), // 2 is approved
                         )
                         .map((question, index) => (
                           <div key={`${question.id}-${index}`}>
