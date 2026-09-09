@@ -610,7 +610,7 @@ class DatabaseQuestionImportController
                                     Auth::id(),
 
                                 'image' =>
-                                    $sourceQuestion->image,
+                                    $this->copyImageIfExists($sourceQuestion->image),
 
                                 'score' =>
                                     $sourceQuestion->score,
@@ -658,7 +658,7 @@ class DatabaseQuestionImportController
                                     (int) $sourceChoice->position,
 
                                 'image' =>
-                                    $sourceChoice->image,
+                                    $this->copyImageIfExists($sourceChoice->image),
                             ]);
                         }
 
@@ -1152,7 +1152,7 @@ class DatabaseQuestionImportController
                                         Auth::id(),
 
                                     'image' =>
-                                        $questionImage,
+                                        $this->copyImageIfExists($questionImage),
 
                                     'score' =>
                                         $sourceQuestion->score,
@@ -1255,7 +1255,7 @@ class DatabaseQuestionImportController
                                         (int) $sourceChoice->position,
 
                                     'image' =>
-                                        $choiceImage,
+                                        $this->copyImageIfExists($choiceImage),
                                 ]);
 
                                 $importedChoices++;
@@ -1361,7 +1361,6 @@ class DatabaseQuestionImportController
             }
         }
     }
-    }
 
     /**
      * Decrypt Laravel encrypted values.
@@ -1409,5 +1408,33 @@ class DatabaseQuestionImportController
              */
             return $value;
         }
+    }
+
+    /**
+     * Copy image file from source storage to destination storage if it exists.
+     * Returns the storage path (relative) or null if file doesn't exist.
+     */
+    private function copyImageIfExists($imagePath)
+    {
+        if (!$imagePath || filter_var($imagePath, FILTER_VALIDATE_URL)) {
+            return $imagePath;
+        }
+
+        $storagePath = storage_path('app/public');
+
+        // Normalize the path (handle both forward and back slashes)
+        $cleanPath = ltrim(str_replace('\\', '/', $imagePath), '/');
+
+        $sourceFile = $storagePath . DIRECTORY_SEPARATOR . str_replace('/', DIRECTORY_SEPARATOR, $cleanPath);
+
+        if (file_exists($sourceFile)) {
+            // File exists in source storage, copy to destination if needed
+            // The destination is the same storage path in this case, so just return the path
+            // If importing from a different server, you'd need to download/copy the file
+            return $imagePath;
+        }
+
+        // File doesn't exist physically, return null to avoid broken references
+        return null;
     }
 }

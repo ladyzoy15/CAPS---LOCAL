@@ -212,7 +212,7 @@ class QuestionController extends Controller
             });
         }
 
-        $questions = $query->orderBy('created_at', 'desc')
+        $questions = $query->orderBy('updated_at', 'desc')
             ->get()
             ->map(fn($q) => $this->formatQuestion($q));
 
