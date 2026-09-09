@@ -706,7 +706,6 @@ const AdminContent = () => {
       // Wait for the new question list
       // after approval.
       await fetchQuestions();
-      setActiveTab(1);
 
       showToast(
         "Question approved successfully!",
@@ -806,7 +805,6 @@ const AdminContent = () => {
         // IMPORTANT:
         // Refresh the questions after bulk approval.
         await fetchQuestions();
-        setActiveTab(1);
 
         setSelectedQuestions([]);
         setIsMultiSelectMode(false);

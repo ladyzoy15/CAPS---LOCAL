@@ -7,6 +7,7 @@ import {
 import Register from "./pages/Register";
 import Layout from "./components/layout";
 import ProtectedRoute from "./components/protectRoute";
+import StudentRoute from "./components/StudentRoute";
 import TutorialLayout from "./components/TutorialLayout";
 
 import Credits from "./pages/Credits";
@@ -165,7 +166,7 @@ function App() {
 
           <Route
             path=":classID/quizzes"
-            element={<StudentClasses />}
+            element={<StudentRoute element={<StudentClasses />} />}
           />
         </Route>
 
@@ -346,7 +347,7 @@ function App() {
 
         <Route
           path="/student-dashboard"
-          element={<ProtectedRoute element={<Layout />} />}
+          element={<StudentRoute element={<Layout />} />}
         >
           <Route
             index
@@ -596,7 +597,7 @@ function App() {
 
         <Route
           path="/quiz/:classPersonalQuizID"
-          element={<ProtectedRoute element={<Layout />} />}
+          element={<StudentRoute element={<Layout />} />}
         >
           <Route
             index
@@ -611,7 +612,7 @@ function App() {
 
         <Route
           path="/quiz-result/:classPersonalQuizID"
-          element={<ProtectedRoute element={<Layout />} />}
+          element={<StudentRoute element={<Layout />} />}
         >
           <Route
             index
