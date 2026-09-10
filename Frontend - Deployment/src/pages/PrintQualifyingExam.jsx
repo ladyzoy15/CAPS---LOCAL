@@ -78,10 +78,10 @@ export default function PrintQualifyingExam() {
     XL: 20,
   };
   const imageSizeMap = {
-    S: 50,
-    M: 60,
-    L: 80,
-    XL: 140,
+    S: 120,
+    M: 200,
+    L: 300,
+    XL: 420,
   };
   const [imageSize, setImageSize] = useState("S");
   const [showSettings, setShowSettings] = useState(false);
@@ -998,7 +998,7 @@ export default function PrintQualifyingExam() {
                           </span>
                         </div>
                         {question.questionImage && (
-                          <div className="mt-2">
+                          <div className="mt-2 flex justify-center">
                             <img
                               src={question.questionImage}
                               alt={`Question ${index + 1} image`}
@@ -1007,7 +1007,7 @@ export default function PrintQualifyingExam() {
                                 width: "auto",
                                 maxWidth: "100%",
                               }}
-                              className="rounded-lg"
+                              className="rounded-lg mx-auto"
                               onError={(e) => {
                                 e.target.onerror = null;
                                 e.target.style.display = "none";
@@ -1511,7 +1511,7 @@ export default function PrintQualifyingExam() {
                       </span>
                     </div>
                     {question.questionImage && (
-                      <div className="mt-2">
+                      <div className="mt-2 flex justify-center">
                         <img
                           src={question.questionImage}
                           alt={`Question ${index + 1} image`}
@@ -1520,7 +1520,7 @@ export default function PrintQualifyingExam() {
                             width: "auto",
                             maxWidth: "100%",
                           }}
-                          className="rounded-lg"
+                          className="rounded-lg mx-auto"
                           onError={(e) => {
                             e.target.onerror = null;
                             e.target.style.display = "none";
@@ -1859,10 +1859,3 @@ export default function PrintQualifyingExam() {
     </div>
   );
 }
-
-
-
-
-
-
-

@@ -17,6 +17,7 @@ return new class extends Migration
             $table->string('database', 100);
             $table->string('username', 100);
             $table->text('password')->nullable();
+            $table->string('storage_url', 500)->nullable();
             $table->boolean('is_active')->default(true);
             $table->timestamps();
         });

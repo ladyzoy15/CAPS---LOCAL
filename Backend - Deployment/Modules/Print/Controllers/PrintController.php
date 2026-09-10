@@ -58,6 +58,29 @@ class PrintController extends Controller
     private function getBase64ImageData($path)
     {
         try {
+            // Handle full external URLs (e.g. images brought in via the Import
+            // feature, which are stored as-is and never copied into local
+            // storage — see DatabaseQuestionImportController::copyImageIfExists()).
+            if (\Illuminate\Support\Str::startsWith($path, ['http://', 'https://'])) {
+                $imageContents = @file_get_contents($path);
+                if ($imageContents !== false) {
+                    $type = null;
+                    $sizeInfo = @getimagesizefromstring($imageContents);
+                    if ($sizeInfo && isset($sizeInfo['mime'])) {
+                        $type = $sizeInfo['mime'];
+                    } else {
+                        $type = 'image/jpeg';
+                    }
+                    $base64 = base64_encode($imageContents);
+                    return "data:$type;base64,$base64";
+                }
+                // Could not fetch the remote file (network/CORS/host down).
+                // Fall back to returning the URL directly so the <img> tag can
+                // still attempt to load it client-side instead of showing nothing.
+                \Log::warning('Could not fetch remote image for base64 embed, falling back to URL', ['path' => $path]);
+                return $path;
+            }
+
             // Try public storage
             if (\Illuminate\Support\Facades\Storage::disk('public')->exists($path)) {
                 $file = \Illuminate\Support\Facades\Storage::disk('public')->get($path);
@@ -87,6 +110,34 @@ class PrintController extends Controller
         }
     }
 
+    /**
+     * Some imported questions/choices embed the figure directly inside the
+     * rich-text HTML (e.g. <img src="data:image/png;base64,...">) instead of
+     * using the separate `image` column. The print/export view strips all
+     * HTML from the text for plain-text rendering, which silently drops
+     * these inline images. This pulls the first <img> src out of the HTML
+     * so it can still be rendered as a proper questionImage/choiceImage.
+     */
+    private function extractInlineImage($html)
+    {
+        if (!$html) {
+            return null;
+        }
+        if (!preg_match('/<img[^>]+src=["\']([^"\']+)["\']/i', $html, $matches)) {
+            return null;
+        }
+        $src = $matches[1];
+
+        // Already a data URI — use as-is, no fetching needed.
+        if (\Illuminate\Support\Str::startsWith($src, 'data:image/')) {
+            return $src;
+        }
+
+        // Full external/local URL or a relative storage path — reuse the
+        // same resolution logic as the `image` column.
+        return $this->getBase64ImageData($src);
+    }
+
     private function formatQuestions($questions, $subject = null)
     {
         try {
@@ -96,8 +147,16 @@ class PrintController extends Controller
                     $questionText = Crypt::decryptString($q->questionText);
                     $questionImage = null;
                     if ($q->image) {
-                        $imagePath = 'question_images/' . basename($q->image);
+                        $imagePath = \Illuminate\Support\Str::startsWith($q->image, ['http://', 'https://'])
+                            ? $q->image
+                            : 'question_images/' . basename($q->image);
                         $questionImage = $this->getBase64ImageData($imagePath);
+                    }
+                    // Fallback: the figure may be embedded directly inside the
+                    // question's HTML (common for imported questions) rather
+                    // than stored in the `image` column.
+                    if (!$questionImage) {
+                        $questionImage = $this->extractInlineImage($questionText);
                     }
                     $choices = [];
                     $regularChoices = [];
@@ -107,8 +166,13 @@ class PrintController extends Controller
                             $choiceText = $choice->choiceText ? Crypt::decryptString($choice->choiceText) : null;
                             $choiceImage = null;
                             if ($choice->image) {
-                                $imagePath = 'choices/' . basename($choice->image);
+                                $imagePath = \Illuminate\Support\Str::startsWith($choice->image, ['http://', 'https://'])
+                                    ? $choice->image
+                                    : 'choices/' . basename($choice->image);
                                 $choiceImage = $this->getBase64ImageData($imagePath);
+                            }
+                            if (!$choiceImage) {
+                                $choiceImage = $this->extractInlineImage($choiceText);
                             }
                             $formattedChoice = [
                                 'choiceText' => $choiceText,

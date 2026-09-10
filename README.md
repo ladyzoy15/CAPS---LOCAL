@@ -1,4 +1,4 @@
-# CAPS - College Assessment and Practice System
+# ARC - Academic Readiness and Review for Competence
 
 A web-based assessment platform built with Laravel (backend) and React (frontend), containerized using Docker. It supports subject/question management, qualifying exam workflows, and practice exams for students.
 
