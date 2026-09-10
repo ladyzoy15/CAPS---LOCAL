@@ -40,6 +40,119 @@ const cleanLines = (lines) =>
         !/^(page \d+|sheet\d*|©|table of contents)$/i.test(l)
     );
 
+// =========================================================
+// QUESTION + CHOICE GROUPING (for DOCX / PDF / TXT / IMAGE)
+// =========================================================
+// Turns raw extracted lines like:
+//   "1. What is the SI unit of electrical resistance?"
+//   "A. Ampere"
+//   "B. Volt"
+//   "C. Ohm  ✓ (Correct)"
+//   "D. Watt"
+// into structured { questionText, choices: [...], difficulty_id } objects,
+// the same shape the manual "Add Question" form sends to the API.
+
+const DIFFICULTY_LABEL_TO_ID = {
+  easy: 1,
+  moderate: 2,
+  difficult: 3,
+  hard: 3,
+};
+
+// Matches a question start line, e.g. "1. ..." or "12) ..."
+const QUESTION_START_RE = /^(\d{1,3})[.)]\s+(.+)$/;
+
+// Matches a lettered choice line, e.g. "A. ..." or "b) ..."
+const CHOICE_LINE_RE = /^([A-Ea-e])[.)]\s*(.*)$/;
+
+// Any of these markers on a choice line means it's the correct answer.
+// They're stripped from the stored choice text afterward.
+const CORRECT_MARKER_RE = /(✓|✔|\(\s*correct\s*\)|\[\s*correct\s*\])/gi;
+
+const groupQuestionsFromTokens = (tokens) => {
+  const questions = [];
+  let current = null;
+  let currentDifficulty = 1; // default: easy
+
+  const pushCurrent = () => {
+    if (
+      current &&
+      current.questionText &&
+      current.choices.length >= 2
+    ) {
+      questions.push(current);
+    }
+    current = null;
+  };
+
+  tokens.forEach((token) => {
+    if (token.type === "image") {
+      // Attach the figure to the question currently being built, as long
+      // as we haven't started reading its choices yet (i.e. the image
+      // appeared between the question stem and option A).
+      if (current && current.choices.length === 0 && !current.image) {
+        current.image = token.dataUri;
+      }
+      return;
+    }
+
+    const line = (token.text || "").trim();
+    if (!line) return;
+
+    const lower = line.toLowerCase().replace(/[^a-z]/g, "");
+
+    if (DIFFICULTY_LABEL_TO_ID[lower] !== undefined) {
+      currentDifficulty = DIFFICULTY_LABEL_TO_ID[lower];
+      return;
+    }
+
+    const choiceMatch = line.match(CHOICE_LINE_RE);
+    const questionMatch = !choiceMatch && line.match(QUESTION_START_RE);
+
+    if (questionMatch) {
+      pushCurrent();
+      current = {
+        questionText: questionMatch[2].trim(),
+        choices: [],
+        difficulty_id: currentDifficulty,
+        image: null,
+      };
+      return;
+    }
+
+    if (choiceMatch && current) {
+      const isCorrect = CORRECT_MARKER_RE.test(line);
+      CORRECT_MARKER_RE.lastIndex = 0;
+
+      const choiceText = choiceMatch[2]
+        .replace(CORRECT_MARKER_RE, "")
+        .trim();
+
+      current.choices.push({ choiceText, isCorrect });
+      return;
+    }
+
+    // Continuation of the question stem (e.g. a figure caption on its own
+    // line) — only append while we haven't started reading choices yet.
+    if (current && current.choices.length === 0 && line) {
+      current.questionText = `${current.questionText} ${line}`.trim();
+    }
+  });
+
+  pushCurrent();
+
+  return questions;
+};
+
+const groupQuestionsFromLines = (rawLines) => {
+  const tokens = rawLines
+    .map((l) => (l || "").replace(/\s+/g, " ").trim())
+    .filter(Boolean)
+    .map((text) => ({ type: "text", text }));
+
+  return groupQuestionsFromTokens(tokens);
+};
+
 const parseSpreadsheet = (file) =>
   new Promise((resolve, reject) => {
     const reader = new FileReader();
@@ -250,6 +363,104 @@ const parseDocx = (file) =>
     reader.onerror = reject;
     reader.readAsArrayBuffer(file);
   });
+
+// DOCX parsing that keeps embedded circuit/figure images in place (in the
+// same order they appear relative to the question text), instead of the
+// text-only extraction above which silently drops them. Each returned
+// token is either { type: "text", text } or { type: "image", dataUri }.
+const parseDocxTokens = (file) =>
+  new Promise((resolve, reject) => {
+    const reader = new FileReader();
+
+    reader.onload = async (e) => {
+      try {
+        const result = await mammoth.convertToHtml(
+          { arrayBuffer: e.target.result },
+          {
+            convertImage: mammoth.images.imgElement(async (image) => {
+              const base64 = await image.read("base64");
+              return {
+                src: `data:${image.contentType};base64,${base64}`,
+              };
+            }),
+          }
+        );
+
+        const doc = new DOMParser().parseFromString(
+          result.value,
+          "text/html"
+        );
+
+        const tokens = [];
+
+        const walk = (node) => {
+          if (node.nodeType === Node.ELEMENT_NODE) {
+            if (node.tagName === "IMG") {
+              const src = node.getAttribute("src");
+              if (src) {
+                tokens.push({ type: "image", dataUri: src });
+              }
+              return;
+            }
+
+            // If an element wraps both text and an image (rare, but
+            // possible), walk its children individually so the image
+            // still lands in the right position relative to the text.
+            if (node.querySelector && node.querySelector("img")) {
+              Array.from(node.childNodes).forEach(walk);
+              return;
+            }
+
+            const text = (node.textContent || "")
+              .replace(/\s+/g, " ")
+              .trim();
+
+            if (text) {
+              tokens.push({ type: "text", text });
+            }
+
+            return;
+          }
+
+          if (node.nodeType === Node.TEXT_NODE) {
+            const text = (node.textContent || "")
+              .replace(/\s+/g, " ")
+              .trim();
+
+            if (text) {
+              tokens.push({ type: "text", text });
+            }
+          }
+        };
+
+        Array.from(doc.body.childNodes).forEach(walk);
+
+        resolve(tokens);
+      } catch (err) {
+        reject(err);
+      }
+    };
+
+    reader.onerror = reject;
+    reader.readAsArrayBuffer(file);
+  });
+
+// Converts a "data:<mime>;base64,...." string (as produced by
+// parseDocxTokens) into a File object suitable for FormData upload.
+const dataUriToFile = (dataUri, filename) => {
+  const [header, base64] = dataUri.split(",");
+  const mimeMatch = header.match(/data:(.*);base64/);
+  const mime = mimeMatch ? mimeMatch[1] : "image/png";
+
+  const binary = atob(base64);
+  const bytes = new Uint8Array(binary.length);
+
+  for (let i = 0; i < binary.length; i++) {
+    bytes[i] = binary.charCodeAt(i);
+  }
+
+  return new File([bytes], filename, { type: mime });
+};
 
 const parsePdf = async (file) => {
   const buffer = await file.arrayBuffer();
@@ -894,6 +1105,7 @@ const ImportQuestions = () => {
 
     try {
       let parsedLines = [];
+      let docxTokens = null;
 
       if (
         ["xlsx", "xls", "csv"].includes(ext)
@@ -901,8 +1113,13 @@ const ImportQuestions = () => {
         parsedLines =
           await parseSpreadsheet(file);
       } else if (ext === "docx") {
-        parsedLines =
-          await parseDocx(file);
+        // Token-based parse keeps embedded circuit/figure images attached
+        // to their question instead of dropping them (plain parseDocx
+        // above is left in place, unused, in case it's needed elsewhere).
+        docxTokens = await parseDocxTokens(file);
+        parsedLines = docxTokens
+          .filter((t) => t.type === "text")
+          .map((t) => t.text);
       } else if (ext === "pdf") {
         parsedLines =
           await parsePdf(file);
@@ -940,6 +1157,41 @@ const ImportQuestions = () => {
         return;
       }
 
+      // Spreadsheets with dedicated "Choice A/B/C/D" + "Correct" columns
+      // already come back as structured { questionText, choices } objects.
+      const isStructuredRows =
+        Array.isArray(parsedLines) &&
+        parsedLines.length > 0 &&
+        typeof parsedLines[0] === "object";
+
+      if (isStructuredRows) {
+        setIsParsing(false);
+        setOcrProgress(null);
+
+        await handleImportQuestions(parsedLines);
+        return;
+      }
+
+      // For DOCX / PDF / TXT / images: try to detect question + lettered
+      // choice patterns (e.g. "1. ..." followed by "A. ...", "B. ...",
+      // with the correct one marked "✓" or "(Correct)") so choices are
+      // imported along with the question text, not dropped. For DOCX,
+      // this also carries over any embedded figure/circuit image.
+      const groupedQuestions = docxTokens
+        ? groupQuestionsFromTokens(docxTokens)
+        : groupQuestionsFromLines(parsedLines);
+
+      if (groupedQuestions.length > 0) {
+        setIsParsing(false);
+        setOcrProgress(null);
+
+        await handleImportQuestions(groupedQuestions);
+        return;
+      }
+
+      // Fallback: no recognizable question/choice pattern was found, so
+      // import each remaining line as a standalone question with no
+      // choices (previous behavior).
       const cleaned =
         cleanLines(parsedLines);
 
@@ -1119,6 +1371,14 @@ const ImportQuestions = () => {
 
     setIsImporting(false);
 
+    finishImport(successCount, failCount);
+  };
+
+  // =========================================================
+  // FINISH IMPORT (shared by both import paths)
+  // =========================================================
+
+  const finishImport = (successCount, failCount) => {
     if (successCount > 0) {
       showToast(
         `${successCount} question${
@@ -1185,6 +1445,132 @@ const ImportQuestions = () => {
         isError: true,
       });
     }
+  };
+
+  // =========================================================
+  // STRUCTURED IMPORT (question + choices, from DOCX/PDF/TXT/
+  // image grouping or from a spreadsheet with choice columns)
+  // =========================================================
+
+  const handleImportQuestions = async (questionsToImport) => {
+    const selected = questionsToImport.filter(
+      (q) => q && q.questionText && q.questionText.trim()
+    );
+
+    if (selected.length === 0) {
+      return;
+    }
+
+    setIsImporting(true);
+
+    setStatus({
+      message: `Importing ${selected.length} question${
+        selected.length === 1 ? "" : "s"
+      }...`,
+      isError: false,
+    });
+
+    const token = getToken();
+
+    let successCount = 0;
+    let failCount = 0;
+
+    for (const q of selected) {
+      try {
+        const qfd = new FormData();
+
+        qfd.append("subjectID", selectedSubjectId);
+        qfd.append("coverage_id", DEFAULT_COVERAGE_ID);
+        qfd.append("questionText", q.questionText);
+        qfd.append("score", 1);
+        qfd.append("difficulty_id", q.difficulty_id || 1);
+        qfd.append("status_id", 1);
+        qfd.append("purpose_id", DEFAULT_PURPOSE_ID);
+
+        // Attach the figure/circuit image (DOCX imports only) if one was
+        // captured alongside this question by groupQuestionsFromTokens.
+        if (q.image) {
+          try {
+            qfd.append(
+              "image",
+              dataUriToFile(q.image, `question-figure.png`)
+            );
+          } catch (imgErr) {
+            console.error(
+              "Could not attach question image, continuing without it:",
+              imgErr
+            );
+          }
+        }
+
+        const qRes = await fetch(`${apiUrl}/questions/add`, {
+          method: "POST",
+          headers: { Authorization: `Bearer ${token}` },
+          credentials: "include",
+          body: qfd,
+        });
+
+        const qData = await qRes.json().catch(() => ({}));
+
+        if (!qRes.ok || !qData?.data?.questionID) {
+          failCount += 1;
+          console.error("Question import failed:", qData);
+          continue;
+        }
+
+        // Backend requires exactly 5 choices: the (up to) 4 parsed
+        // choices, plus a fixed "None of the above" 5th choice —
+        // matching the manual Add Question form's behavior.
+        const normalizedChoices = [...(q.choices || [])]
+          .slice(0, 4)
+          .map((c) => ({
+            choiceText: (c.choiceText || "").trim(),
+            isCorrect: !!c.isCorrect,
+          }));
+
+        while (normalizedChoices.length < 4) {
+          normalizedChoices.push({ choiceText: "", isCorrect: false });
+        }
+
+        normalizedChoices.push({
+          choiceText: "None of the above",
+          isCorrect: false,
+        });
+
+        const cfd = new FormData();
+        cfd.append("questionID", qData.data.questionID);
+
+        normalizedChoices.forEach((choice, index) => {
+          cfd.append(`choices[${index}][choiceText]`, choice.choiceText);
+          cfd.append(
+            `choices[${index}][isCorrect]`,
+            choice.isCorrect ? "1" : "0"
+          );
+        });
+
+        const cRes = await fetch(`${apiUrl}/questions/choices`, {
+          method: "POST",
+          headers: { Authorization: `Bearer ${token}` },
+          credentials: "include",
+          body: cfd,
+        });
+
+        if (cRes.ok) {
+          successCount += 1;
+        } else {
+          failCount += 1;
+          const errorText = await cRes.text();
+          console.error("Choices import failed:", errorText);
+        }
+      } catch (err) {
+        console.error("Error importing question:", q, err);
+        failCount += 1;
+      }
+    }
+
+    setIsImporting(false);
+
+    finishImport(successCount, failCount);
   };
 
   // =========================================================
