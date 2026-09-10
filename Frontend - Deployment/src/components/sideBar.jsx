@@ -544,34 +544,34 @@ const Sidebar = ({
 
       return (
         location.pathname ===
-          "/dean/Subjects/archive" ||
+          "/dean/subjects/archive" ||
         location.pathname ===
-          "/asso-dean/Subjects/archive"
+          "/asso-dean/subjects/archive"
       );
 
     }
 
 
-    if (path === "/dean/Subjects/archive") {
+    if (path === "/dean/subjects/archive") {
 
       return (
         location.pathname ===
-          "/dean/Subjects/archive" ||
+          "/dean/subjects/archive" ||
         location.pathname.startsWith(
-          "/dean/Subjects/archive/"
+          "/dean/subjects/archive/"
         )
       );
 
     }
 
 
-    if (path === "/asso-dean/Subjects/archive") {
+    if (path === "/asso-dean/subjects/archive") {
 
       return (
         location.pathname ===
-          "/asso-dean/Subjects/archive" ||
+          "/asso-dean/subjects/archive" ||
         location.pathname.startsWith(
-          "/asso-dean/Subjects/archive/"
+          "/asso-dean/subjects/archive/"
         )
       );
 
@@ -1008,16 +1008,14 @@ const Sidebar = ({
                       ARCHIVE - MOBILE
                   ================================================= */}
 
-                  {parsedRoleId >= 2 && (
+                  {(parsedRoleId === 4 || parsedRoleId === 5) && (
                     <div className="flex h-16 flex-1 flex-col items-center justify-center">
 
                       <Link
                         to={
-                          parsedRoleId === 2
-                            ? "/faculty/Subjects/archive"
-                            : parsedRoleId === 5
-                              ? "/asso-dean/Subjects/archive"
-                              : "/dean/Subjects/archive"
+                          parsedRoleId === 5
+                            ? "/asso-dean/subjects/archive"
+                            : "/dean/subjects/archive"
                         }
                         onClick={handleMenuClick}
                         className={`flex flex-col items-center transition-colors ${
@@ -2089,7 +2087,7 @@ const Sidebar = ({
                   ARCHIVE
               ================================================= */}
 
-              {parsedRoleId >= 2 && (
+              {(parsedRoleId === 4 || parsedRoleId === 5) && (
                 <li className="group relative">
 
                   <span
@@ -2105,11 +2103,9 @@ const Sidebar = ({
 
                     <Link
                       to={
-                        parsedRoleId === 2
-                          ? "/faculty/Subjects/archive"
-                          : parsedRoleId === 5
-                            ? "/asso-dean/Subjects/archive"
-                            : "/dean/Subjects/archive"
+                        parsedRoleId === 5
+                          ? "/asso-dean/subjects/archive"
+                          : "/dean/subjects/archive"
                       }
                       onClick={() => {
 

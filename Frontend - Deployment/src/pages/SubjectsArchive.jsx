@@ -17,6 +17,15 @@ function SubjectsArchive() {
 
   const [selectedSubjects, setSelectedSubjects] = useState([]);
 
+  const user = JSON.parse(
+    sessionStorage.getItem("user") || "{}",
+  );
+  const userRoleID = Number(
+    user.roleID ?? user.roleId ?? 0,
+  );
+  const canManageArchive =
+    userRoleID === 4 || userRoleID === 5;
+
   const [isRestoring, setIsRestoring] = useState(false);
   const [isDeleting, setIsDeleting] = useState(false);
 
@@ -1082,65 +1091,67 @@ function SubjectsArchive() {
 
           {/* RIGHT BUTTONS */}
 
-          <div className="flex items-center gap-2">
+          {canManageArchive && (
+            <div className="flex items-center gap-2">
 
-            {/* RESTORE */}
+              {/* RESTORE */}
 
-            <button
-              type="button"
-              onClick={
-                handleRestore
-              }
-              disabled={
-                selectedSubjects.length ===
-                  0 ||
-                isRestoring ||
-                isDeleting
-              }
-              className="flex items-center gap-2 rounded-lg border border-green-500 bg-green-500 px-4 py-2.5 text-sm font-semibold text-white transition hover:bg-green-600 disabled:cursor-not-allowed disabled:border-green-200 disabled:bg-green-100 disabled:text-green-400"
-            >
+              <button
+                type="button"
+                onClick={
+                  handleRestore
+                }
+                disabled={
+                  selectedSubjects.length ===
+                    0 ||
+                  isRestoring ||
+                  isDeleting
+                }
+                className="flex items-center gap-2 rounded-lg border border-green-500 bg-green-500 px-4 py-2.5 text-sm font-semibold text-white transition hover:bg-green-600 disabled:cursor-not-allowed disabled:border-green-200 disabled:bg-green-100 disabled:text-green-400"
+              >
 
-              <RotateCcw
-                size={17}
-              />
+                <RotateCcw
+                  size={17}
+                />
 
-              <span>
-                {isRestoring
-                  ? "Restoring..."
-                  : "Restore"}
-              </span>
+                <span>
+                  {isRestoring
+                    ? "Restoring..."
+                    : "Restore"}
+                </span>
 
-            </button>
+              </button>
 
-            {/* PERMANENT DELETE */}
+              {/* PERMANENT DELETE */}
 
-            <button
-              type="button"
-              onClick={() =>
-                setShowDeleteModal(
-                  true,
-                )
-              }
-              disabled={
-                selectedSubjects.length ===
-                  0 ||
-                isRestoring ||
-                isDeleting
-              }
-              className="flex items-center gap-2 rounded-lg border border-red-500 bg-red-500 px-4 py-2.5 text-sm font-semibold text-white transition hover:bg-red-600 disabled:cursor-not-allowed disabled:border-red-200 disabled:bg-red-100 disabled:text-red-400"
-            >
+              <button
+                type="button"
+                onClick={() =>
+                  setShowDeleteModal(
+                    true,
+                  )
+                }
+                disabled={
+                  selectedSubjects.length ===
+                    0 ||
+                  isRestoring ||
+                  isDeleting
+                }
+                className="flex items-center gap-2 rounded-lg border border-red-500 bg-red-500 px-4 py-2.5 text-sm font-semibold text-white transition hover:bg-red-600 disabled:cursor-not-allowed disabled:border-red-200 disabled:bg-red-100 disabled:text-red-400"
+              >
 
-              <Trash2
-                size={17}
-              />
+                <Trash2
+                  size={17}
+                />
 
-              <span>
-                Permanently Delete
-              </span>
+                <span>
+                  Permanently Delete
+                </span>
 
-            </button>
+              </button>
 
-          </div>
+            </div>
+          )}
 
         </div>
 

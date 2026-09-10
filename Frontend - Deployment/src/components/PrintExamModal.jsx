@@ -297,7 +297,6 @@ export default function ExamGenerator({
           hard: settings.hard_percentage,
         },
         preview: true,
-        purpose: "examQuestions",
       };
 
       // Debug log to see what subjects are being sent

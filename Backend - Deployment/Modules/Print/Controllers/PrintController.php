@@ -206,7 +206,6 @@ class PrintController extends Controller
                     'action' => 'Please contact your administrator if you believe this is an error.'
                 ], 401);
             }
-            $request->merge(['purpose' => 'examQuestions']);
             try {
                 $validated = $request->validate([
                     'total_items' => 'required|integer|min:1',
@@ -234,25 +233,7 @@ class PrintController extends Controller
                     'action' => 'Please review the form and ensure all fields are filled correctly.'
                 ], 422);
             }
-            $validated['purpose'] = 'examQuestions';
-            try {
-                $purpose = \Modules\Questions\Models\Purpose::where('name', 'examQuestions')->first();
-                if (!$purpose) {
-                    throw new \Exception('ExamQuestions purpose not found in database');
-                }
-            } catch (\Exception $e) {
-                Log::error('Purpose Retrieval Error:', [
-                    'error' => $e->getMessage(),
-                    'trace' => $e->getTraceAsString()
-                ]);
-                return response()->json([
-                    'status' => 'error',
-                    'message' => 'System Configuration Error',
-                    'details' => 'Unable to process exam generation. The system is not properly configured.',
-                    'code' => 'CONFIG_ERROR',
-                    'action' => 'Please contact system administrator to resolve this issue.'
-                ], 500);
-            }
+            $validated['purpose'] = $request->input('purpose', 'examQuestions');
             try {
                 $totalSubjectPercentage = collect($validated['subjects'])->sum('percentage');
                 if ($totalSubjectPercentage !== 100) {
@@ -297,7 +278,6 @@ class PrintController extends Controller
                     try {
                         $baseQuery = Question::with(['choices', 'difficulty', 'status', 'purpose'])
                             ->where('subjectID', $subjectData['subjectID'])
-                            ->where('purpose_id', $purpose->id)
                             ->whereHas('status', function($query) {
                                 $query->where('name', 'approved');
                             });
@@ -1149,7 +1129,7 @@ class PrintController extends Controller
     }
 
     /**
-     * Return the number of easy, moderate, and hard approved exam questions for every subject.
+     * Return the number of easy, moderate, and hard approved questions for every subject.
      */
     public function getSubjectQuestionDifficultyCounts(Request $request)
     {
@@ -1173,19 +1153,6 @@ class PrintController extends Controller
                     'code' => 'FORBIDDEN',
                     'action' => 'Contact your administrator if you need access to this information.',
                 ], 403);
-            }
-
-            $purpose = Purpose::where('name', 'examQuestions')->first();
-            if (!$purpose) {
-                Log::error('ExamQuestions purpose not found while fetching difficulty counts');
-
-                return response()->json([
-                    'status' => 'error',
-                    'message' => 'System Configuration Error',
-                    'details' => 'Unable to retrieve question counts because exam question settings are not configured.',
-                    'code' => 'CONFIG_ERROR',
-                    'action' => 'Please contact the system administrator.',
-                ], 500);
             }
 
             $subjectQuery = Subject::query()->with(['program', 'yearLevel']);
@@ -1225,7 +1192,6 @@ class PrintController extends Controller
                 ->selectRaw('subjectID, difficulties.name as difficulty, COUNT(*) as count')
                 ->join('difficulties', 'questions.difficulty_id', '=', 'difficulties.id')
                 ->join('statuses', 'questions.status_id', '=', 'statuses.id')
-                ->where('questions.purpose_id', $purpose->id)
                 ->where('statuses.name', 'approved')
                 ->whereIn('questions.subjectID', $subjectIDs);
 
@@ -1271,7 +1237,7 @@ class PrintController extends Controller
             return response()->json([
                 'status' => 'success',
                 'message' => 'Question difficulty counts retrieved successfully.',
-                'details' => 'Counts include approved exam questions only, filtered by your role and access level.',
+                'details' => 'Counts include all approved questions, filtered by your role and access level.',
                 'data' => $data,
                 'summary' => [
                     'total_subjects' => $data->count(),
