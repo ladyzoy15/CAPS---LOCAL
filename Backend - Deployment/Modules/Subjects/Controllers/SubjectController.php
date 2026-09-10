@@ -104,11 +104,11 @@ class SubjectController extends Controller
             // Add subquery to get last question added date by any faculty (roleID 2) for this subject
             // This applies to all roles (1,2,3,4,5)
             $query->addSelect(DB::raw("(
-                SELECT MAX(q.created_at) 
+                SELECT MAX(q.updated_at)
                 FROM questions q
-                INNER JOIN users u ON q.userID = u.userID
-                WHERE q.subjectID = s.subjectID 
-                AND u.roleID = 2
+                INNER JOIN statuses st ON q.status_id = st.id
+                WHERE q.subjectID = s.subjectID
+                AND st.name = 'approved'
             ) as lastQuestionAdded"));
 
             // Instructors (Faculty): show only subjects assigned to them
@@ -213,11 +213,11 @@ class SubjectController extends Controller
         'yl.name as yearLevel'
     )
                 ->addSelect(DB::raw("(
-                    SELECT MAX(q.created_at) 
+                    SELECT MAX(q.updated_at)
                     FROM questions q
-                    INNER JOIN users u ON q.userID = u.userID
-                    WHERE q.subjectID = s.subjectID 
-                    AND u.roleID = 2
+                    INNER JOIN statuses st ON q.status_id = st.id
+                    WHERE q.subjectID = s.subjectID
+                    AND st.name = 'approved'
                 ) as lastQuestionAdded"))
                 ->orderBy('s.subjectID')
                 ->get();

@@ -241,6 +241,16 @@ class FacultySubjectController extends Controller
                     's.yearLevelID',
                     'yl.name as yearLevel'
                 )
+                // Only APPROVED questions should count as "questions added" —
+                // pending/disapproved questions must not make the subject
+                // card look like it already has usable exam questions.
+                ->addSelect(DB::raw("(
+                    SELECT MAX(q.updated_at)
+                    FROM questions q
+                    INNER JOIN statuses st ON q.status_id = st.id
+                    WHERE q.subjectID = s.subjectID
+                    AND st.name = 'approved'
+                ) as lastQuestionAdded"))
                 ->orderBy('s.subjectID')
                 ->get();
 
@@ -266,7 +276,10 @@ class FacultySubjectController extends Controller
                     'programID' => $subject->programID,
                     'programName' => $programName,
                     'yearLevelID' => $subject->yearLevelID,
-                    'yearLevel' => $subject->yearLevel
+                    'yearLevel' => $subject->yearLevel,
+                    'lastQuestionAdded' => $subject->lastQuestionAdded
+                        ? \Carbon\Carbon::parse($subject->lastQuestionAdded)->toDateTimeString()
+                        : null,
                 ];
             });
 
