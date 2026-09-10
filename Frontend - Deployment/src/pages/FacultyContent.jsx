@@ -356,8 +356,11 @@ const FacultyContent = () => {
         return direction * (dateA - dateB);
       }
 
-      // Default sort by updated_at timestamp (most recently updated first)
-      return new Date(b.updated_at) - new Date(a.updated_at);
+      // Default sort: preserve creation/import order (oldest → newest,
+      // matching questionID order) instead of "most recently updated
+      // first" — the previous default silently reversed/shuffled the
+      // order of questions that were just bulk-imported.
+      return (a.questionID || 0) - (b.questionID || 0);
     });
 
   // Function to confirm question deletion
@@ -1356,11 +1359,3 @@ const FacultyContent = () => {
 };
 
 export default FacultyContent;
-
-
-
-
-
-
-
-

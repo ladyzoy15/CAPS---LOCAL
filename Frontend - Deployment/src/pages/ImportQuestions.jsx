@@ -692,21 +692,27 @@ const ImportQuestions = () => {
       setIsSubjectsLoading(true);
 
       try {
-        const token =
-          getToken();
+        const token = getToken();
 
-        const response = await fetch(
-          `${apiUrl}/subjects/all`,
-          {
-            method: "GET",
-            headers: {
-              "Content-Type":
-                "application/json",
-              Authorization: `Bearer ${token}`,
-            },
-            credentials: "include",
-          }
-        );
+        // Faculty should only ever see the subjects assigned to them,
+        // same behavior as the main Subjects page (SubjectList.jsx).
+        // Every other role continues to see the full subject list.
+        const user = getUser() || {};
+        const roleID = user?.roleID ?? user?.roleId;
+        const isFaculty = roleID === 2;
+
+        const endpoint = isFaculty
+          ? `${apiUrl}/faculty/my-subjects`
+          : `${apiUrl}/subjects/all`;
+
+        const response = await fetch(endpoint, {
+          method: "GET",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${token}`,
+          },
+          credentials: "include",
+        });
 
         if (handleUnauthorized(response)) return;
 
@@ -721,31 +727,31 @@ const ImportQuestions = () => {
 
         const data = await response.json();
 
-        if (
-          data.success &&
-          Array.isArray(data.subjects)
-        ) {
-          const sorted = [...data.subjects].sort(
-            (a, b) => {
-              const programCompare =
-                (a.programName || "").localeCompare(
-                  b.programName || ""
-                );
+        // /faculty/my-subjects responds with { subjects: [...] } directly,
+        // while /subjects/all responds with { success, subjects: [...] }.
+        const rawSubjects = isFaculty
+          ? Array.isArray(data.subjects)
+            ? data.subjects
+            : []
+          : data.success && Array.isArray(data.subjects)
+          ? data.subjects
+          : [];
 
-              if (programCompare !== 0) {
-                return programCompare;
-              }
-
-              return (
-                a.subjectCode || ""
-              ).localeCompare(
-                b.subjectCode || ""
-              );
-            }
+        const sorted = [...rawSubjects].sort((a, b) => {
+          const programCompare = (a.programName || "").localeCompare(
+            b.programName || ""
           );
 
-          setSubjects(sorted);
-        }
+          if (programCompare !== 0) {
+            return programCompare;
+          }
+
+          return (a.subjectCode || "").localeCompare(
+            b.subjectCode || ""
+          );
+        });
+
+        setSubjects(sorted);
       } catch (err) {
         console.error(
           "Error loading subjects:",
