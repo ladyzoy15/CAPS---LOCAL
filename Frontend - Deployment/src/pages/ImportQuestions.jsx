@@ -339,31 +339,6 @@ const parseSpreadsheet = (file) =>
     reader.readAsBinaryString(file);
   });
 
-const parseDocx = (file) =>
-  new Promise((resolve, reject) => {
-    const reader = new FileReader();
-
-    reader.onload = async (e) => {
-      try {
-        const result = await mammoth.extractRawText({
-          arrayBuffer: e.target.result,
-        });
-
-        resolve(
-          result.value
-            .split("\n")
-            .map((l) => l.trim())
-            .filter(Boolean)
-        );
-      } catch (err) {
-        reject(err);
-      }
-    };
-
-    reader.onerror = reject;
-    reader.readAsArrayBuffer(file);
-  });
-
 // DOCX parsing that keeps embedded circuit/figure images in place (in the
 // same order they appear relative to the question text), instead of the
 // text-only extraction above which silently drops them. Each returned
@@ -462,73 +437,214 @@ const dataUriToFile = (dataUri, filename) => {
   return new File([bytes], filename, { type: mime });
 };
 
-const parsePdf = async (file) => {
-  const buffer = await file.arrayBuffer();
+const extractPdfPageLines = (content) => {
+  const lines = [];
+  let currentLine = "";
+  let lastY = null;
 
-  const pdf = await pdfjsLib.getDocument({
-    data: buffer,
-  }).promise;
-
-  const allLines = [];
-  let totalChars = 0;
-
-  for (
-    let pageNum = 1;
-    pageNum <= pdf.numPages;
-    pageNum++
-  ) {
-    const page = await pdf.getPage(pageNum);
-    const content = await page.getTextContent();
-
-    let currentLine = "";
-    let lastY = null;
-
-    content.items.forEach((item) => {
-      totalChars += item.str.length;
-
-      const y = item.transform[5];
-
-      if (
-        lastY !== null &&
-        Math.abs(y - lastY) > 2
-      ) {
-        if (currentLine.trim()) {
-          allLines.push(currentLine.trim());
-        }
-
-        currentLine = item.str;
-      } else {
-        currentLine +=
-          (currentLine ? " " : "") + item.str;
-      }
-
-      lastY = y;
-
-      if (item.hasEOL) {
-        if (currentLine.trim()) {
-          allLines.push(currentLine.trim());
-        }
-
-        currentLine = "";
-      }
-    });
-
-    if (currentLine.trim()) {
-      allLines.push(currentLine.trim());
+  content.items.forEach((item) => {
+    if (!item?.str) {
+      return;
     }
+
+    const y = item.transform[5];
+
+    if (
+      lastY !== null &&
+      Math.abs(y - lastY) > 2
+    ) {
+      if (currentLine.trim()) {
+        lines.push(currentLine.trim());
+      }
+
+      currentLine = item.str;
+    } else {
+      currentLine +=
+        (currentLine ? " " : "") + item.str;
+    }
+
+    lastY = y;
+
+    if (item.hasEOL) {
+      if (currentLine.trim()) {
+        lines.push(currentLine.trim());
+      }
+
+      currentLine = "";
+    }
+  });
+
+  if (currentLine.trim()) {
+    lines.push(currentLine.trim());
   }
 
-  if (totalChars === 0) {
-    const err = new Error(
-      "This PDF has no selectable text (it looks like a scanned image). Try a text-based PDF, or use OCR first."
+  return lines;
+};
+
+const renderPdfPageForOcr = async (page) => {
+  const baseViewport = page.getViewport({ scale: 1 });
+  const maxDimension = 2200;
+  const scale = Math.min(
+    2.5,
+    Math.max(
+      1.5,
+      maxDimension /
+        Math.max(
+          baseViewport.width,
+          baseViewport.height
+        )
+    )
+  );
+  const viewport = page.getViewport({ scale });
+  const canvas = document.createElement("canvas");
+  const context = canvas.getContext("2d", {
+    willReadFrequently: true,
+  });
+
+  if (!context) {
+    throw new Error(
+      "Could not prepare the PDF page for OCR."
+    );
+  }
+
+  canvas.width = Math.ceil(viewport.width);
+  canvas.height = Math.ceil(viewport.height);
+
+  await page
+    .render({
+      canvasContext: context,
+      canvas,
+      viewport,
+    })
+    .promise;
+
+  return canvas;
+};
+
+const parsePdf = async (file, onProgress) => {
+  const buffer = await file.arrayBuffer();
+  let pdf = null;
+  let loadingTask = null;
+  const pageLines = [];
+  let needsOcr = false;
+
+  try {
+    loadingTask = pdfjsLib.getDocument({
+      data: buffer,
+    });
+    pdf = await loadingTask.promise;
+
+    for (
+      let pageNum = 1;
+      pageNum <= pdf.numPages;
+      pageNum++
+    ) {
+      const page = await pdf.getPage(pageNum);
+      const content = await page.getTextContent();
+      const lines = extractPdfPageLines(content);
+      const charCount = lines
+        .join(" ")
+        .replace(/\s/g, "")
+        .length;
+
+      pageLines.push(lines);
+
+      if (charCount < 20) {
+        needsOcr = true;
+      }
+    }
+
+    if (!needsOcr) {
+      return pageLines.flat();
+    }
+
+    let currentPage = 1;
+    const worker = await Tesseract.createWorker(
+      "eng",
+      1,
+      {
+        logger: (message) => {
+          if (
+            message.status === "recognizing text" &&
+            onProgress
+          ) {
+            const pageProgress =
+              message.progress || 0;
+            const overallProgress =
+              ((currentPage - 1 + pageProgress) /
+                pdf.numPages) *
+              100;
+
+            onProgress(
+              Math.min(
+                99,
+                Math.round(overallProgress)
+              )
+            );
+          }
+        },
+      }
     );
 
-    err.isNoTextLayer = true;
+    try {
+      const lines = [];
 
-    throw err;
+      for (
+        let pageNum = 1;
+        pageNum <= pdf.numPages;
+        pageNum++
+      ) {
+        currentPage = pageNum;
+        const existingLines = pageLines[pageNum - 1];
+        const existingCharCount = existingLines
+          .join(" ")
+          .replace(/\s/g, "")
+          .length;
+
+        if (existingCharCount >= 20) {
+          lines.push(...existingLines);
+          continue;
+        }
+
+        const page = await pdf.getPage(pageNum);
+        const canvas = await renderPdfPageForOcr(
+          page
+        );
+
+        try {
+          const {
+            data: { text },
+          } = await worker.recognize(canvas);
+          const ocrLines = (text || "")
+            .split(/\r?\n/)
+            .map((line) =>
+              line.replace(/\s+/g, " ").trim()
+            )
+            .filter(Boolean);
+
+          lines.push(...ocrLines);
+        } finally {
+          canvas.remove();
+        }
+
+        if (onProgress) {
+          onProgress(
+            Math.round(
+              (pageNum / pdf.numPages) * 100
+            )
+          );
+        }
+      }
+
+      return lines;
+    } finally {
+      await worker.terminate();
+    }
+  } finally {
+    if (loadingTask) {
+      await loadingTask.destroy();
+    }
   }
-
-  return allLines;
 };
 
 const parseText = (file) =>
@@ -1127,8 +1243,16 @@ const ImportQuestions = () => {
           .filter((t) => t.type === "text")
           .map((t) => t.text);
       } else if (ext === "pdf") {
-        parsedLines =
-          await parsePdf(file);
+        parsedLines = await parsePdf(
+          file,
+          (pct) => {
+            setOcrProgress(pct);
+            setStatus({
+              message: `Reading PDF with OCR... ${pct}%`,
+              isError: false,
+            });
+          }
+        );
       } else if (ext === "txt") {
         parsedLines =
           await parseText(file);
