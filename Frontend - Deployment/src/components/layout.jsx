@@ -253,12 +253,14 @@ const Layout = () => {
           }}
         >
           {/* HEADER */}
-          {!isStudentQuizPage && (
-            <Header
-              title={roleTitle}
-              className="lg:hidden"
-            />
-          )}
+          {!isStudentQuizPage &&
+            !isPrintQualifyingExam &&
+            !isPrintPersonalQuiz && (
+              <Header
+                title={roleTitle}
+                className="lg:hidden"
+              />
+            )}
 
           {/* MAIN */}
           <main
@@ -286,7 +288,3 @@ const Layout = () => {
 };
 
 export default Layout;
-
-
-
-
